@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>BayaniHire - Register</title>
+	<style>
+		.name-container, .address-container, .info-container, .password-container, .username-email-gender-container {
+			display: flex;
+			gap: 10px;
+		}
+	</style>
+</head>
+<body>
+	<nav class="navbar">
+		<div class="navdiv">
+			<button class="signin-btn"><a href="{% url "login" %}">Log In</a></button>
+		</div>
+	</nav>
+
+	<header class="header">
+		<img src="{% static 'Logo.png' %}" alt="logo image" width="150" height="128">
+	</header>
+
+	<div class="content-area">
+		<h2>Create Account</h2>
+		
+		<!-- Updated form using Django form fields -->
+		<form method="POST">
+			{% csrf_token %}
+			<div class="name-container">
+				{{ form.first_name.label_tag }} {{ form.first_name }} 
+				{{ form.middle_name.label_tag }} {{ form.middle_name }}
+				{{ form.last_name.label_tag }} {{ form.last_name }}
+			</div>
+			
+			<div class="address-container">
+				{{ form.house_no.label_tag }} {{ form.house_no }}  <!-- House No. Input -->
+				{{ form.street_village.label_tag }} {{ form.street_village }}  <!-- Street/Village Input -->
+				{{ form.barangay.label_tag }} {{ form.barangay }}  <!-- Barangay Input -->
+			</div>
+			
+			<div class="address-container">
+				{{ form.city_municipality.label_tag }} {{ form.city_municipality }}  <!-- City/Municipality Input -->
+				{{ form.province.label_tag }} {{ form.province }}  <!-- Province Input -->
+				{{ form.state.label_tag }} {{ form.state }}  <!-- State Input -->
+				{{ form.zipcode.label_tag }} {{ form.zipcode }}  <!-- Zipcode Input -->
+			</div>
+
+			<div class="info-container">
+				{{ form.email.label_tag }} {{ form.email }}
+				{{ form.mobile_number.label_tag }} {{ form.mobile_number }}
+				{{ form.birth_date.label_tag }} {{ form.birth_date }}
+			</div>
+
+			<div class="username-email-gender-container">
+				{{ form.username.label_tag }} {{ form.username }}
+				<input type="text" class="email-domain" id="email-domain" value="@bynhr.com" readonly> <!-- Append domain -->
+				{{ form.gender.label_tag }} {{ form.gender }}  <!-- Dropdown for gender -->
+			</div>
+
+			<div class="password-container">
+				{{ form.password.label_tag }} {{ form.password }}  <!-- Password input -->
+			</div>
+
+			<div class="button-container">
+				<button type="submit">Register</button>
+			</div>
+		</form>
+
+		<div class="terms-container">
+			<input type="checkbox" id="terms" name="terms" required>
+			<span>I agree to the <a href="#" id="terms-link">Terms and Conditions</a></span>
+		</div>
+	</div>
+
+	<!-- Terms and Conditions Modal -->
+	<div id="terms-modal" class="modal">
+		<div class="modal-content">
+			<img src="{% static 'terms.png' %}" alt="logo image" width="128" height="128">
+			<div class="modal-text">
+				<h2>Terms and Conditions</h2>
+				<p>
+					By accessing BayaniHire, you agree to be bound by the following terms and conditions. Please read these terms carefully before using the System. If you do not agree to these terms, you may not use the System.
+				</p>
+				<!-- Terms content continues -->
+			</div>
+		</div>
+		<!-- Close Button -->
+		<button class="close-btn" id="close-modal">&times;</button>
+	</div>
+
+	<footer>
+		&copy; 2024 BayaniHire. All Rights Reserved.
+	</footer>
+
+</body>
+</html>

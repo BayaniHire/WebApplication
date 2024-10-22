@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BayaniHire - Email Confirmation</title>
+</head>
+<body>
+
+    <div class="content-area">
+        <!-- Title -->
+        <h2>Email Confirmation</h2>
+
+        <!-- Instructions -->
+        <p class="instructions">
+            Please check your email for the OTP code that has just been sent to your registered email address.
+        </p>
+
+        <!-- Icon Image -->
+        <img src="{% static 'mobile.png' %}" alt="Confirmation Icon" width="128" height="128">
+
+        
+
+        <!-- Additional Instructions with Resend Link -->
+        <p class="additional-instructions">
+            Didn't receive the OTP code? <a href=>Resend OTP Code</a>
+        </p>
+
+        <!-- OTP Confirmation Form -->
+        <form class="confirmation-form" action="process_email_confirmation.php" method="POST">
+            <label for="otp-code">
+                <span>OTP Code:</span>
+                <input type="text" id="otp-code" name="otp_code" required placeholder="Enter OTP Code">
+            </label>
+
+            <!-- Buttons: Cancel and Verify -->
+            <div class="button-container">
+                <button type="button" class="cancel-btn" onclick="window.location.href='{% url 'login' %}'">Cancel</button>
+                <button type="submit" class="verify-btn">Verify</button>
+            </div>
+        </form>
+    </div>
+
+    <footer>
+        &copy; 2024 BayaniHire. All Rights Reserved.
+    </footer>
+
+</body>
+</html>

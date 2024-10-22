@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BayaniHire: Interviewer Center</title>
+</head>
+<body>
+
+    <h1 style="font-family: Georgia; font-size: 30px; font-weight: bold;">BayaniHire: Interviewer Center</h1>
+
+    <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo" width="500px" height="300px">
+
+<br>
+    <button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTprofile' %}'">Profile</button>
+    <button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTappointments' %}'">Appointments</button>
+    <button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTapplicants' %}'">Applicants</button>
+    <button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTfeedback' %}'">Interview Feedback</button>
+    <button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTeditfeedback' %}'">Feedback History</button>
+
+    <table border="1">
+        <tr>
+            <th style="font-family: Georgia; font-size: 18px;">Interview Dates</th>
+        </tr>
+        <tr>
+            <td style="font-family: Georgia; font-size: 18px;">Date 1</td>
+        </tr>
+        <tr>
+            <td style="font-family: Georgia; font-size: 18px;">Date 2</td>
+        </tr>
+        <tr>
+            <td style="font-family: Georgia; font-size: 18px;">Date 3</td>
+        </tr>
+        <tr>
+            <td style="font-family: Georgia; font-size: 18px;">Date 4</td>
+        </tr>
+        <tr>
+            <td style="font-family: Georgia; font-size: 18px;">Date 5</td>
+        </tr>
+        <tr>
+            <td style="font-family: Georgia; font-size: 18px;">Date 6</td>
+        </tr>
+        <tr>
+            <td style="font-family: Georgia; font-size: 18px;">Date 7</td>
+        </tr>
+        <tr>
+            <td style="font-family: Georgia; font-size: 18px;">Date 8</td>
+        </tr>
+        <tr>
+            <td style="font-family: Georgia; font-size: 18px;">Date 9</td>
+        </tr>
+        <tr>
+            <td style="font-family: Georgia; font-size: 18px;">Date 10</td>
+        </tr>
+        <tr>
+            <td style="font-family: Georgia; font-size: 18px;">Date 11</td>
+        </tr>
+        <tr>
+            <td style="font-family: Georgia; font-size: 18px;">Date 12</td>
+        </tr>
+    </table>
+
+     <h1 style="font-family: Georgia; font-size: 40px;font-weight: bold;">Interview Appointments</h1>
+
+</body>
+</html>

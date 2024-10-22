@@ -1,0 +1,84 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BayaniHire Admin Center</title>
+</head>
+<body>
+    <!-- Logo -->
+    <div>
+        <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo" width="200" height="200">
+    </div>
+
+    <!-- Buttons -->
+    <div>
+        <button onclick="window.location.href='{% url 'list_of_applicants' %}';">List of Applicants</button>
+        <button onclick="window.location.href='{% url 'list_of_jobs' %}';">List of Jobs</button>
+        <button onclick="window.location.href='{% url 'qualification' %}';">Qualification</button>
+        <button onclick="window.location.href='{% url 'schedule' %}';">Schedule</button>
+        <button onclick="window.location.href='{% url 'feedback' %}';">Feedback</button>
+    </div>
+
+    <!-- Title and Profile -->
+    <div>
+        <h1>BayaniHire Admin Center</h1>
+        <button onclick="window.location.href='{% url 'adminprofile' %}';">Profile</button>
+    </div>
+    <h2>List of Qualified Applicants</h2>
+    
+    <table width="100%">
+        <tr>
+            <!-- Interviewers List -->
+            <td valign="top" width="50%">
+                <p>Here are the list of available Interviewers. Kindly select an Interviewer.</p>
+                <table border="1" width="100%">
+                    <tr><td>Interviewer 1</td></tr>
+                    <tr><td>Interviewer 2</td></tr>
+                    <tr><td>Interviewer 3</td></tr>
+                    <tr><td>Interviewer 4</td></tr>
+                    <tr><td>Interviewer 5</td></tr>
+                </table>
+            </td>
+            <!-- Schedule Dates List -->
+            <td valign="top" width="50%">
+                <p>Available Schedule Date</p>
+                <table border="1" width="100%">
+                    <tr><td>Date 1</td></tr>
+                    <tr><td>Date 2</td></tr>
+                    <tr><td>Date 3</td></tr>
+                    <tr><td>Date 4</td></tr>
+                    <tr><td>Date 5</td></tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    
+    <!-- Applicants and Jobs Table with Control Buttons -->
+    <table width="100%">
+        <tr>
+            <td valign="top" width="75%">
+                <p>Here are the list of available Interviewees. Kindly select an Interviewee.</p>
+                <table border="1" width="100%">
+                    <tr>
+                        <th>Qualified for Interview</th>
+                        <th>Job Applied</th>
+                    </tr>
+                    <tr><td>Candidate 1</td><td>Job 1</td></tr>
+                    <tr><td>Candidate 2</td><td>Job 2</td></tr>
+                    <tr><td>Candidate 3</td><td>Job 3</td></tr>
+                    <tr><td>Candidate 4</td><td>Job 4</td></tr>
+                    <tr><td>Candidate 5</td><td>Job 5</td></tr>
+                </table>
+            </td>
+            <!-- Control Buttons -->
+            <td valign="top" width="25%"><br><br><br>
+                <button>View All</button><br><br>
+                <button onclick="window.location.href='{% url 'send_schedule' %}';">Send</button><br><br>
+                <button onclick="window.location.href='{% url 'open_schedule_list' %}';">Open Schedule List</button>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

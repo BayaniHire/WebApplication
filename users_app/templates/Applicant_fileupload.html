@@ -1,0 +1,412 @@
+{% load static %} 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload Page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Helvetica", sans-serif;
+            background-color: #FFD8AD;
+            color: #5C472E;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .background {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            width: 100%;
+            position: relative;
+        }
+
+        .header {
+            width: 100%;
+            height: 60px;
+            background: #5C472E;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            color: #D3B18B;
+            font-family: "Georgia";
+            font-weight: bold;
+            font-size: 24px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .profile-button {
+            width: 120px;
+            height: 40px;
+            background: #FFD8AD;
+            color: #5C472E;
+            border: 1px solid #5C472E;
+            border-radius: 15px;
+            font-family: "ABeeZee";
+            font-weight: bold;
+            font-size: 14px;
+            text-align: center;
+            line-height: 40px;
+            cursor: pointer;
+        }
+
+        .sidebar {
+            width: 12%;
+            background: #bea17e;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: fixed;
+            top: 60px;
+            bottom: 0;
+            left: 0;
+            border-right: 1px solid #000000;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+            overflow-y: auto;
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 130px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .button {
+            width: 100%;
+            height: 60px;
+            margin-bottom: 10px;
+            background: #FFD8AD;
+            color: #5C472E;
+            border: 1px solid #5C472E;
+            border-radius: 15px;
+            font-family: "Georgia";
+            font-weight: bold;
+            font-size: 14px;
+            text-align: center;
+            line-height: 60px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: rgba(59, 47, 32, 0.3);
+            color: #FFD8AD;
+        }
+
+        .main-content {
+            margin-left: 12%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-sizing: border-box;
+            flex: 1;
+            position: relative;
+        }
+
+        .upload-info {
+            font-size: 16px;
+            color: #5C472E;
+            margin-bottom: 20px;
+        }
+
+        .upload-container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .small-container {
+            width: 200px;
+            height: 200px;
+            background-color: #FFD8AD;
+            border: 1px solid #5C472E;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        .file-name {
+            padding: 5px;
+            font-size: 16px;
+            color: #5C472E;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+
+        .file-name:hover {
+            background-color: #5C472E;
+            color: #FFD8AD;
+        }
+
+        .large-container {
+            flex: 1;
+            height: 400px;
+            background-color: #FFF;
+            border: 1px solid #5C472E;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            overflow: auto;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 20px;
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+        }
+
+        .button-group .button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 200px;
+            height: 40px;
+            font-size: 14px;
+            background-color: #5C472E;
+            color: #FFD8AD;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .button-group .button:hover {
+            background-color: rgba(59, 47, 32, 0.3);
+            color: #FFD8AD;
+        }
+
+        .apply-button {
+            width: 200px;
+            height: 40px;
+            background-color: #5C472E;
+            color: #FFD8AD;
+            border: none;
+            border-radius: 5px;
+            font-family: "Georgia";
+            font-weight: bold;
+            font-size: 14px;
+            text-align: center;
+            line-height: 40px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .apply-button:hover {
+            background-color: rgba(59, 47, 32, 0.3);
+            color: #FFD8AD;
+        }
+
+        .footer {
+            width: 100%;
+            height: 60px;
+            background: #5C472E;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: flex-start;
+            color: #D3B18B;
+            font-family: "Georgia";
+            font-weight: bold;
+            box-shadow: 0 -1px 5px rgba(0,0,0,0.3);
+            position: relative;
+            margin-top: auto;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="background">
+    <!-- Header -->
+    <div class="header">
+        <h1>BayaniHire: Applicant Center</h1>
+        <div class="profile-button" onclick="window.location.href='{% url 'profile' %}';">Profile</div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="image-placeholder">
+            <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo">
+        </div>
+        <div class="button" onclick="window.location.href='{% url 'homepage' %}'">Home</div>
+        <div class="button" onclick="window.location.href='{% url 'applicationstatus' %}'">Application Status</div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="upload-info">
+            Please select up to 2 files to upload. Supported file types include PDF documents and images (JPEG, PNG).
+        </div>
+        <div class="upload-container">
+            <div class="small-container" id="file-list">
+                <!-- List of file names will be shown here -->
+            </div>
+            <div class="large-container" id="large-container">
+                <!-- Content for large container (file preview) -->
+            </div>
+        </div>
+        <input type="file" id="file-input" multiple style="display:none;" />
+        <div class="button-group">
+            <button class="button" onclick="document.getElementById('file-input').click();">UPLOAD</button>
+            <button class="button" onclick="deleteFiles();">DELETE</button>
+            <button class="button" onclick="viewFile();">VIEW</button>
+            <button class="button" onclick="downloadFile();">DOWNLOAD</button>
+        </div>
+        <button class="apply-button" onclick="window.location.href='{% url 'fileupload' %}';">APPLY</button>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>© BayaniHire Inc</p>
+    </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
+<script>
+    let selectedFiles = [];
+    let currentFileIndex = -1;
+
+    document.getElementById('file-input').addEventListener('change', function(event) {
+        const files = Array.from(event.target.files);
+        if (selectedFiles.length + files.length > 2) {
+            alert("You can only upload a maximum of 2 files.");
+            return;
+        }
+        selectedFiles = [...selectedFiles, ...files];
+        displayFileNames();
+    });
+
+    function displayFileNames() {
+        const fileList = document.getElementById('file-list');
+        fileList.innerHTML = '';
+        selectedFiles.forEach((file, index) => {
+            const fileNameElement = document.createElement('div');
+            fileNameElement.textContent = file.name;
+            fileNameElement.className = 'file-name';
+            fileNameElement.addEventListener('click', () => selectFile(index));
+            fileList.appendChild(fileNameElement);
+        });
+    }
+
+    function selectFile(index) {
+        currentFileIndex = index;
+        document.querySelectorAll('.file-name').forEach((el, i) => {
+            el.style.backgroundColor = i === index ? '#5C472E' : '';
+            el.style.color = i === index ? '#FFD8AD' : '#5C472E';
+        });
+    }
+
+    function deleteFiles() {
+        if (currentFileIndex === -1) {
+            alert("Please select a file to delete.");
+            return;
+        }
+        selectedFiles.splice(currentFileIndex, 1);
+        currentFileIndex = -1;
+        displayFileNames();
+        document.getElementById('large-container').innerHTML = ''; // Clear the display area
+    }
+
+    function viewFile() {
+        const container = document.getElementById('large-container');
+        container.innerHTML = ''; // Clear the container
+
+        if (currentFileIndex === -1) {
+            alert('Please select a file to view');
+            return;
+        }
+
+        const fileToView = selectedFiles[currentFileIndex];
+
+        if (fileToView.type.startsWith('image/')) {
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(fileToView);
+            img.style.maxWidth = '100%';
+            img.style.maxHeight = '100%';
+            container.appendChild(img);
+        } else if (fileToView.type === 'application/pdf') {
+            // Use PDF.js to render the PDF file
+            const pdfContainer = document.createElement('div');
+            container.appendChild(pdfContainer);
+
+            const fileReader = new FileReader();
+            fileReader.onload = function() {
+                const typedarray = new Uint8Array(this.result);
+                pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        pdf.getPage(i).then(function(page) {
+                            const viewport = page.getViewport({ scale: 1.5 });
+                            const canvas = document.createElement('canvas');
+                            const context = canvas.getContext('2d');
+                            canvas.height = viewport.height;
+                            canvas.width = viewport.width;
+                            pdfContainer.appendChild(canvas);
+
+                            const renderContext = {
+                                canvasContext: context,
+                                viewport: viewport
+                            };
+                            page.render(renderContext);
+                        });
+                    }
+                });
+            };
+            fileReader.readAsArrayBuffer(fileToView);
+        } else {
+            alert('File format not supported for viewing');
+        }
+    }
+
+    function downloadFile() {
+        if (currentFileIndex === -1) {
+            alert("Please select a file to download.");
+            return;
+        }
+        const fileName = selectedFiles[currentFileIndex].name;
+        const url = URL.createObjectURL(selectedFiles[currentFileIndex]);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        URL.revokeObjectURL(url); // Clean up
+    }
+</script>
+
+</body>
+</html>

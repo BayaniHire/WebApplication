@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>BayaniHire: Interviewer Center</title>
+  </head>
+  <body>
+    <h1 style="font-family: Georgia; font-size: 30px; font-weight: bold;">BayaniHire: Interviewer Center</h1>
+    <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo" width="500px" height="300px">
+<br>
+<button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTprofile' %}'">Profile</button>
+<button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTappointments' %}'">Appointments</button>
+<button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTapplicants' %}'">Applicants</button>
+<button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTfeedback' %}'">Interview Feedback</button>
+<button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTeditfeedback' %}'">Feedback History</button>
+
+    <br><br>
+
+    <table border="1" style="font-family: Georgia; font-size: 18px;">
+      <tr>
+        <th>Interviewed Applicant List</th>
+      </tr>
+      <tr><td>1</td></tr>
+      <tr><td>2</td></tr>
+      <tr><td>3</td></tr>
+      <tr><td>4</td></tr>
+      <tr><td>5</td></tr>
+      <tr><td>6</td></tr>
+      <tr><td>7</td></tr>
+      <tr><td>8</td></tr>
+      <tr><td>9</td></tr>
+      <tr><td>10</td></tr>
+      <tr><td>11</td></tr>
+      <tr><td>12</td></tr>
+    </table>
+
+    <br>
+
+    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;">View Feedback</button>
+
+    <br><br>
+
+    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;"onclick="window.location.href='{% url 'INTeditfeedback' %}'">Back</button><br>
+
+    <label style="font-family: Georgia; font-size: 40px; font-weight: bold;">Feedback History</label>
+  </body>
+</html>

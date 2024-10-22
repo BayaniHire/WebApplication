@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BayaniHire: Admin Center</title>
+</head>
+<body>
+    <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">BayaniHire: Admin Center</label>
+    <br>
+    <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo" width="500px" height="300px">
+    <br><br>
+    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'adminprofile' %}';">Profile</button>
+    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'list_of_applicants' %}';">List of Applicants</button>
+    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'list_of_jobs' %}';">List of Jobs</button>
+    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'qualification' %}';">Qualification</button>
+    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'schedule' %}';">Schedule</button>
+    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'feedback' %}';">Feedback</button>
+    <br><br>
+    
+    <label style="font-family: Georgia; font-size: 36px; font-weight: bold;">Interviewer Feedback</label>
+    <br><br>
+    
+    <label style="font-family: Georgia; font-size: 20px; font-weight: bold;">Interviewer Name:</label>
+    <label style="font-family: Georgia; font-size: 18px;">*INSERT INTERVIEWER NAME*</label>
+    <br>
+    
+    <label style="font-family: Georgia; font-size: 20px; font-weight: bold;">Applicant Name:</label>
+    <label style="font-family: Georgia; font-size: 18px;">*INSERT APPLICANT NAME*</label>
+    <br>
+    
+    <label style="font-family: Georgia; font-size: 20px; font-weight: bold;">Interview Status:</label>
+    <label style="font-family: Georgia; font-size: 18px;">*INTERVIEW STATUS*</label>
+    <br>
+    
+    <label style="font-family: Georgia; font-size: 20px; font-weight: bold;">Update the final status of the applicant:</label>
+    <select style="font-family: Georgia; font-size: 18px;">
+        <option>PASSED</option>
+        <option>FAILED</option>
+    </select>
+    <br>
+    
+    <label style="font-family: Georgia; font-size: 20px; font-weight: bold;">Interviewer's Feedback:</label>
+    <br>
+    <textarea readonly style="font-family: Georgia; font-size: 18px; width: 300px; height: 100px;">*INTERVIEWER FEEDBACK*</textarea>
+    <br><br>
+    
+    <button style="font-family: Georgia; font-size: 20px; font-weight: bold;">Update Status</button>
+</body>
+</html>

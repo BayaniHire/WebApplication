@@ -1,0 +1,274 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applicant Homepage</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Helvetica", sans-serif;
+            background-color: #FFD8AD;
+            color: #D3B18B;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+        .background {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            background: #FFD8AD;
+            color: #444444;
+            width: 100%;
+            margin: 0;
+        }
+
+        .header {
+            width: 100%;
+            height: 60px;
+            background: #5C472E;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            color: #D3B18B;
+            font-family: "Georgia";
+            font-weight: bold;
+            font-size: 24px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .profile-button {
+            width: 120px;
+            height: 40px;
+            background: #FFD8AD;
+            color: #5C472E;
+            border: 1px solid #5C472E;
+            border-radius: 15px;
+            font-family: "ABeeZee";
+            font-weight: bold;
+            font-size: 14px;
+            text-align: center;
+            line-height: 40px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .profile-button:hover {
+            background-color: rgba(59, 47, 32, 0.3);
+            color: #FFD8AD;
+        }
+        .content-area {
+            display: flex;
+            flex: 1;
+            margin: 20px 0;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        .sidebar {
+            width: 12%;
+            background: #bea17e;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: fixed;
+            top: 60px;
+            bottom: 0;
+            left: 0;
+            border-right: 1px solid #000000;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+            overflow-y: auto;
+        }
+        .image-placeholder {
+            width: 100%;
+            height: 130px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .image-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .button {
+            width: 100%;
+            height: 60px;
+            margin-bottom: 10px;
+            background: #FFD8AD;
+            color: #5C472E;
+            border: 1px solid #5C472E;
+            border-radius: 15px;
+            font-family: "Georgia";
+            font-weight: bold;
+            font-size: 14px;
+            text-align: center;
+            line-height: 60px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: rgba(59, 47, 32, 0.3);
+            color: #FFD8AD;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            background: #FFD8AD;
+            padding: 20px;
+            margin-left: 12%;
+            border: 0px solid #000000;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-height: 0;
+            box-sizing: border-box;
+            color: #000000;
+        }
+
+        .job-card {
+            background: #FFE5C2;
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid #5C472E;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            font-family: "Georgia";
+        }
+        .job-card h2 {
+            font-size: 24px;
+            color: #5C472E;
+        }
+        .job-card p {
+            font-size: 16px;
+            color: #000000;
+        }
+        .view-details {
+            width: 120px;
+            height: 40px;
+            background: #FFD8AD;
+            color: #5C472E;
+            border: 1px solid #5C472E;
+            border-radius: 15px;
+            font-family: "ABeeZee";
+            font-weight: bold;
+            font-size: 14px;
+            text-align: center;
+            line-height: 40px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .footer {
+            width: 100%;
+            height: 60px;
+            background: #5C472E;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: flex-start;
+            color: #D3B18B;
+            font-family: "Georgia";
+            font-weight: bold;
+            position: relative;
+            box-shadow: 0 -1px 5px rgba(0,0,0,0.3);
+        }
+
+        .search-bar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .search-input {
+            width: 200px;
+            padding: 10px;
+            border: 1px solid #5C472E;
+            border-radius: 15px;
+            font-family: "ABeeZee";
+            font-size: 14px;
+            color: #5C472E;
+        }
+        .search-button {
+            width: 100px;
+            height: 40px;
+            background: #FFD8AD;
+            color: #5C472E;
+            border: 1px solid #5C472E;
+            border-radius: 15px;
+            font-family: "ABeeZee";
+            font-weight: bold;
+            font-size: 14px;
+            text-align: center;
+            line-height: 40px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="background">
+    <!-- Header -->
+    <div class="header">
+        <h1 class="center-text">BayaniHire: Applicant Center</h1>
+        <div class="profile-button" onclick="window.location.href='{% url 'profile' %}';">Profile</div>
+    </div>
+
+    <div class="content-area">
+        <div class="sidebar">
+            <div class="image-placeholder">
+                <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo">
+            </div>
+            <div class="button" onclick="window.location.href='{% url 'homepage' %}'">Home</div>
+            <div class="button" onclick="window.location.href='{% url 'applicationstatus' %}'">Application Status</div>
+        </div>
+
+        <div class="main-content" id="mainContent">
+            <!-- Search Bar -->
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Search Position Here">
+                <button class="search-button">Search</button>
+            </div>
+
+            <!-- Job Cards -->
+            <div class="job-card">
+                <h2>Doctor</h2>
+                <p>A doctor is a medical professional who diagnoses and treats illnesses and injuries in patients. They conduct physical examinations, order and interpret diagnostic tests, and develop treatment plans. Doctors also provide preventive care, educate patients about health and wellness, and may work in various settings including hospitals, clinics, and private practices.</p>
+                <button class="view-details" onclick="window.location.href='{% url 'jobreq' 'doctor' %}'">View Details</button>
+            </div>
+
+            <div class="job-card">
+                <h2>Teacher</h2>
+                <p>A teacher is an educational professional who imparts knowledge and skills to students at various levels. Teachers create a supportive learning environment, develop and implement lesson plans, and assess student progress to foster academic and personal growth.</p>
+                <button class="view-details" onclick="window.location.href='{% url 'jobreq' 'teacher' %}'">View Details</button>
+            </div>
+
+            <div class="job-card">
+                <h2>Helper</h2>
+                <p>A helper provides support and assistance in various tasks, often in non-medical settings. The role can vary widely depending on the specific job or industry, but generally involves assisting others with their daily tasks and contributing to the smooth operation of activities.</p>
+                <button class="view-details" onclick="window.location.href='{% url 'jobreq' 'helper' %}'">View Details</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>© BayaniHire Inc.</p>
+    </div>
+</div>
+
+</body>
+</html>

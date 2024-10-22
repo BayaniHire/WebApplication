@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>BayaniHire</title>
+	
+</head>
+<body>
+	<nav class="navbar">
+		<div class="navdiv">
+			<!-- Redirect to login.html on click -->
+			<a href="{% url "login" %}" class="signin-btn">Log In</a>
+			<a href="{% url 'Registration' %}" class="login-btn">Sign Up</a>
+		</div>
+	</nav>
+
+	<header class="header">
+		<!-- Add the background image as an <img> element -->
+		<img src="header-picture.png" alt="Header Background Image" class="background">
+
+		<!-- Logo image -->
+		<img src="{% static 'Logo.png' %}" alt="logo image" width="150" height="128">
+
+	</header>
+
+	<div class="content-area">
+		<h2>Welcome to BayaniHire – where talent meets opportunity.</h2>
+		<p>
+			Whether you're a job seeker ready to embark on a new career journey or an employer seeking the perfect candidate to join your team, our system is here to streamline the process for you. Our primary goal is to connect talented individuals with exciting employment opportunities while providing employers with the tools they need to make informed hiring decisions. 
+		</p>
+		<p>
+			For job seekers, navigating the job market can sometimes feel like a daunting task. That's why our user-friendly interface is designed to make the search for your dream job a breeze. From browsing job listings to tracking application statuses, we're here to support you every step of the way.
+		</p>
+		<p>
+			Employers, too, face their own set of challenges when it comes to finding the right candidates. Our system empowers you with the resources to efficiently manage the recruitment process, from posting job listings to conducting interviews and beyond. With seamless communication and coordination features, we strive to make hiring a smooth and hassle-free experience.
+		</p>
+		<p class="bold-text">
+			Let's explore how you can make the most of our system:
+		</p>
+		<p>           
+			1. Admin: As the overseer of the hiring process, you have the power to post job listings, review applications, and coordinate interviews. Your meticulous attention to detail ensures that the recruitment process runs smoothly, benefiting both applicants and employers alike.
+		</p>
+		<p>          
+			2. Applicant: Your journey begins by creating an account and inputting your personal information. From there, you can explore job listings, apply to positions, and track your application statuses. With the ability to upload your credentials and view scheduled interview dates, you're always in control of your job search.
+		</p>
+		<p>
+			3. Interviewer: Armed with the responsibility of evaluating candidates, you play a crucial role in the hiring process. Conducting interviews and providing valuable feedback, you help ensure that the right candidates are selected for the job.
+		</p>
+		<p>
+			No matter your role within the hiring process, our system is here to support you every step of the way. Let's work together to unlock new opportunities and build successful careers.
+		</p>
+	</div>
+
+	<footer>
+		&copy; 2024 BayaniHire. All Rights Reserved.
+	</footer>
+</body>
+</html>

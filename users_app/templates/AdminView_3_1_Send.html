@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BayaniHire Admin Center</title>
+</head>
+<body>
+    <!-- Logo -->
+    <div>
+        <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo" width="200" height="200">
+    </div>
+
+    <!-- Buttons -->
+    <div>
+        <button onclick="window.location.href='{% url 'list_of_applicants' %}';">List of Applicants</button>
+        <button onclick="window.location.href='{% url 'list_of_jobs' %}';">List of Jobs</button>
+        <button onclick="window.location.href='{% url 'qualification' %}';">Qualification</button>
+        <button onclick="window.location.href='{% url 'schedule' %}';">Schedule</button>
+        <button onclick="window.location.href='{% url 'feedback' %}';">Feedback</button>
+    </div>
+
+    <!-- Title and Profile -->
+    <div>
+        <h1>BayaniHire Admin Center</h1>
+        <button onclick="window.location.href='{% url 'adminprofile' %}';">Profile</button>
+    </div>
+    <h2>Applicant Interview Schedule</h2>
+    <table width="100%">
+        <tr>
+            <!-- Qualified Applicants List -->
+            <td valign="top" width="50%">
+                <p>Shown on the list are the Qualified Applicants.</p>
+                <table border="1" width="100%">
+                    <tr><td>Applicant 1</td></tr>
+                    <tr><td>Applicant 2</td></tr>
+                    <tr><td>Applicant 3</td></tr>
+                    <tr><td>Applicant 4</td></tr>
+                    <tr><td>Applicant 5</td></tr>
+                </table>
+                <p><button>View All</button></p>
+                <p>Interview message</p>
+                <textarea></textarea> <!-- Large text area -->
+            </td>
+            <!-- Interviewer Details -->
+            <td valign="top" width="50%">
+                <p>Name of Interviewer</p>
+                <input type="text" placeholder="Interviewer Name">
+                <p>Schedule Date</p>
+                <input type="text" placeholder="dd-mm-yyyy">
+                <p>Location</p>
+                <!-- Placeholder for Google Map (static image as a placeholder in pure HTML) -->
+                <img src="https://via.placeholder.com/400x200.png?text=Google+Map" alt="Google Map" width="100%">
+                <p><button>Send</button></p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

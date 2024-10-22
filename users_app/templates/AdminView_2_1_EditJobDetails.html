@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BayaniHire Admin Center</title>
+</head>
+<body>
+    <!-- Logo -->
+    <div>
+        <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo" width="200" height="200">
+    </div>
+
+    <!-- Buttons -->
+    <div>
+        <button onclick="window.location.href='{% url 'list_of_applicants' %}';">List of Applicants</button>
+        <button onclick="window.location.href='{% url 'list_of_jobs' %}';">List of Jobs</button>
+        <button onclick="window.location.href='{% url 'qualification' %}';">Qualification</button>
+        <button onclick="window.location.href='{% url 'schedule' %}';">Schedule</button>
+        <button onclick="window.location.href='{% url 'feedback' %}';">Feedback</button>
+    </div>
+
+    <!-- Title and Profile -->
+    <div>
+        <h1>BayaniHire Admin Center</h1>
+        <button onclick="window.location.href='{% url 'adminprofile' %}';">Profile</button>
+    </div>
+    <h2>Create/Edit Job Details & Requirements</h2>
+    
+    <form action="{% url 'admin_creatingjob' %}" method="post" style="font-family: Georgia; font-size: 18px; font-weight: bold;">
+        {% csrf_token %}
+        <table>
+            <tr>
+                <td><strong>Status:</strong></td>
+                <td>
+                    <select name="status" required>
+                        <option value="ACTIVE">ACTIVE</option>
+                        <option value="CLOSE">CLOSE</option>
+                    </select>
+                </td>
+                <td><strong>Date:</strong></td>
+                <td><input type="date" name="date" value="2024-09-20" readonly></td>
+            </tr>
+            <tr>
+                <td><strong>Job Title</strong></td>
+                <td><input type="text" name="job_title" placeholder="Job Title" required></td>
+                <td><strong>Job Benefits</strong></td>
+                <td><textarea name="job_benefits" placeholder="Job Benefits" required></textarea></td>
+            </tr>
+            <tr>
+                <td><strong>Company</strong></td>
+                <td><input type="text" name="company" placeholder="Company" required></td>
+            </tr>
+            <tr>
+                <td><strong>Job Description</strong></td>
+                <td><textarea name="job_description" placeholder="Job Description" required></textarea></td>
+                <td><strong>Job Requirements</strong></td>
+                <td><textarea name="job_requirements" placeholder="Job Requirements" required></textarea></td>
+            </tr>
+        </table>
+        <button type="submit">Save/Upload</button>
+    </form>
+
+</body>
+</html>

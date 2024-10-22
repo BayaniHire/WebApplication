@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BayaniHire Admin Center</title>
+</head>
+<body>
+    <!-- Logo -->
+    <div>
+        <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo" width="200" height="200">
+    </div>
+
+    <!-- Buttons -->
+    <div>
+        <button onclick="window.location.href='{% url 'list_of_applicants' %}';">List of Applicants</button>
+        <button onclick="window.location.href='{% url 'list_of_jobs' %}';">List of Jobs</button>
+        <button onclick="window.location.href='{% url 'qualification' %}';">Qualification</button>
+        <button onclick="window.location.href='{% url 'schedule' %}';">Schedule</button>
+        <button onclick="window.location.href='{% url 'feedback' %}';">Feedback</button>
+    </div>
+
+    <!-- Title and Profile -->
+    <div>
+        <h1>BayaniHire Admin Center</h1>
+        <button onclick="window.location.href='{% url 'adminprofile' %}';">Profile</button>
+    </div>
+    <h2>List of Applicants</h2>
+    <p>Number of New Applicants: <font color="red">5</font></p>
+    <select>
+        <option>Sort</option>
+    </select>
+    <button onclick="location.href='{% url 'open_applicants' %}';">Open</button>
+    <button>View All</button>
+    <input type="text" placeholder="Search">
+    <button>Enter</button>
+    <table border="1" width="100%">
+        <tr>
+            <th>No.</th>
+            <th>Applicant Name</th>
+            <th>Company</th>
+            <th>Position Applied</th>
+            <th>Date Applied</th>
+            <th>Status</th>
+        </tr>
+        <!-- Repeat the row below for each entry -->
+        <tr>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+        </tr>
+        <tr>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+        </tr>
+        <tr>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+        </tr>
+        <tr>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+        </tr>
+        <tr>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+        </tr>
+        <tr>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+        </tr>
+        <tr>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+        </tr>
+        <tr>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+            <td>" "</td>
+        </tr>
+        <!-- Additional rows would be added here -->
+    </table>
+</body>
+</html>

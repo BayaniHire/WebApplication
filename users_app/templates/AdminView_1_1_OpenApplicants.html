@@ -1,0 +1,78 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BayaniHire Admin Center</title>
+</head>
+<body>
+    <!-- Logo -->
+    <div>
+        <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo" width="200" height="200">
+    </div>
+
+    <!-- Buttons -->
+    <div>
+        <button onclick="window.location.href='{% url 'list_of_applicants' %}';">List of Applicants</button>
+        <button onclick="window.location.href='{% url 'list_of_jobs' %}';">List of Jobs</button>
+        <button onclick="window.location.href='{% url 'qualification' %}';">Qualification</button>
+        <button onclick="window.location.href='{% url 'schedule' %}';">Schedule</button>
+        <button onclick="window.location.href='{% url 'feedback' %}';">Feedback</button>
+    </div>
+
+    <!-- Title and Profile -->
+    <div>
+        <h1>BayaniHire Admin Center</h1>
+        <button onclick="window.location.href='{% url 'adminprofile' %}';">Profile</button>
+    </div>
+    <h2>Pre/Post Evaluation Applicant's File Upload</h2>
+    <table width="100%">
+        <tr>
+            <td valign="top"> <!-- Group 1 -->
+                <table>
+                    <tr><td>Name:</td><td>John Michael A. Quiambao</td></tr>
+                    <tr><td>Applied For:</td><td>Cookerist</td></tr>
+                    <tr><td>Date Applied:</td><td>September 20, 2024</td></tr>
+                    <tr><td>Age:</td><td>21</td></tr>
+                    <tr><td>Gender:</td><td>Male</td></tr>
+                    <tr><td>Current Address:</td><td>Imus Cavite</td></tr>
+                    <tr><td>Mobile Number:</td><td>09123456789</td></tr>
+                    <tr><td>Email:</td><td>yourstrulyjohn@gmail.com</td></tr>
+                    <tr><td>Username:</td><td>john@bynhr.com</td></tr>
+                </table>
+                <label>File Upload</label>
+                <table width="100%" border="1">
+                    <tr>
+                        <td>File List Here</td>
+                    </tr>
+                    <tr>
+                        <td>File List Here</td>
+                    </tr>
+                    <tr>
+                        <td>File List Here</td>
+                    </tr>
+                    <tr>
+                        <td>File List Here</td>
+                    </tr>
+                </table>
+                <button onclick="window.location.href='{% url 'viewing_files' %}';">View File</button>
+                <button>Download</button><br>
+                <button>Print</button>
+            </td>
+            <td valign="top"> <!-- Group 2 -->
+                <table>
+                    <tr><td>Job Title:</td><td>Bank Accountant</td></tr>
+                    <tr><td>Company:</td><td>BDO</td></tr>
+                </table>
+                <textarea placeholder="Job Requirements"></textarea><br>
+                <label>Status: STATUS OF THE APPLICANT</label><br>
+                <p>Please select new status:</p>
+                <select>
+                    <option>Status</option>
+                </select>
+                <button>Save</button>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

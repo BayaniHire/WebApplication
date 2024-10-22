@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BayaniHire Admin Center</title>
+</head>
+<body>
+    <!-- Logo -->
+    <div>
+        <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo" width="200" height="200">
+    </div>
+
+    <!-- Buttons -->
+    <div>
+        <button onclick="window.location.href='{% url 'list_of_applicants' %}';">List of Applicants</button>
+        <button onclick="window.location.href='{% url 'list_of_jobs' %}';">List of Jobs</button>
+        <button onclick="window.location.href='{% url 'qualification' %}';">Qualification</button>
+        <button onclick="window.location.href='{% url 'schedule' %}';">Schedule</button>
+        <button onclick="window.location.href='{% url 'feedback' %}';">Feedback</button>
+    </div>
+
+    <!-- Title and Profile -->
+    <div>
+        <h1>BayaniHire Admin Center</h1>
+        <button onclick="window.location.href='{% url 'adminprofile' %}';">Profile</button>
+    </div>
+    <h2>List of Qualified Applicants</h2>
+    <div>
+        <label for="searchInterviewer">Search Interviewer:</label><br>
+        <select id="searchInterviewer">
+            <option>Select</option>
+            <!-- Additional options can be added here -->
+        </select>
+        <button>View All</button>
+    </div>
+    
+    <table border="1" width="100%">
+        <tr>
+            <th>List of Qualified Applicants</th>
+            <th>Interview Date</th>
+        </tr>
+        <tr><td>Applicant 1</td><td>Date 1</td></tr>
+        <tr><td>Applicant 2</td><td>Date 2</td></tr>
+        <tr><td>Applicant 3</td><td>Date 3</td></tr>
+        <tr><td>Applicant 4</td><td>Date 4</td></tr>
+        <tr><td>Applicant 5</td><td>Date 5</td></tr>
+    </table>
+</body>
+</html>

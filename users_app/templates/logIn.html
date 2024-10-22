@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>BayaniHire - Log In</title>
+</head>
+<body>
+	<nav class="navbar">
+		<div class="navdiv">
+			<!-- Redirect back to index.html (home page) on click -->
+			<button class="home-btn"><a href="{% url "Index" %}">About</a></button>
+		</div>
+	</nav>
+
+	<header class="header">
+		<img src="{% static 'Logo.png' %}" alt="logo image" width="150" height="128">
+	</header>
+
+	<div class="content-area">
+		<h2>Log In</h2>
+		<!-- Updated Login form -->
+		<form class="login-form" method="post" action="{% url 'login' %}">
+			{% csrf_token %}
+			
+			<!-- Username input -->
+			<div>
+				<label for="username">Username:</label>
+				<br>
+				<input type="text" id="username" name="username" required>
+			</div>
+
+			<!-- Add a line break between username and password inputs -->
+			<br>
+
+			<!-- Password input placed below the username input -->
+			<div>
+				<label for="password">Password:</label>
+				<br>
+				<input type="password" id="password" name="password" required>
+			</div>
+
+			<!-- Forgot Password Link -->
+			<div class="forgot-password">
+				<a href="{% url "ForgotPassword" %}">Forgot Password?</a>
+			</div>
+
+			<!-- Submit Button -->
+			<div class="button-container">
+				<button type="submit">Log In</button>
+			</div>
+
+			<!-- Registration link -->
+			<div class="register-container">
+				<span class="register-text">Don't have an account yet?</span>
+				<a href="{% url "Registration" %}" class="register-btn">Register</a>
+			</div>
+
+			<!-- REMOVE THIS AFTER FUNCTIONALITY IS ADDED -->
+			<h3 style="font-family: Georgia; font-size: 30px; font-weight: bold;">Temporary Buttons:</h3>
+			<button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'homepage' %}'">Applicant Account</button>
+    		<button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'list_of_applicants' %}'">Admin Account</button>
+    		<button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTappointments' %}'">Interviewer Account</button>
+		</form>
+	</div>
+
+	<footer>
+		&copy; 2024 BayaniHire. All Rights Reserved.
+	</footer>
+</body>
+</html>
+

@@ -1,0 +1,86 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>BayaniHire: Admin Center</title>
+</head>
+<body>
+    <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">BayaniHire: Admin Center</label>
+    <br><br>
+    <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo" width="500px" height="300px">
+    <br><br>
+
+    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'adminprofile' %}';">Profile</button>
+    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'list_of_applicants' %}';">List of Applicants</button>
+    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'list_of_jobs' %}';">List of Jobs</button>
+    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'qualification' %}';">Qualification</button>
+    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'schedule' %}';">Schedule</button>
+    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'feedback' %}';">Feedback</button>
+    <br><br><br>
+    <label style="font-family: Georgia; font-size: 36px; font-weight: bold;">Admin Manage Accounts</label>
+    <br><br>
+    <label style="font-family: Georgia; font-size: 14px; font-weight: bold;">
+        Welcome to Admin Manage Accounts, where the System Admin can manage all the accounts registered in the system
+    </label>
+    <br><br>
+    <div style="font-family: Georgia; margin-bottom: 20px;">
+        <input type="text" placeholder="Search by username..." style="padding: 10px; font-size: 14px;">
+        <button>Enter</button>
+        <select style="padding: 10px; font-size: 14px;">
+            <option value="role-admin">Sort by Admin Role</option>
+            <option value="role-interviewer">Sort by Interviewer Role</option>
+            <option value="role-applicant">Sort by Applicant Role</option>
+            <option value="role-new">Sort by New Role</option>
+            <option value="status-activated">Sort by Activated Status</option>
+            <option value="status-deactivated">Sort by Deactivated Status</option>
+        </select>
+        <button>View More</button>
+        <button>Reactivated</button>
+        <button>Deactivated</button>
+    </div>
+    <table border="1" cellpadding="10" cellspacing="0" style="font-family: Georgia; width: 80%; text-align: left;">
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Account Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>" "</td>
+                <td>" "</td>
+                <td>" "</td>
+                <td>" "</td>
+            </tr>
+            <tr>
+                <td>" "</td>
+                <td>" "</td>
+                <td>" "</td>
+                <td>" "</td>
+            </tr>
+            <tr>
+                <td>" "</td>
+                <td>" "</td>
+                <td>" "</td>
+                <td>" "</td>
+            </tr>
+            <tr>
+                <td>" "</td>
+                <td>" "</td>
+                <td>" "</td>
+                <td>" "</td>
+            </tr>
+            <tr>
+                <td>" "</td>
+                <td>" "</td>
+                <td>" "</td>
+                <td>" "</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <br><br>    
+</body>
+</html>
