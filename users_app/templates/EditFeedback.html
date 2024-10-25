@@ -1,41 +1,33 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>BayaniHire: Interviewer Center</title>
-</head>
-<body>
-    <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">BayaniHire: Interviewer Center</label>
-    <br>
-    <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo" width="500px" height="300px">
-    <br><br>
-    <button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTprofile' %}'">Profile</button>
-    <button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTappointments' %}'">Appointments</button>
-    <button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTapplicants' %}'">Applicants</button>
-    <button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTfeedback' %}'">Interview Feedback</button>
-    <button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTeditfeedback' %}'">Feedback History</button>
-    <br><br>
+{% extends "Interviewer_Inheritance.html" %}
 
-    <label style="font-family: Georgia; font-size: 36px;font-weight: bold;">Applicant Name:</label>
-    <label style="font-family: Georgia; font-size: 24px;">*INSERT APPLICANT NAME*</label>
+{% block body %}
+<div class="main-content">
+    <label class="header-label">Applicant Name:</label>
+
+    <label class="sub-label">*INSERT APPLICANT NAME*</label>
     <br>
-    <label style="font-family: Georgia; font-size: 36px;font-weight: bold;">Applicant Status:</label>
-    <select style="font-family: Georgia; font-size:28px">
+
+    <label class="header-label">Applicant Status:</label>
+    <select class="dropdown">
         <option>PASSED</option>
         <option>FAILED</option>
     </select>
-    <br><br>
-
-    <label style="font-family: Georgia; font-size: 36px;font-weight: bold;">Interviewer Remarks:</label>
-    <br>
-    <textarea style="font-family: Georgia; font-size: 18px;" ></textarea>
-    <br><br>
-
-    <button style="font-family: Georgia; font-size: 18px;">Submit Feedback</button>
-    <br><br>
-    <button style="font-family: Georgia; font-size: 18px;"onclick="window.location.href='{% url 'INThistory' %}'">Edit Feedback</button>
     <br>
 
-    <label style="font-family: Georgia; font-size: 40px;font-weight: bold;">Feedback History</label>
-</body>
-</html>
+    <label class="header-label">Interviewer Remarks:</label>
+
+    <textarea class="remarks-textarea"></textarea>
+
+
+    <button class="bodybutton">Submit Feedback</button>
+
+    <button class="bodybutton">Edit Feedback</button>
+
+    <button class="bodybutton" onclick="window.location.href='{% url 'INThistory' %}'">Back</button>
+    <br>
+
+    <div class="qualified-applicants">
+        <h2>Feedback History</h2>
+    </div>
+</div>
+{% endblock %}

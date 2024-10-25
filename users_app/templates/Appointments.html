@@ -1,23 +1,8 @@
-{% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>BayaniHire: Interviewer Center</title>
-</head>
-<body>
+{% extends "Interviewer_Inheritance.html" %}
 
-    <h1 style="font-family: Georgia; font-size: 30px; font-weight: bold;">BayaniHire: Interviewer Center</h1>
-
-    <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo" width="500px" height="300px">
-
-<br>
-    <button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTprofile' %}'">Profile</button>
-    <button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTappointments' %}'">Appointments</button>
-    <button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTapplicants' %}'">Applicants</button>
-    <button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTfeedback' %}'">Interview Feedback</button>
-    <button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTeditfeedback' %}'">Feedback History</button>
-
-    <table border="1">
+{% block body %}
+<div class="main-content">
+    <table>
         <tr>
             <th style="font-family: Georgia; font-size: 18px;">Interview Dates</th>
         </tr>
@@ -60,6 +45,5 @@
     </table>
 
      <h1 style="font-family: Georgia; font-size: 40px;font-weight: bold;">Interview Appointments</h1>
-
-</body>
-</html>
+</div>
+{% endblock %}

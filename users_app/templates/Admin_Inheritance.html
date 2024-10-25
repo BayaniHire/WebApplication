@@ -4,33 +4,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Applicant Homepage</title>
+    <title>BayaniHire: Admin Center</title>
     <style>
-        /* Your existing CSS styles */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
             font-family: "Helvetica", sans-serif;
             background-color: #FFD8AD;
-            color: #D3B18B;
+            color: #5C472E;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
             padding: 0;
             margin: 0;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
         }
-        .background {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            background: #FFD8AD;
-            color: #444444;
-            width: 100%;
-            margin: 0;
-        }
+
         .header {
             width: 100%;
             height: 60px;
@@ -48,6 +41,8 @@
             top: 0;
             z-index: 1000;
         }
+
+        /* Profile Button Styling */
         .profile-button {
             width: 120px;
             height: 40px;
@@ -63,17 +58,20 @@
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
+
         .profile-button:hover {
             background-color: rgba(59, 47, 32, 0.3);
             color: #FFD8AD;
         }
+
         .content-area {
             display: flex;
             flex: 1;
-            margin: 20px 0;
-            padding: 0 20px;
+            margin: 20px 0; /* Added margin for spacing */
+            padding: 0 20px; /* Added padding for content area */
             box-sizing: border-box;
         }
+
         .sidebar {
             width: 12%;
             background: #bea17e;
@@ -89,6 +87,7 @@
             box-shadow: 2px 0 5px rgba(0,0,0,0.3);
             overflow-y: auto;
         }
+
         .image-placeholder {
             width: 100%;
             height: 130px;
@@ -97,11 +96,13 @@
             align-items: center;
             justify-content: center;
         }
+
         .image-placeholder img {
             width: 100%;
             height: 100%;
             object-fit: contain;
         }
+
         .button {
             width: 100%;
             height: 60px;
@@ -118,15 +119,38 @@
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
+        .bodybutton {
+            width: 100%;
+            height: 60px;
+            margin-bottom: 10px;
+            background: #e0bd97;
+            color: #5C472E;
+            border: 1px solid #5C472E;
+            border-radius: 15px;
+            font-family: "Georgia";
+            font-weight: bold;
+            font-size: 14px;
+            text-align: center;
+            line-height: 60px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+
         .button:hover {
             background-color: rgba(59, 47, 32, 0.3);
             color: #FFD8AD;
         }
+        .bodybutton:hover {
+            background-color: rgba(59, 47, 32, 0.3);
+            color: #FFD8AD;
+        }
+
         .main-content {
             flex-grow: 1;
             background: #FFD8AD;
             padding: 20px;
-            margin-left: 12%;
+            margin-left: 12%; /* Align with the sidebar */
             border: 0px solid #000000;
             display: flex;
             flex-direction: column;
@@ -135,41 +159,20 @@
             box-sizing: border-box;
             color: #000000;
         }
-        .job-card {
-            background: #FFE5C2;
-            padding: 20px;
-            border-radius: 15px;
-            border: 1px solid #5C472E;
-            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-            font-family: "Georgia";
+
+        table {
+            font-family: Georgia;
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 18px;
+            margin-bottom: 20px;
         }
-        .job-card h2 {
-            font-size: 20px; /* Adjusted font size */
-            color: #5C472E;
+
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
         }
-        .job-card p {
-            font-size: 14px; /* Adjusted font size */
-            color: #000000;
-        }
-        .job-date {
-            font-size: 12px; /* Smaller font for date */
-            color: #888888;
-        }
-        .view-details {
-            width: 120px;
-            height: 40px;
-            background: #FFD8AD;
-            color: #5C472E;
-            border: 1px solid #5C472E;
-            border-radius: 15px;
-            font-family: "ABeeZee";
-            font-weight: bold;
-            font-size: 14px;
-            text-align: center;
-            line-height: 40px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
+
         .footer {
             width: 100%;
             height: 60px;
@@ -184,45 +187,85 @@
             position: relative;
             box-shadow: 0 -1px 5px rgba(0,0,0,0.3);
         }
-        .search-bar {
+
+        .qualified-applicants {
             display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            margin-bottom: 20px;
+            justify-content: space-between;
+            align-items: center; /* Align vertically in the center */
+            font-family: Georgia;
+            font-size: 28px;
         }
-        .search-input {
-            width: 200px;
-            padding: 10px;
-            border: 1px solid #5C472E;
-            border-radius: 15px;
-            font-family: "ABeeZee";
-            font-size: 14px;
-            color: #5C472E;
-        }
-        .search-button {
-            width: 100px;
-            height: 40px;
-            background: #FFD8AD;
-            color: #5C472E;
-            border: 1px solid #5C472E;
-            border-radius: 15px;
-            font-family: "ABeeZee";
+        .header-label {
+            font-family: Georgia;
+            font-size: 36px;
             font-weight: bold;
-            font-size: 14px;
-            text-align: center;
-            line-height: 40px;
+        }
+
+        .sub-label {
+            font-family: Georgia;
+            font-size: 24px;
+        }
+
+        .dropdown {
+            font-family: Georgia;
+            font-size: 24px;
+            padding: 5px;
+            width: 650px;
+            background: #f3c89a;
+            color: #292015;
+            border: 1px solid #5C472E;
+        }
+
+        .remarks-textarea {
+            font-family: Georgia;
+            font-size: 18px;
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            background: #f3c89a;
+            color: #292015;
+            border: 1px solid #5C472E;
+        }
+        .inputarea {
+            font-family: Georgia;
+            font-size: 18px;
+            width: 100%;
+            height: 50px;
+            padding: 10px;
+            background: #f3c89a;
+            color: #292015;
+            border: 1px solid #5C472E;
+        }
+        .action-button {
+            font-family: Georgia;
+            font-size: 18px;
+            padding: 10px 20px;
+            margin: 5px;
             cursor: pointer;
-            margin-left: 10px;
+        }
+
+        .title-label {
+           font-family: Georgia;
+            font-size: 40px;
+            font-weight: bold;
+           margin-top: 20px;
+        }
+        .hidden-content {
+            display: none;
+        }
+        .input-group {
+            margin-top: 20px;
+            font-family: Georgia;
+            font-size: 30px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-<div class="background">
-    <!-- Header -->
     <div class="header">
-        <h1 class="center-text">BayaniHire: Applicant Center</h1>
-        <div class="profile-button" onclick="window.location.href='{% url 'profile' %}';">Profile</div>
+        <h1>BayaniHire: Admin Center</h1>
+        <button class="profile-button" onclick="window.location.href='{% url 'adminprofile'%}'">Profile</button>
     </div>
 
     <div class="content-area">
@@ -230,54 +273,19 @@
             <div class="image-placeholder">
                 <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo">
             </div>
-            <div class="button" onclick="window.location.href='{% url 'homepage' %}'">Home</div>
-            <div class="button" onclick="window.location.href='{% url 'applicationstatus' %}'">Application Status</div>
+            <button class="button" onclick="window.location.href='{% url 'list_of_applicants' %}';">List of Applicants</button>
+            <button class="button" onclick="window.location.href='{% url 'list_of_jobs' %}';">List of Jobs</button>
+            <button class="button" onclick="window.location.href='{% url 'qualification' %}';">Qualification</button>
+            <button class="button" onclick="window.location.href='{% url 'schedule' %}';">Schedule</button>
+            <button class="button" onclick="window.location.href='{% url 'feedback' %}';">Feedback</button>
         </div>
 
-        <div class="main-content" id="mainContent">
-            <!-- Search Bar -->
-            <div class="search-bar">
-                <input type="text" class="search-input" placeholder="Search Position Here" id="searchInput">
-                <button class="search-button" onclick="searchJobs()">Search</button>
-            </div>
-
-            <!-- Job Cards -->
-            <div id="jobCards">
-                {% for job in jobs %}
-                <div class="job-card">
-                    <h2>{{ job.job_title }}</h2>
-                    <p>{{ job.job_description }}</p>
-                    <p class="job-date">Date Posted: {{ job.job_date_published }}</p>
-                    <button class="view-details" onclick="window.location.href='{% url 'jobreq' job.job_id %}'">View Details</button>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
+        <!-- Placeholder for body content of inheriting templates -->
+        {% block body %}{% endblock %}
     </div>
 
-    <!-- Footer -->
     <div class="footer">
-        <p>© BayaniHire Inc.</p>
+        <p>© BayaniHire Inc</p>
     </div>
-</div>
-
-<script>
-    function searchJobs() {
-        const input = document.getElementById('searchInput').value.toLowerCase();
-        const jobCards = document.querySelectorAll('.job-card');
-        
-        jobCards.forEach(card => {
-            const title = card.querySelector('h2').textContent.toLowerCase();
-            const description = card.querySelector('p').textContent.toLowerCase();
-
-            if (title.includes(input) || description.includes(input)) {
-                card.style.display = ''; // Show the card
-            } else {
-                card.style.display = 'none'; // Hide the card
-            }
-        });
-    }
-</script>
-
 </body>
 </html>

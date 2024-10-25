@@ -156,10 +156,11 @@
             color: #5C472E;
             cursor: pointer;
             margin-bottom: 5px;
+            transition: background-color 0.3s;
         }
 
-        .file-name:hover {
-            background-color: #5C472E;
+        .file-name.selected {
+            background-color: rgba(59, 47, 32, 0.3);
             color: #FFD8AD;
         }
 
@@ -181,9 +182,8 @@
             flex-direction: column;
             align-items: flex-start;
             gap: 20px;
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
+            position: relative; /* Changed from absolute */
+            margin-bottom: 20px;
         }
 
         .button-group .button {
@@ -220,7 +220,7 @@
             line-height: 40px;
             cursor: pointer;
             transition: background-color 0.3s ease, color 0.3s ease;
-            position: absolute;
+            position: absolute; /* Changed to absolute */
             bottom: 20px;
             right: 20px;
             z-index: 1000;
@@ -246,7 +246,6 @@
             position: relative;
             margin-top: auto;
         }
-
     </style>
 </head>
 <body>
@@ -269,144 +268,171 @@
 
     <!-- Main Content -->
     <div class="main-content">
-        <div class="upload-info">
-            Please select up to 2 files to upload. Supported file types include PDF documents and images (JPEG, PNG).
-        </div>
-        <div class="upload-container">
-            <div class="small-container" id="file-list">
-                <!-- List of file names will be shown here -->
+        <form id="upload-form" action="{% url 'fileupload' job_id=job_id %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="upload-info">
+                Please select files to upload. Supported file types include PDF documents and images (JPEG, PNG).
             </div>
-            <div class="large-container" id="large-container">
-                <!-- Content for large container (file preview) -->
+            <div class="upload-container">
+                <div class="small-container" id="file-list">
+                    <!-- List of file names will be shown here -->
+                </div>
+                <div class="large-container" id="large-container">
+                    <!-- Content for large container (file preview) -->
+                </div>
             </div>
-        </div>
-        <input type="file" id="file-input" multiple style="display:none;" />
-        <div class="button-group">
-            <button class="button" onclick="document.getElementById('file-input').click();">UPLOAD</button>
-            <button class="button" onclick="deleteFiles();">DELETE</button>
-            <button class="button" onclick="viewFile();">VIEW</button>
-            <button class="button" onclick="downloadFile();">DOWNLOAD</button>
-        </div>
-        <button class="apply-button" onclick="window.location.href='{% url 'fileupload' %}';">APPLY</button>
+            <input type="file" id="file-input" name="files" multiple style="display:none;" />
+            <div class="button-group">
+                <button type="button" class="button" onclick="document.getElementById('file-input').click();">UPLOAD</button>
+                <button type="button" class="button" id="delete-button" onclick="deleteSelectedFiles();">DELETE</button>
+                <button type="button" class="button" id="view-button" onclick="viewSelectedFiles();">VIEW</button>
+                <button type="button" class="button" id="download-button" onclick="downloadSelectedFiles();">DOWNLOAD</button>
+                <button type="submit" class="apply-button">APPLY</button>
+            </div>
+        </form>
     </div>
 
     <!-- Footer -->
     <div class="footer">
-        <p>© BayaniHire Inc</p>
+        <p>© BayaniHire Inc.</p>
     </div>
-
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
 <script>
-    let selectedFiles = [];
-    let currentFileIndex = -1;
+    const fileInput = document.getElementById('file-input');
+    const fileList = document.getElementById('file-list');
+    const largeContainer = document.getElementById('large-container');
+    const deleteButton = document.getElementById('delete-button');
+    const viewButton = document.getElementById('view-button');
+    const downloadButton = document.getElementById('download-button');
+    const applyButton = document.getElementById('apply-button'); // Assuming you have an APPLY button
+    let selectedFile = null;
 
-    document.getElementById('file-input').addEventListener('change', function(event) {
-        const files = Array.from(event.target.files);
-        if (selectedFiles.length + files.length > 2) {
-            alert("You can only upload a maximum of 2 files.");
-            return;
-        }
-        selectedFiles = [...selectedFiles, ...files];
-        displayFileNames();
-    });
+    // Handle file input change
+    fileInput.addEventListener('change', function(event) {
+        const files = event.target.files;
 
-    function displayFileNames() {
-        const fileList = document.getElementById('file-list');
-        fileList.innerHTML = '';
-        selectedFiles.forEach((file, index) => {
+        // Loop through the files and add them to the file list
+        for (const file of files) {
             const fileNameElement = document.createElement('div');
             fileNameElement.textContent = file.name;
             fileNameElement.className = 'file-name';
-            fileNameElement.addEventListener('click', () => selectFile(index));
+            fileNameElement.onclick = () => {
+                // Deselect previously selected file
+                if (selectedFile === file) {
+                    selectedFile = null;
+                    fileNameElement.classList.remove('selected');
+                } else {
+                    selectedFile = file;
+                    // Remove 'selected' class from all other file names
+                    const fileNames = document.getElementsByClassName('file-name');
+                    for (let el of fileNames) {
+                        el.classList.remove('selected');
+                    }
+                    fileNameElement.classList.add('selected');
+                }
+            };
             fileList.appendChild(fileNameElement);
-        });
-    }
-
-    function selectFile(index) {
-        currentFileIndex = index;
-        document.querySelectorAll('.file-name').forEach((el, i) => {
-            el.style.backgroundColor = i === index ? '#5C472E' : '';
-            el.style.color = i === index ? '#FFD8AD' : '#5C472E';
-        });
-    }
-
-    function deleteFiles() {
-        if (currentFileIndex === -1) {
-            alert("Please select a file to delete.");
-            return;
         }
-        selectedFiles.splice(currentFileIndex, 1);
-        currentFileIndex = -1;
-        displayFileNames();
-        document.getElementById('large-container').innerHTML = ''; // Clear the display area
-    }
+    });
 
-    function viewFile() {
-        const container = document.getElementById('large-container');
-        container.innerHTML = ''; // Clear the container
+    // Handle delete button click
+    deleteButton.addEventListener('click', () => {
+        if (selectedFile) {
+            // Remove the selected file from the displayed list
+            const fileNames = Array.from(fileList.getElementsByClassName('file-name'));
+            const fileNameElement = fileNames.find(el => el.textContent === selectedFile.name);
+            if (fileNameElement) {
+                fileList.removeChild(fileNameElement);
+            }
 
-        if (currentFileIndex === -1) {
-            alert('Please select a file to view');
-            return;
+            selectedFile = null; // Clear the selected file
+            largeContainer.innerHTML = ''; // Clear the large container
         }
+    });
 
-        const fileToView = selectedFiles[currentFileIndex];
 
-        if (fileToView.type.startsWith('image/')) {
-            const img = document.createElement('img');
-            img.src = URL.createObjectURL(fileToView);
-            img.style.maxWidth = '100%';
-            img.style.maxHeight = '100%';
-            container.appendChild(img);
-        } else if (fileToView.type === 'application/pdf') {
-            // Use PDF.js to render the PDF file
-            const pdfContainer = document.createElement('div');
-            container.appendChild(pdfContainer);
+    // Handle view button click
+    viewButton.addEventListener('click', () => {
+        if (selectedFile) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const fileType = selectedFile.type;
+                if (fileType.startsWith('image/')) {
+                    largeContainer.innerHTML = `<img src="${e.target.result}" alt="${selectedFile.name}" style="max-width: 100%; max-height: 100%;">`;
+                } else if (fileType === 'application/pdf') {
+                    largeContainer.innerHTML = `<iframe src="${e.target.result}" width="100%" height="100%" style="border: none;"></iframe>`;
+                } else {
+                    largeContainer.innerHTML = `<p>Preview not available for this file type.</p>`;
+                }
+            };
+            reader.readAsDataURL(selectedFile);
+        } else {
+            alert("Please select a file to view.");
+        }
+    });
 
-            const fileReader = new FileReader();
-            fileReader.onload = function() {
-                const typedarray = new Uint8Array(this.result);
-                pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
-                    for (let i = 1; i <= pdf.numPages; i++) {
-                        pdf.getPage(i).then(function(page) {
-                            const viewport = page.getViewport({ scale: 1.5 });
-                            const canvas = document.createElement('canvas');
-                            const context = canvas.getContext('2d');
-                            canvas.height = viewport.height;
-                            canvas.width = viewport.width;
-                            pdfContainer.appendChild(canvas);
+    // Handle download button click
+    downloadButton.addEventListener('click', () => {
+        if (selectedFile) {
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(selectedFile);
+            link.download = selectedFile.name;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    });
 
-                            const renderContext = {
-                                canvasContext: context,
-                                viewport: viewport
-                            };
-                            page.render(renderContext);
-                        });
+    // Add event listener for the APPLY button
+    applyButton.addEventListener('click', async () => {
+        const formData = new FormData();
+        const fileNames = Array.from(fileList.getElementsByClassName('file-name'));
+
+        if (fileNames.length > 0) {
+            const concatenatedFileNames = fileNames.map(el => el.textContent).join(','); // Concatenate filenames
+            formData.append('file_metadata', concatenatedFileNames); // Append concatenated filenames
+
+            // Check if any file is selected
+            const filesToUpload = [];
+            for (const fileNameElement of fileNames) {
+                const fileName = fileNameElement.textContent;
+                const originalFile = Array.from(fileInput.files).find(file => file.name === fileName);
+                if (originalFile) {
+                    filesToUpload.push(originalFile); // Store selected files
+                }
+            }
+
+            // Append actual files
+            filesToUpload.forEach(file => {
+                formData.append('files', file); // Append actual files
+            });
+
+            try {
+                const response = await fetch("{% url 'fileupload' job_id=job_id %}", {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}' // Include CSRF token for security
                     }
                 });
-            };
-            fileReader.readAsArrayBuffer(fileToView);
+
+                if (response.ok) {
+                    alert("Files uploaded successfully!");
+                    fileInput.value = ''; // Clear the file input
+                    fileList.innerHTML = ''; // Clear the file list
+                    largeContainer.innerHTML = ''; // Clear the large container
+                } else {
+                    alert("Error uploading files. Please try again.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("An error occurred while uploading the files.");
+            }
         } else {
-            alert('File format not supported for viewing');
+            alert("Please select a file to upload.");
         }
-    }
-
-    function downloadFile() {
-        if (currentFileIndex === -1) {
-            alert("Please select a file to download.");
-            return;
-        }
-        const fileName = selectedFiles[currentFileIndex].name;
-        const url = URL.createObjectURL(selectedFiles[currentFileIndex]);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        a.click();
-        URL.revokeObjectURL(url); // Clean up
-    }
+    });
 </script>
-
 </body>
 </html>

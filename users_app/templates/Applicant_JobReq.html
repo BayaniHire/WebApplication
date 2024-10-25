@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Job Requirement</title>
+    <title>Job Details</title>
     <style>
+        /* Your existing CSS styles */
         * {
             margin: 0;
             padding: 0;
@@ -14,20 +15,13 @@
         body {
             font-family: "Helvetica", sans-serif;
             background-color: #FFD8AD;
-            color: #5C472E;
+            color: #D3B18B;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            padding: 0;
+            margin: 0;
         }
-        .background {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            background: #FFD8AD;
-            color: #444444;
-            width: 100%;
-        }
-
         .header {
             width: 100%;
             height: 60px;
@@ -45,7 +39,6 @@
             top: 0;
             z-index: 1000;
         }
-
         .profile-button {
             width: 120px;
             height: 40px;
@@ -59,133 +52,37 @@
             text-align: center;
             line-height: 40px;
             cursor: pointer;
-        }
-
-        .container {
-            display: flex;
-            flex: 1;
-            margin: 20px;
-        }
-
-        .sidebar {
-            width: 12%;
-            background: #bea17e;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: fixed;
-            top: 60px;
-            bottom: 0;
-            left: 0;
-            border-right: 1px solid #000000;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.3);
-            overflow-y: auto;
-        }
-
-        .image-placeholder {
-            width: 100%;
-            height: 130px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .image-placeholder img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        .button {
-            width: 100%;
-            height: 60px;
-            margin-bottom: 10px;
-            background: #FFD8AD;
-            color: #5C472E;
-            border: 1px solid #5C472E;
-            border-radius: 15px;
-            font-family: "Georgia";
-            font-weight: bold;
-            font-size: 14px;
-            text-align: center;
-            line-height: 60px;
-            cursor: pointer;
             transition: background-color 0.3s ease;
         }
-
-        .button:hover {
+        .profile-button:hover {
             background-color: rgba(59, 47, 32, 0.3);
             color: #FFD8AD;
         }
-
         .main-content {
-            flex: 1;
-            margin-left: 12%;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-sizing: border-box;
-        }
-
-        .job-details-container {
-            background-color: #FFE5C2;
-            padding: 60px;
-            border-radius: 15px;
-            border: 1px solid #5C472E;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
-            font-family: "Georgia";
-            width: 90%;
-            max-width: 1400px;
-        }
-
-        .job-details-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-
-        .job-details-table th, .job-details-table td {
-            padding: 15px;
-            text-align: left;
-            border: 1px solid #5C472E;
-            font-size: 16px;
-        }
-
-        .job-details-table th {
-            background-color: #FFD8AD;
-            color: #5C472E;
-            font-weight: bold;
-        }
-
-        .status-and-apply {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .status-text {
-            font-size: 18px;
-            color: #5C472E;
-            font-weight: bold;
-        }
-
-        .apply-button {
-            width: 120px;
-            height: 40px;
+            flex-grow: 1;
             background: #FFD8AD;
-            color: #5C472E;
-            border: 1px solid #5C472E;
+            padding: 20px;
+            margin: 20px 12%;
+            border: 0px solid #000000;
+            box-sizing: border-box;
+            color: #000000;
             border-radius: 15px;
-            font-family: "ABeeZee";
-            font-weight: bold;
-            font-size: 14px;
-            text-align: center;
-            line-height: 40px;
-            cursor: pointer;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
         }
-
+        .job-title {
+            font-size: 24px;
+            color: #5C472E;
+            margin-bottom: 10px;
+        }
+        .job-description, .job-requirements, .job-benefits, .job-status {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #000000;
+        }
+        .job-date {
+            font-size: 12px; /* Smaller font for date */
+            color: #888888;
+        }
         .footer {
             width: 100%;
             height: 60px;
@@ -200,65 +97,50 @@
             position: relative;
             box-shadow: 0 -1px 5px rgba(0,0,0,0.3);
         }
-
+        .apply-button {
+            width: 150px;
+            height: 40px;
+            background: #FFD8AD;
+            color: #5C472E;
+            border: 1px solid #5C472E;
+            border-radius: 15px;
+            font-family: "ABeeZee";
+            font-weight: bold;
+            font-size: 14px;
+            text-align: center;
+            line-height: 40px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+        .apply-button:hover {
+            background-color: rgba(59, 47, 32, 0.3);
+            color: #FFD8AD;
+        }
     </style>
 </head>
 <body>
 
-<div class="background">
-    <!-- Header -->
-    <div class="header">
-        <h1>BayaniHire: Applicant Center</h1>
-        <div class="profile-button" onclick="window.location.href='{% url 'profile' %}';">Profile</div>
-    </div>
+<div class="header">
+    <h1>BayaniHire: Applicant Center</h1>
+    <div class="profile-button" onclick="window.location.href='{% url 'profile' %}';">Profile</div>
+</div>
 
-    <div class="container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="image-placeholder">
-                <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo">
-            </div>
-            <div class="button" onclick="window.location.href='{% url 'homepage' %}'">Home</div>
-            <div class="button" onclick="window.location.href='{% url 'applicationstatus' %}'">Application Status</div>
-        </div>
+<div class="main-content">
+    <h2 class="job-title">{{ job_details.job_title }}</h2>
+    <p class="job-description"><strong>Description:</strong> {{ job_details.job_description }}</p>
+    <p class="job-requirements"><strong>Requirements:</strong> {{ job_details.job_requirements }}</p>
+    <p class="job-company"><strong>Company:</strong> {{ job_details.job_company }}</p>
+    <p class="job-benefits"><strong>Benefits:</strong> {{ job_details.job_benefits }}</p>
+    <p class="job-status"><strong>Status:</strong> {{ job_details.job_status }}</p>
+    <p class="job-date"><strong></strong>Date Published: {{ job_details.job_date_published }}</p>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <div class="job-details-container">
-                <table class="job-details-table">
-                    <tr>
-                        <th>Job Title</th>
-                        <td>{{ job_details.title }}</td>
-                    </tr>
-                    <tr>
-                        <th>Date Published</th>
-                        <td>{{ job_details.date_published }}</td>
-                    </tr>
-                    <tr>
-                        <th>Job Description</th>
-                        <td>{{ job_details.description }}</td>
-                    </tr>
-                    <tr>
-                        <th>Job Requirements</th>
-                        <td>{{ job_details.requirements }}</td>
-                    </tr>
-                    <tr>
-                        <th>Job Benefits</th>
-                        <td>{{ job_details.benefits }}</td>
-                    </tr>
-                </table>
-                <div class="status-and-apply">
-                    <p class="status-text">Status: ACTIVE</p>
-                    <button class="apply-button" onclick="window.location.href='{% url 'fileupload' %}';">Apply</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <button class="apply-button" onclick="window.location.href='{% url 'fileupload' job_details.job_id %}'">Apply Now</button>
+</div>
 
-    <!-- Footer -->
-    <div class="footer">
-        <p>© BayaniHire Inc</p>
-    </div>
+<!-- Footer -->
+<div class="footer">
+    <p>© BayaniHire Inc.</p>
 </div>
 
 </body>

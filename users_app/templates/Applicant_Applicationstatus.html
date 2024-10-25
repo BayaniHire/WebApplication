@@ -186,90 +186,102 @@
     </style>
 </head>
 <body>
-
-<div class="background">
-    <!-- Header -->
     <div class="header">
         <h1>BayaniHire: Applicant Center</h1>
-        <div class="profile-button" onclick="window.location.href='{% url 'profile' %}';">Profile</div>
+        <button class="profile-button" onclick="window.location.href='{% url 'profile' %}'">Profile</button>
     </div>
 
-    <div class="container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="image-placeholder">
-                <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo">
-            </div>
-            <div class="button" onclick="window.location.href='{% url 'homepage' %}'">Home</div>
-            <div class="button" onclick="window.location.href='{% url 'applicationstatus' %}'">Application Status</div>
+    <div class="sidebar">
+        <div class="image-placeholder">
+            <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo">
         </div>
-
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Table Section -->
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Position Applied</th>
-                            <th>Date Created</th>
-                            <th>Application Status</th>
-                            <th>Date Applied</th>
-                            <th>Interview Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Row 1: Doctor -->
-                        <tr>
-                            <td>Doctor</td>
-                            <td>01/01/2024</td>
-                            <td>Pending</td>
-                            <td>01/01/2024</td>
-                            <td>01/15/2024</td>
-                        </tr>
-                        
-                        <!-- Row 2: Helper -->
-                        <tr>
-                            <td>Helper</td>
-                            <td>01/02/2024</td>
-                            <td>Reviewed</td>
-                            <td>01/02/2024</td>
-                            <td>01/16/2024</td>
-                        </tr>
-                        
-                        <!-- Empty Rows -->
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Buttons Section -->
-            <div class="button-group">
-                <div class="button" onclick="window.location.href='{% url 'viewfileupload' %}';">View Files Uploaded</div>
-                <div class="button" onclick="window.location.href='{% url 'jobreq' 'doctor' %}';">View Job Description</div>
-                <div class="button" onclick="window.location.href='{% url 'interviewdetails' %}';">View Interview Details</div>
-            </div>
-        </div>
+        <div class="button" onclick="window.location.href='{% url 'homepage' %}'">Home</div>
+        <div class="button" onclick="window.location.href='{% url 'applicationstatus' %}'">Application Status</div>
     </div>
 
-    <!-- Footer -->
+    <div class="main-content">
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Job Applied</th>
+                        <th>Date Created</th>
+                        <th>Application Status</th>
+                        <th>Date Applied</th>
+                        <th>Interview Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if has_applications %}
+                        {% for application in applications %}
+                        <tr onclick="selectApplication({{ application.applicant_status_id }}, event)">
+                            <td>{{ application.job__job_title }}</td>
+                            <td>{{ application.job__job_date_published}}</td>
+                            <td>{{ application.applicant_status }}</td>
+                            <td>{{ application.submission_date }}</td>
+                            <td>{{ application.interview_date }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5">No applications found.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="button-group">
+            <button class="button" onclick="redirectToPage('viewfileupload')">View Uploaded Files</button>
+            <button class="button" onclick="redirectToPage('jobreq')">View Job Description</button>
+            <button class="button" onclick="redirectToPage('interviewdetails')">View Interview Details</button>
+        </div>
+        
+    </div>
+
     <div class="footer">
         <p>© BayaniHire Inc.</p>
     </div>
-</div>
 
+    <script>
+        let selectedApplicantStatusId = null;
+
+        function selectApplication(applicantStatusId, event) {
+            selectedApplicantStatusId = applicantStatusId; // Ensure this is set to the right ID based on your data
+            // Highlight selected row (optional)
+            
+            const rows = document.querySelectorAll("tbody tr");
+            rows.forEach(row => row.style.backgroundColor = ""); // reset background color
+            event.currentTarget.style.backgroundColor = "rgba(92, 71, 46, 0.3)"; // highlight selected row
+        }
+
+        function redirectToPage(page) {
+            if (!selectedApplicantStatusId) {
+                alert('Please select an application first.');
+                return; // Exit the function if no application is selected
+            }
+
+            let url;
+
+            switch (page) {
+                case 'viewfileupload':
+                    url = "{% url 'viewfileupload' 0 %}".replace('0', selectedApplicantStatusId); // Make sure this is correct
+                    break;
+                case 'jobreq':
+                    url = "{% url 'jobreq' 0 %}".replace('0', selectedApplicantStatusId); // Adjust if needed
+                    break;
+                case 'interviewdetails':
+                    url = "{% url 'interviewdetails' %}";
+                    break;
+                default:
+                    alert('Invalid page selection');
+                    return; // Exit the function if the page is invalid
+            }
+
+            // Redirect to the constructed URL
+            window.location.href = url;
+        }
+
+    </script>    
 </body>
 </html>

@@ -1,23 +1,7 @@
-{% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>BayaniHire: Interviewer Center</title>
-</head>
-<body>
+{% extends "Interviewer_Inheritance.html" %}
 
-    <h1 style="font-family: Georgia; font-size: 30px; font-weight: bold;">BayaniHire: Interviewer Center</h1>
-    <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo" width="500px" height="300px">
-    <br><br>
-
-    <button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTprofile' %}'">Profile</button>
-    <button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTappointments' %}'">Appointments</button>
-    <button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTapplicants' %}'">Applicants</button>
-    <button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTfeedback' %}'">Interview Feedback</button>
-    <button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTeditfeedback' %}'">Feedback History</button>
-
-    <br><br>
-
+{% block body %}
+<div class="main-content">
     <h2 style="font-family: Georgia; font-size: 36px; font-weight: bold;">User Profile:</h2>
 
     <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">Username: </label>
@@ -30,36 +14,38 @@
 
     <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">Email: </label>
     <span style="font-family: Georgia; font-size: 24px;">*INSERT EMAIL HERE*</span>
-    <br><br>
-
-    <h2 style="font-family: Georgia; font-size: 36px; font-weight: bold;">Password:</h2>
+    <br>
 
     <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">PASSWORD: </label>
     <span style="font-family: Georgia; font-size: 24px;">*HIDDEN*</span>
     <br>
-    <button style="font-family: Georgia; font-size: 20px; font-weight: bold;">Show Password</button>
+    <button class="bodybutton" style="font-family: Georgia; font-size: 20px; font-weight: bold;" onclick="showContent()">Change Password</button>
+    <div id="password-section" class="hidden-content">
+        <div class="input-group">
+            <label>Current Password:</label>
+            <input class="inputarea" type="password" placeholder="Enter Current Password">
+        </div>
+    
+        <div class="input-group">
+            <label>New Password:</label>
+            <input class="inputarea" type="password" placeholder="Enter New Password Here">
+        </div>
+    
+        <div class="input-group">
+            <label>Confirm Password:</label>
+            <input class="inputarea" type="password" placeholder="Enter New Password Here">
+        </div>
+        <div class="input-group">
+        <button class="bodybutton">Save</button>
+        </div>
+    </div>
+    
+    <script>
+        function showContent() {
+            document.getElementById("password-section").style.display = "block";
+        }
+    </script>
 
-    <br><br>
-
-    <h2 style="font-family: Georgia; font-size: 36px; font-weight: bold;">Change Password: (only shown when edit is clicked)</h2>
-
-    <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">Current Password: </label>
-    <input type="password" placeholder="Enter Current Password" style="font-family: Georgia; font-size: 24px; font-weight: bold;">
-    <br>
-
-    <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">New Password: </label>
-    <input type="password" placeholder="Enter New Password Here" style="font-family: Georgia; font-size: 24px; font-weight: bold;">
-    <br>
-
-    <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">Confirm Password: </label>
-    <input type="password" placeholder="Enter New Password Here" style="font-family: Georgia; font-size: 24px; font-weight: bold;">
-    <br><br>
-
-    <button style="font-family: Georgia; font-size: 20px; font-weight: bold;">Save</button>
-
-    <br><br><br>
-
-    <button style="font-family: Georgia; font-size: 20px; font-weight: bold;"onclick="window.location.href='{% url 'Index' %}'">Sign Out</button>
-
-</body>
-</html>
+    <button class="bodybutton" style="font-family: Georgia; font-size: 20px; font-weight: bold;"onclick="window.location.href='{% url 'Index' %}'">Sign Out</button>
+</div>
+{% endblock %}

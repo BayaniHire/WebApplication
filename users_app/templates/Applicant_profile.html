@@ -290,6 +290,7 @@
     <div class="header">
         <h1 class="center-text">BayaniHire: Applicant Center</h1>
         <div class="profile-button" onclick="window.location.href='{% url 'profile' %}';">Profile</div>
+
     </div>
     
     <div class="content-area">
@@ -334,6 +335,8 @@
                 <div class="change-password-buttons">
                     <button class="save-button">Save</button>
                 </div>
+                <div class="profile-button" onclick="signOut()">Sign Out</div>
+
             </div>
         </div>
     </div>
@@ -351,6 +354,15 @@
             changePasswordSection.style.display = 'none';
         }
     });
+
+    function signOut() {
+        // Clear session data or tokens (example, adapt as needed)
+        sessionStorage.clear();
+        localStorage.clear();
+
+        // Redirect to the login page
+        window.location.href = "{% url 'login' %}";
+    }
 </script>
 
 </body>
