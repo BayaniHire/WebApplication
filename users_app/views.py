@@ -13,6 +13,10 @@ from bayanihire_app.forms import AdminAccountSetupForm
 from datetime import datetime
 from django.contrib.auth import authenticate
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
+from django.core.files.storage import FileSystemStorage
+from django.http import JsonResponse
+import base64
 
 
 
@@ -57,55 +61,167 @@ def interviewer_profile(request):
 def interviewer_viewinfo(request):
     return render(request, 'ViewInfo.html')
 
-
+###################APPLICANT############################
 def applicant_homepage(request):
-    return render(request, 'Applicant_homepage.html')
+    jobs = JobDetailsAndRequirements.objects.filter(job_status='ACTIVE')  # Fetch only active jobs
+    context = {
+        'jobs': jobs  # Pass the jobs to the template context
+    }
+    return render(request, 'Applicant_homepage.html', context)
 
-def applicant_profile(request):
-    return render(request, 'Applicant_profile.html')
 
-def applicant_applicationstatus(request):
-    return render(request, 'Applicant_Applicationstatus.html')
-
-def applicant_jobreq(request, job_type):
-    job_details = {}
-    if job_type == "doctor":
-        job_details = {
-            "title": "Doctor",
-            "date_published": "01/01/2024",
-            "description": "A doctor diagnoses and treats illnesses and injuries in patients. They conduct physical exams, order and interpret diagnostic tests, and develop treatment plans. Doctors also provide preventive care and educate patients about health and wellness.",
-            "requirements": "Medical degree, relevant certifications, at least 3 years of experience in a medical field.",
-            "benefits": "Healthcare coverage, pension, 30 days vacation, paid time off, professional development programs."
-        }
-    elif job_type == "teacher":
-        job_details = {
-            "title": "Teacher",
-            "date_published": "01/02/2024",
-            "description": "A teacher imparts knowledge and skills to students, fosters a supportive learning environment, and develops lesson plans to aid student progress.",
-            "requirements": "Teaching degree, state certifications, experience in lesson planning and classroom management.",
-            "benefits": "Pension, summer vacation, 20 days paid time off, professional development courses."
-        }
-    elif job_type == "helper":
-        job_details = {
-            "title": "Helper",
-            "date_published": "01/03/2024",
-            "description": "A helper provides assistance with daily tasks, helping to ensure smooth operations in non-medical environments.",
-            "requirements": "Basic experience in assisting roles, strong organizational skills, ability to multitask.",
-            "benefits": "Flexible hours, healthcare coverage, 15 days paid vacation."
-        }
+def applicant_jobreq(request, job_id):
+    job_details = get_object_or_404(JobDetailsAndRequirements, job_id=job_id)
 
     return render(request, 'Applicant_JobReq.html', {'job_details': job_details})
 
-def applicant_fileupload(request):
-    return render(request, 'Applicant_fileupload.html')
+def applicant_fileupload(request, job_id):
+    uploaded_files_display = []
 
-def applicant_viewfileupload(request):
-    return render(request, 'Applicant_Viewfileupload.html')
+    if request.method == 'GET':
+        context = {'job_id': job_id, 'uploaded_files_display': uploaded_files_display}
+        return render(request, 'Applicant_fileupload.html', context)
+
+    if request.method == 'POST':
+        uploaded_files = request.FILES.getlist('files')
+
+        if not uploaded_files:
+            return JsonResponse({"error": "No files selected."}, status=400)
+
+        job_instance = get_object_or_404(JobDetailsAndRequirements, job_id=job_id)
+
+        account_id = request.session.get('account_id')
+        if not account_id:
+            return JsonResponse({"error": "User must be logged in to upload files."}, status=403)
+
+        account = get_object_or_404(AccountInformation, account_id=account_id)
+        role_instance = get_object_or_404(AccountStorage, account=account)
+
+        if role_instance.role.lower() != "applicant":
+            return JsonResponse({"error": "Only applicants can upload files."}, status=403)
+
+        # Initialize a list to hold file names for metadata and file contents
+        file_metadata_list = []
+        combined_file_content = b''  # Use bytes for combining file contents
+
+        # Process each uploaded file
+        for uploaded_file in uploaded_files:
+            file_name = uploaded_file.name
+            file_metadata_list.append(file_name)  # Collect file names
+
+            # Read the file content into a separate variable to keep track of sizes
+            file_content = uploaded_file.read()  # Read file content
+            combined_file_content += file_content  # Combine file contents into a single blob
+
+        # Save a single instance with all the combined contents and metadata
+        new_application = ListOfApplicantsWithStatusAndCredentials(
+            job=job_instance,
+            role=role_instance,
+            account=account,
+            credentials=combined_file_content,  # Store combined file contents
+            file_metadata=', '.join(file_metadata_list),  # Store concatenated file names
+            submission_date=timezone.now().date(),
+            interview=None,
+            applicant_status="UNDER REVIEW"
+        )
+        new_application.save()
+
+        # Render the template with success message and uploaded files
+        context = {
+            'job_id': job_id,
+            'uploaded_files_display': uploaded_files_display,
+            'success_message': "Files successfully uploaded!"
+        }
+        return render(request, 'Applicant_fileupload.html', context)
+
+    return JsonResponse({"error": "Invalid request method."}, status=405)
+
+def applicant_applicationstatus(request):
+    # Ensure the user is logged in using session data
+    account_id = request.session.get('account_id')
+    if not account_id:
+        return redirect('login')  # Redirect to login if the user is not logged in
+
+    # Fetch account information
+    account = get_object_or_404(AccountInformation, account_id=account_id)
+
+    # Retrieve applications related to the logged-in applicant, grouping by job
+    applications = (
+        ListOfApplicantsWithStatusAndCredentials.objects
+        .filter(account=account)
+        .select_related('job') 
+        .order_by('-submission_date') # Ensure you can access job-related fields
+        .annotate(
+            interview_schedule_date=InterviewStorage.objects.filter(account=account).values('interview_schedule_date')[:1]
+        )  # Annotate to include interview date
+        .values(
+            'job__job_title',
+            'job__job_date_published',  # Ensure this field exists in the job model
+            'applicant_status',
+            'submission_date',
+            'interview_schedule_date',
+            'applicant_status_id',
+        )
+        .distinct()  
+    )
+    
+
+    context = {
+        'applications': applications,  # Pass the applications to the template
+        'has_applications': applications.exists()  # Flag to check if applications exist
+    }
+
+    
+
+    return render(request, 'Applicant_Applicationstatus.html', context)
+
+def applicant_viewfileupload(request, applicant_status_id):
+    # Retrieve the application details using the applicant_status_id
+    application = get_object_or_404(ListOfApplicantsWithStatusAndCredentials, applicant_status_id=applicant_status_id)
+
+    # Prepare to retrieve the uploaded files as binary
+    uploaded_files = []
+
+    # Split the file_metadata string into individual file names
+    filenames = application.file_metadata.split(', ')  # Split by comma and space
+
+    # Ensure you have the credentials data for each file
+    if application.credentials:
+        total_files_size = len(application.credentials)
+        individual_file_size = total_files_size // len(filenames)  # Assume equal sizes for simplicity
+
+        # Loop through each filename and prepare separate data
+        for i, filename in enumerate(filenames):
+            # Calculate the start and end index for each file's BLOB data
+            start_index = i * individual_file_size
+            end_index = start_index + individual_file_size if i < len(filenames) - 1 else total_files_size
+            
+            # Extract the specific file's binary data
+            file_data = application.credentials[start_index:end_index]
+            encoded_file = base64.b64encode(file_data).decode('utf-8')  # Base64 encode the specific part
+            
+            uploaded_files.append({
+                'data': encoded_file,
+                'metadata': filename,  # Use the individual filename
+                'type': filename.split('.')[-1].lower(),  # Get file extension
+            })
+
+    # Pass the relevant information to the template
+    context = {
+        'application': application,
+        'uploaded_files': uploaded_files,
+    }
+
+    return render(request, 'Applicant_Viewfileupload.html', context)
 
 def applicant_interviewdetails(request):
     return render(request, 'Applicant_InterviewDetails.html')
 
+def applicant_profile(request):
+    return render(request, 'Applicant_profile.html')
 
+
+###################APPLICANT############################
 
 def list_of_applicants(request):
     return render(request, 'AdminView_1_Homepage_ListofApplicants.html')
