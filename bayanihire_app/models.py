@@ -69,7 +69,7 @@ class ListOfApplicantsWithStatusAndCredentials(models.Model):
     role = models.ForeignKey(AccountStorage, on_delete=models.CASCADE)
     account = models.ForeignKey(AccountInformation, on_delete=models.CASCADE)
     job = models.ForeignKey(JobDetailsAndRequirements, on_delete=models.CASCADE)
-    interview = models.ForeignKey(InterviewStorage, on_delete=models.CASCADE)
+    interview = models.ForeignKey(InterviewStorage, null=True, blank=True, on_delete=models.CASCADE)
     applicant_status = models.CharField(max_length=30, blank=True, null=True)
     credentials = models.BinaryField(blank=True, null=True)
     file_metadata = models.TextField(blank=True, null=True)
