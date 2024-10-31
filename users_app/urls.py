@@ -16,15 +16,15 @@ urlpatterns = [
     path('editfeedback/', views.interviewer_editfeedback, name='INTeditfeedback'),
     path('feedback/', views.interviewer_feedback, name='INTfeedback'),
     path('history/', views.interviewer_history, name='INThistory'),
-    
+##########################APPLICANT###############################################
     path('dashboard_applicant/', views.applicant_homepage, name='homepage'),
-    path('jobreq/<str:job_type>/', views.applicant_jobreq, name='jobreq'),
-    path('profile_applicant/', views.applicant_profile, name='profile'),
+    path('jobreq/<int:job_id>/', views.applicant_jobreq, name='jobreq'),
+    path('fileupload/<int:job_id>/', views.applicant_fileupload, name='fileupload'),
     path('applicationstatus/', views.applicant_applicationstatus, name='applicationstatus'),
-    path('jobreq/', views.applicant_jobreq, name='jobreq'),
-    path('fileupload/', views.applicant_fileupload, name='fileupload'),
-    path('viewfileupload/', views.applicant_viewfileupload, name='viewfileupload'),
-    path('interviewdetails/', views.applicant_interviewdetails, name='interviewdetails'),
+    path('viewfileupload/<int:applicant_status_id>/', views.applicant_viewfileupload, name='viewfileupload'),
+    path('interviewdetails/<int:applicant_status_id>/', views.applicant_interviewdetails, name='interviewdetails'),
+    path('profile_applicant/', views.applicant_profile, name='profile'),
+##########################APPLICANT###############################################
     
     path('dashboard_admin/', views.list_of_applicants, name='list_of_applicants'),
     path('open_applicants/', views.open_applicants, name='open_applicants'),
@@ -45,4 +45,4 @@ urlpatterns = [
     path('admin_interviewer_account_setup/', views.admin_interviewer_account_setup, name='admin_interviewer_account_setup'),
     path('admin_creatingjob/', views.admin_creatingjob, name='admin_creatingjob'),
 
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
