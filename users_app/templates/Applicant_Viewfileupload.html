@@ -241,7 +241,7 @@
                 {% if uploaded_files %}
                     <ul>
                         {% for file in uploaded_files %}
-                            <li>{{ file.metadata }}</li>  <!-- Displaying file name -->
+                        <li onclick="selectFile('{{ file.data }}', '{{ file.metadata }}')">{{ file.metadata }}</li>  <!-- Displaying file name -->
                         {% endfor %}
                     </ul>
                 {% else %}
@@ -251,27 +251,23 @@
         
             <div class="large-container">
                 <h3>File Preview</h3>
-                {% if uploaded_files %}
-                    <div class="file-preview">
-                        {% for file in uploaded_files %}
-                            {% if file.metadata|slice:"-4:" == ".jpg" or file.metadata|slice:"-4:" == ".png" or file.metadata|slice:"-4:" == ".jpeg" %}
-                                <img src="data:image/jpeg;base64,{{ file.data }}" 
-                                     alt="{{ file.metadata }}" style="max-width: 100%; height: auto;">
-                            {% elif file.metadata|slice:"-4:" == ".pdf" %}
-                                <embed src="data:application/pdf;base64,{{ file.data }}" 
-                                       type="application/pdf" width="100%" height="400px" />
-                            {% else %}
-                                <p>Unsupported file type: {{ file.metadata }}</p>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <p>No files to preview.</p>
-                {% endif %}
+                <div class="file-preview" id="file-preview">
+                    <p>Select a file and click VIEW to preview it.</p>
+                    {% for file in uploaded_files %}
+                        {% if file.metadata|slice:"-4:" == ".jpg" or file.metadata|slice:"-4:" == ".png" or file.metadata|slice:"-4:" == ".jpeg" %}
+                            <img src="data:image/jpeg;base64,{{ file.data }}" 
+                                 alt="{{ file.metadata }}" style="max-width: 100%; height: auto; display: none;" />
+                        {% elif file.metadata|slice:"-4:" == ".pdf" %}
+                            <embed src="data:application/pdf;base64,{{ file.data }}" 
+                                   type="application/pdf" width="100%" height="400px" style="display: none;" />
+                        {% else %}
+                            <p>Unsupported file type: {{ file.metadata }}</p>
+                        {% endif %}
+                    {% endfor %}
+                </div>
             </div>            
         </div>
-        
-    
+
         <!-- Button Group -->
         <div class="button-group">
             <button class="button" id="view-button" onclick="viewFile()">VIEW</button>
@@ -286,31 +282,49 @@
 </div>
 
 <script>
-    function showPreview(data, filename) {
-        const previewElement = document.getElementById('file-preview');
-        previewElement.innerHTML = ''; // Clear any existing preview
+    let selectedFileData = '';
+    let selectedFileName = '';
 
-        if (filename.toLowerCase().endsWith('.jpg') || 
-            filename.toLowerCase().endsWith('.jpeg') || 
-            filename.toLowerCase().endsWith('.png')) {
-            // Render image files
-            const img = document.createElement('img');
-            img.src = `data:image/${getImageFormat(filename)};base64,${data}`;
-            img.alt = 'File Preview';
-            img.style.maxWidth = '100%';
-            img.style.maxHeight = '400px';
-            previewElement.appendChild(img);
-        } else if (filename.toLowerCase().endsWith('.pdf')) {
-            // Render PDFs using <embed>
-            const embed = document.createElement('embed');
-            embed.src = `data:application/pdf;base64,${data}`;
-            embed.type = 'application/pdf';
-            embed.style.width = '100%';
-            embed.style.height = '400px';
-            previewElement.appendChild(embed);
+    function selectFile(data, filename) {
+        selectedFileData = data; // Store the selected file's data
+        selectedFileName = filename; // Store the selected file's name
+        console.log(`Selected file: ${selectedFileName}, Data: ${selectedFileData}`);
+        document.getElementById('file-preview').innerHTML = `<p>Ready to view: ${filename}</p>`;
+    }
+
+    function viewFile() {
+        const previewElement = document.getElementById('file-preview');
+        previewElement.innerHTML = ''; // Clear previous preview
+
+        // Only display the selected file if it has been chosen
+        if (selectedFileData && selectedFileName) {
+            console.log(`Viewing file: ${selectedFileName}, Data: ${selectedFileData}`);
+            
+            // Check the file type and display accordingly
+            if (selectedFileName.toLowerCase().endsWith('.jpg') || 
+                selectedFileName.toLowerCase().endsWith('.jpeg') || 
+                selectedFileName.toLowerCase().endsWith('.png')) {
+                // Render image files
+                const img = document.createElement('img');
+                img.src = `data:image/${getImageFormat(selectedFileName)};base64,${selectedFileData}`;
+                img.alt = 'File Preview';
+                img.style.maxWidth = '100%';
+                img.style.maxHeight = '400px';
+                previewElement.appendChild(img);
+            } else if (selectedFileName.toLowerCase().endsWith('.pdf')) {
+                // Render PDFs using <embed>
+                const embed = document.createElement('embed');
+                embed.src = `data:application/pdf;base64,${selectedFileData}`;
+                embed.type = 'application/pdf';
+                embed.style.width = '100%';
+                embed.style.height = '400px';
+                previewElement.appendChild(embed);
+            } else {
+                // Unsupported file type
+                previewElement.innerHTML = `<p>Preview not available for this file type.</p>`;
+            }
         } else {
-            // Unsupported file type
-            previewElement.innerHTML = `<p>Preview not available for this file type.</p>`;
+            previewElement.innerHTML = `<p>No file selected to preview.</p>`;
         }
     }
 
@@ -318,6 +332,7 @@
         const extension = filename.split('.').pop().toLowerCase();
         return extension === 'png' ? 'png' : 'jpeg'; // Default to jpeg if not png
     }
+
 </script>
 
 </body>
