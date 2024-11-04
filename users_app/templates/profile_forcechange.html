@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BayaniHire - Force Change Password</title>
+</head>
+<body>
+
+    <div class="content-area">
+        <!-- Header Section with Image and Title -->
+        <div class="header-section">
+            <img src="{% static 'password.png' %}" alt="Password Icon" width="128" height="128">
+            <h2>Change Your Password</h2>
+        </div>
+
+        <!-- Instructions for the user -->
+        <p class="instructions">
+            For security reasons, you are required to change your password before continuing. Please enter a new password below.
+        </p>
+
+        <!-- Reset Password Form -->
+        <form class="reset-form" action="{% url 'change_password' %}" method="POST">
+            {% csrf_token %}
+            <label for="new-password">New Password:</label>
+            <input type="password" id="new-password" name="new_password" required placeholder="Enter new password">
+
+            <label for="confirm-password">Confirm Password:</label>
+            <input type="password" id="confirm-password" name="confirm_password" required placeholder="Confirm new password">
+
+            <!-- Submit Button Only -->
+            <div class="button-container">
+                <button type="submit" class="submit-btn">Submit</button>
+            </div>
+        </form>
+    </div>
+
+    <footer>
+        &copy; 2024 BayaniHire. All Rights Reserved.
+    </footer>
+
+</body>
+</html>
