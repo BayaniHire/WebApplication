@@ -39,6 +39,9 @@ def EmailConfirmation(request):
 def FchangePassword(request):
     return render(request, "force_change_password.html")
 
+def Security(request):
+    return render(request, "profile_forcechange.html")
+
 
 def interviewer_applicants(request):
     return render(request, 'Applicants.html')
@@ -382,21 +385,34 @@ def admin_creatingjob(request):
     return render(request, 'users_app/create_job.html')
 
 
-
+############################index##########################################
 def login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
         
-        # Authenticate the user
         try:
-            account = AccountInformation.objects.get(username=username, password=password)
             
-            # Check role from AccountStorage
+            # Authenticate the user
+            account = AccountInformation.objects.get(username=username, password=password)
+            print("Account found:", account)  # Debug: Print the retrieved account
+            
+            # Retrieve the account status from AccountStorage using the foreign key
             account_storage = AccountStorage.objects.filter(account=account).first()
+            print("Account Storage found:", account_storage)
             
             if account_storage:
-                # Store account ID in the session
+                # Check the account status
+                if account_storage.account_status == 'new':
+                    # Store account ID in the session to reference it in change_password view
+                    request.session['account_id'] = account.account_id
+                    return redirect('Security')
+                
+                elif account_storage.account_status == 'deactivate':
+                    messages.error(request, "Account is deactivated. Please contact support.")
+                    return render(request, 'login.html')
+                
+                # If account_status is neither 'new' nor 'deactivate', proceed to role-based redirection
                 request.session['account_id'] = account.account_id
                 
                 # Redirect based on role
@@ -414,4 +430,46 @@ def login(request):
         except AccountInformation.DoesNotExist:
             return render(request, 'login.html', {"message": "Incorrect username or password."})
 
-    return render(request, 'logIn.html')
+    return render(request, 'login.html')
+
+def change_password(request):
+    # Only allow POST requests and check if account_id exists in the session
+    if request.method == 'POST' and 'account_id' in request.session:
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+
+        # Fetch the account by account_id stored in the session
+        account_id = request.session['account_id']
+        account = AccountInformation.objects.get(account_id=account_id)
+
+        # Check if the new password is the same as the old password
+        if new_password == account.password:
+            messages.error(request, "New password cannot be the same as the old password.")
+            return redirect('Security')
+
+        # Verify the password fields match
+        if new_password == confirm_password:
+            # Update the account's password
+            account.password = new_password
+            account.save()
+            
+            # Update account status in AccountStorage
+            account_storage = AccountStorage.objects.get(account=account)
+            account_storage.account_status = 'active'
+            account_storage.save()
+            
+            # Redirect based on role after password change
+            if account_storage.role == 'applicant':
+                return redirect('homepage')
+            elif account_storage.role == 'admin':
+                return redirect('list_of_applicants')
+            elif account_storage.role == 'interviewer':
+                return redirect('INTappointments')
+            else:
+                return render(request, 'login.html', {"message": "Invalid role. Access denied."})
+        else:
+            messages.error(request, "Passwords do not match. Please try again.")
+            return redirect('Security')
+        
+
+    return redirect('login')
