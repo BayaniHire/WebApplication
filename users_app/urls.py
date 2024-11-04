@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 
+
 urlpatterns = [
     path('', views.Index, name = "Index" ),
     path('login/', views.login, name = "login"),
@@ -8,6 +9,7 @@ urlpatterns = [
     path('ForgotPassword/',views.ForgotPassword, name = 'ForgotPassword'),
     path('EmailConfirmation/', views.EmailConfirmation, name = 'EmailConfirmation'),
     path('FchangePassword/', views.FchangePassword, name = 'FchangePassword'),
+    path('security/', views.Security, name='Security'),
     
     path('dashboard_interviewer/', views.interviewer_appointments, name='INTappointments'),
     path('profile_interviewer/', views.interviewer_profile, name='INTprofile'),
@@ -44,5 +46,9 @@ urlpatterns = [
     ###wag galawin pang admin to
     path('admin_interviewer_account_setup/', views.admin_interviewer_account_setup, name='admin_interviewer_account_setup'),
     path('admin_creatingjob/', views.admin_creatingjob, name='admin_creatingjob'),
+    ####### admin#####
+
+    ###wag po galawin pang log in to
+    path('security/change_password/', views.change_password, name='change_password'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
