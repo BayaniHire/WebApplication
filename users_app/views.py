@@ -226,20 +226,149 @@ def applicant_profile(request):
 
 ###################APPLICANT############################
 
+
+
+##########################Admin###############################################
+logger = logging.getLogger(__name__)
+
 def list_of_applicants(request):
-    return render(request, 'AdminView_1_Homepage_ListofApplicants.html')
+    # Get all applicants
+    applicants = ListOfApplicantsWithStatusAndCredentials.objects.all()
+    print(applicants)
 
-def open_applicants(request):
-    return render(request, 'AdminView_1_1_OpenApplicants.html')
+    # Calculate total number of applicants
+    total_applicants = applicants.count()
+    print(total_applicants)
 
-def viewing_files(request):
-    return render(request, 'AdminView_1_2_ViewingFiles.html')
+    # Prepare data for the table
+    applicant_data = []
+    for idx, applicant in enumerate(applicants, start=1):
+        account_info = applicant.account  # Assuming this is the relation to AccountInformation
+        job_details = applicant.job        # Assuming this is the relation to JobDetailsAndRequirements
+
+        # Build the applicant row
+        applicant_data.append({
+            'no': idx,
+            'full_name': f"{account_info.first_name} {account_info.middle_name or ''} {account_info.last_name}",
+            'company': job_details.job_company,
+            'position_applied': job_details.job_title,
+            'date_applied': applicant.submission_date,  # Assuming this is the correct field
+            'status': applicant.applicant_status,
+            'applicant_status_id': applicant.applicant_status_id,  # Make sure this line is added
+        })
+
+    context = {
+        'applicant_data': applicant_data,
+        'total_applicants': total_applicants,
+    }
+    return render(request, 'AdminView_1_Homepage_ListofApplicants.html', context)
+
+def open_applicants(request, applicant_status_id):
+    # Fetch the applicant using the provided applicant_status_id
+    applicant = get_object_or_404(ListOfApplicantsWithStatusAndCredentials, applicant_status_id=applicant_status_id)
+
+    # Fetch related account and job details
+    account_info = applicant.account
+    job_details = applicant.job
+
+    # Prepare the uploaded files
+    uploaded_files = applicant.file_metadata.split(",") if applicant.file_metadata else []
+    uploaded_files = [file.strip() for file in uploaded_files]
+
+    # Prepare context for rendering
+    context = {
+        'applicant': account_info,
+        'job_details': job_details,
+        'uploaded_files': uploaded_files,
+        'submission_date': applicant.submission_date,
+        'applicant_status': applicant.applicant_status,
+        'applicant_status_id': applicant_status_id  # Ensure this is included
+    }
+    return render(request, 'AdminView_1_1_OpenApplicants.html', context)
+
+def update_applicant_status(request, applicant_status_id):
+    # Ensure the request method is POST
+    if request.method == 'POST':
+        # Fetch the applicant using the provided applicant_status_id
+        applicant = get_object_or_404(ListOfApplicantsWithStatusAndCredentials, applicant_status_id=applicant_status_id)
+        
+        # Get the new status from the form
+        new_status = request.POST.get('new_status')
+        
+        # Update the applicant's status in the database
+        applicant.applicant_status = new_status
+        applicant.save()
+        
+        messages.success(request, 'Applicant status updated successfully.')
+        
+        # Redirect to the dashboard after the update
+        return redirect('list_of_applicants')  # Update this to your actual URL name for the dashboard
+
+    return redirect('list_of_applicants')  # Redirect if not a POST request
+
+def viewing_files(request, file_name):
+    # Construct the full file path
+    file_path = os.path.join(settings.MEDIA_ROOT, file_name)
+
+    # Debugging: Print the file path to console
+    print(f"Trying to access file at: {file_path}")
+
+    # Check if the file exists
+    if not os.path.exists(file_path):
+        raise Http404("File does not exist")
+
+    context = {
+        'file_name': file_name,
+        'file_path': file_path
+    }
+
+    return render(request, 'AdminView_1_2_ViewingFiles.html', context)
 
 def list_of_jobs(request):
-    return render(request, 'AdminView_2_ListofJobs.html')
+    jobs = JobDetailsAndRequirements.objects.all()  # Fetch all job details
+    active_jobs_count = JobDetailsAndRequirements.objects.filter(job_status="ACTIVE").count()  # Count active jobs
+    return render(request, 'AdminView_2_ListofJobs.html', {
+        'jobs': jobs,
+        'active_jobs_count': active_jobs_count  # Pass count to the template
+    })
 
-def edit_job_details(request):
-    return render(request, 'AdminView_2_1_EditJobDetails.html')
+def edit_job_details(request, job_id):
+    job = get_object_or_404(JobDetailsAndRequirements, pk=job_id)
+
+    if request.method == 'POST':
+        # Update fields with form data
+        job.job_title = request.POST.get('job_title')
+        job.job_company = request.POST.get('company')
+        job.job_description = request.POST.get('job_description')
+        job.job_benefits = request.POST.get('job_benefits')
+        job.job_requirements = request.POST.get('job_requirements')
+        job.job_status = request.POST.get('status')
+
+        # Update the date field if a new date is provided
+        new_date = request.POST.get('date')
+        if new_date:
+            job.job_date_published = new_date
+
+        # Save changes to the database
+        job.save()
+        return redirect('list_of_jobs')
+
+    # Format the date for display, default to today if no date is set
+    job_date = job.job_date_published or date.today()
+    job_date = job_date.strftime("%Y-%m-%d")  # Format as YYYY-MM-DD for HTML input
+
+    # Count the number of active jobs
+    active_jobs_count = JobDetailsAndRequirements.objects.filter(job_status="ACTIVE").count()
+
+    return render(request, 'AdminView_2_1_EditJobDetails.html', {
+        'job': job,
+        'job_date': job_date,
+    })
+    
+
+def create_job_details(request):
+    today_date = date.today().strftime("%Y-%m-%d")  # Format today's date as YYYY-MM-DD
+    return render(request, 'AdminView_2_2_CreateJobDetails.html', {'today_date': today_date})
 
 def qualification(request):
     return render(request, 'AdminView_3_Qualification.html')
@@ -384,6 +513,7 @@ def admin_creatingjob(request):
     # Render the form if it's a GET request
     return render(request, 'users_app/create_job.html')
 
+###########################ADMIN RETRIEVAL####################################
 
 ############################index##########################################
 def login(request):
@@ -391,28 +521,15 @@ def login(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         
+        # Authenticate the user
         try:
-            
-            # Authenticate the user
             account = AccountInformation.objects.get(username=username, password=password)
-            print("Account found:", account)  # Debug: Print the retrieved account
             
-            # Retrieve the account status from AccountStorage using the foreign key
+            # Check role from AccountStorage
             account_storage = AccountStorage.objects.filter(account=account).first()
-            print("Account Storage found:", account_storage)
             
             if account_storage:
-                # Check the account status
-                if account_storage.account_status == 'new':
-                    # Store account ID in the session to reference it in change_password view
-                    request.session['account_id'] = account.account_id
-                    return redirect('Security')
-                
-                elif account_storage.account_status == 'deactivate':
-                    messages.error(request, "Account is deactivated. Please contact support.")
-                    return render(request, 'login.html')
-                
-                # If account_status is neither 'new' nor 'deactivate', proceed to role-based redirection
+                # Store account ID in the session
                 request.session['account_id'] = account.account_id
                 
                 # Redirect based on role
@@ -430,7 +547,8 @@ def login(request):
         except AccountInformation.DoesNotExist:
             return render(request, 'login.html', {"message": "Incorrect username or password."})
 
-    return render(request, 'login.html')
+    return render(request, 'logIn.html')
+
 
 def change_password(request):
     # Only allow POST requests and check if account_id exists in the session
