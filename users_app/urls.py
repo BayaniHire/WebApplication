@@ -30,11 +30,13 @@ urlpatterns = [
     path('profile_applicant/', views.applicant_profile, name='profile'),
 ##########################APPLICANT###############################################
     
+ ##########################ADMIN##########################################
     path('dashboard_admin/', views.list_of_applicants, name='list_of_applicants'),
-    path('open_applicants/', views.open_applicants, name='open_applicants'),
-    path('viewing_files/', views.viewing_files, name='viewing_files'),
+    path('open_applicants/<int:applicant_status_id>/', views.open_applicants, name='open_applicants'),
+    path('view-file/<str:file_name>/', views.viewing_files, name='viewing_files'),  # Update this line
     path('list_of_jobs/', views.list_of_jobs, name='list_of_jobs'),
-    path('edit_job_details/', views.edit_job_details, name='edit_job_details'),
+    path('create_job_details/', views.create_job_details, name='create_job_details'),
+    path('edit-job/<int:job_id>/', views.edit_job_details, name='edit_job_details'), 
     path('qualification/', views.qualification, name='qualification'),
     path('send_schedule/', views.send_schedule, name='send_schedule'),
     path('open_schedule_list/', views.open_schedule_list, name='open_schedule_list'),
@@ -45,10 +47,10 @@ urlpatterns = [
     path('add_accounts/', views.add_accounts, name='add_accounts'),
     path('manage_accounts/', views.manage_accounts, name='manage_accounts'),
     
-    ###wag galawin pang admin to
     path('admin_interviewer_account_setup/', views.admin_interviewer_account_setup, name='admin_interviewer_account_setup'),
     path('admin_creatingjob/', views.admin_creatingjob, name='admin_creatingjob'),
-    ####### admin#####
+    path('applicant/update/<int:applicant_status_id>/', update_applicant_status, name='update_applicant_status'),
+##########################ADMIN##########################################
 
     ###wag po galawin pang log in to
     path('security/change_password/', views.change_password, name='change_password'),
