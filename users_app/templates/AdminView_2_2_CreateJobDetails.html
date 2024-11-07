@@ -25,44 +25,39 @@
         <h1>BayaniHire Admin Center</h1>
         <button onclick="window.location.href='{% url 'adminprofile' %}';">Profile</button>
     </div>
-    <h2>Edit Job Details & Requirements</h2>
-    <form action="{% url 'edit_job_details' job.job_id %}" method="post" style="font-family: Georgia; font-size: 18px; font-weight: bold;">
+    <h2>Create Job Details & Requirements</h2>
+    <form action="{% url 'admin_creatingjob' %}" method="post" style="font-family: Georgia; font-size: 18px; font-weight: bold;">
         {% csrf_token %}
         <table>
             <tr>
                 <td><strong>Status:</strong></td>
                 <td>
                     <select name="status" required>
-                        <option value="ACTIVE" {% if job.job_status == 'ACTIVE' %}selected{% endif %}>ACTIVE</option>
-                        <option value="CLOSE" {% if job.job_status == 'CLOSE' %}selected{% endif %}>CLOSE</option>
+                        <option value="ACTIVE">ACTIVE</option>
+                        <option value="CLOSE">CLOSE</option>
                     </select>
                 </td>
                 <td><strong>Date:</strong></td>
-                <td>
-                    <!-- Read-only date display -->
-                    <input type="date" value="{{ job_date }}" readonly>
-                    <!-- Hidden input to submit date changes -->
-                    <input type="hidden" name="date" value="{{ job_date }}">
-                </td>
+                <td><input type="date" name="date" value="{{ today_date }}" readonly></td> <!-- Use today_date -->
             </tr>
             <tr>
                 <td><strong>Job Title</strong></td>
-                <td><input type="text" name="job_title" placeholder="Job Title" value="{{ job.job_title }}" required></td>
+                <td><input type="text" name="job_title" placeholder="Job Title" required></td>
                 <td><strong>Job Benefits</strong></td>
-                <td><textarea name="job_benefits" placeholder="Job Benefits" required>{{ job.job_benefits }}</textarea></td>
+                <td><textarea name="job_benefits" placeholder="Job Benefits" required></textarea></td>
             </tr>
             <tr>
                 <td><strong>Company</strong></td>
-                <td><input type="text" name="company" placeholder="Company" value="{{ job.job_company }}" required></td>
+                <td><input type="text" name="company" placeholder="Company" required></td>
             </tr>
             <tr>
                 <td><strong>Job Description</strong></td>
-                <td><textarea name="job_description" placeholder="Job Description" required>{{ job.job_description }}</textarea></td>
+                <td><textarea name="job_description" placeholder="Job Description" required></textarea></td>
                 <td><strong>Job Requirements</strong></td>
-                <td><textarea name="job_requirements" placeholder="Job Requirements" required>{{ job.job_requirements }}</textarea></td>
+                <td><textarea name="job_requirements" placeholder="Job Requirements" required></textarea></td>
             </tr>
         </table>
-        <button type="submit">Save</button>
+        <button type="submit">Upload</button>
     </form>
 </body>
 </html>

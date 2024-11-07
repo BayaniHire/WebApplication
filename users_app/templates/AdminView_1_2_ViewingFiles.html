@@ -26,8 +26,15 @@
         <button onclick="window.location.href='{% url 'adminprofile' %}';">Profile</button>
     </div>
     <h2>Viewing of File</h2>
-    <!-- Image Placeholder -->
-    <img src="image_placeholder.jpg" alt="View File" width="600" height="400">
+
+    <!-- Check if the file is an image -->
+    {% if file_name.endswith('.jpg') or file_name.endswith('.png') or file_name.endswith('.gif') %}
+        <img src="{{ file_name }}" alt="View File" width="600" height="400">
+    {% else %}
+        <p>This file type cannot be displayed directly. Please download it instead:</p>
+        <a href="{{ file_name }}">Download {{ file_name }}</a>
+    {% endif %}
+
     <!-- Back Button -->
     <p><button onclick="history.back()">Back</button></p>
 </body>

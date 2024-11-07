@@ -1,56 +1,66 @@
-{% extends "Admin_Inheritance.html" %}
-{% block body %}
-<div class="main-content">
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BayaniHire: Admin Center</title>
+</head>
+<body>
+
+    <h1 style="font-family: Georgia; font-size: 30px; font-weight: bold;">BayaniHire: Admin Center</h1>
+    <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo" width="500px" height="300px">
+    
+    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'adminprofile' %}';">Profile</button>
+    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'list_of_applicants' %}';">List of Applicants</button>
+    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'list_of_jobs' %}';">List of Jobs</button>
+    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'qualification' %}';">Qualification</button>
+    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'schedule' %}';">Schedule</button>
+    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'feedback' %}';">Feedback</button>
+    
+    <br><br>
 
     <h2 style="font-family: Georgia; font-size: 36px; font-weight: bold;">User Profile:</h2>
     <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">Username:</label> 
-    <span style="font-family: Georgia; font-size: 24px;">*INSERT USERNAME HERE*</span>
+    <span style="font-family: Georgia; font-size: 24px;">*INSERT USERNAME HERE*</span><br>
 
     <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">Name:</label> 
-    <span style="font-family: Georgia; font-size: 24px;">*INSERT NAME HERE*</span>
+    <span style="font-family: Georgia; font-size: 24px;">*INSERT NAME HERE*</span><br>
 
     <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">Email:</label> 
-    <span style="font-family: Georgia; font-size: 24px;">*INSERT EMAIL HERE*</span>
+    <span style="font-family: Georgia; font-size: 24px;">*INSERT EMAIL HERE*</span><br>
 
     <br>
 
-    <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">PASSWORD: </label>
+    <h2 style="font-family: Georgia; font-size: 36px; font-weight: bold;">Password:</h2>
+    <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">PASSWORD:</label>
     <span style="font-family: Georgia; font-size: 24px;">*HIDDEN*</span>
-    <br>
-    <button class="bodybutton" style="font-family: Georgia; font-size: 20px; font-weight: bold;" onclick="showContent()">Change Password</button>
-    <div id="change-password-section" class="hidden-content">
-        <div class="input-group">
-            <label>Current Password:</label>
-            <input class="inputarea" type="password" placeholder="Enter Current Password">
-        </div>
+    <button style="font-family: Georgia; font-size: 20px; font-weight: bold;">Show Password</button>
+
+    <br><br>
+
+    <h2 style="font-family: Georgia; font-size: 36px; font-weight: bold;">Change Password: (only shown when edit is clicked)</h2>
     
-        <div class="input-group">
-            <label>New Password:</label>
-            <input class="inputarea" type="password" placeholder="Enter New Password Here">
-        </div>
+    <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">Current Password:</label>
+    <input type="password" placeholder="Enter Current Password" style="font-family: Georgia; font-size: 24px; font-weight: bold;"><br>
+
+    <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">New Password:</label>
+    <input type="password" placeholder="Enter New Password Here" style="font-family: Georgia; font-size: 24px; font-weight: bold;"><br>
+
+    <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">Confirm Password:</label>
+    <input type="password" placeholder="Enter New Password Here" style="font-family: Georgia; font-size: 24px; font-weight: bold;"><br>
+
+    <button style="font-family: Georgia; font-size: 20px; font-weight: bold;">Save</button>
+
+    <br><br>
+
+    <h2 style="font-family: Georgia; font-size: 36px; font-weight: bold;">Create Account for Admin and Interviewer</h2>
     
-        <div class="input-group">
-            <label>Confirm Password:</label>
-            <input class="inputarea" type="password" placeholder="Enter New Password Here">
-        </div>
-        <div class="input-group">
-        <button class="bodybutton">Save</button>
+    <button style="font-family: Georgia; font-size: 20px; font-weight: bold;" onclick="window.location.href='{% url 'manage_accounts' %}';">Manage Accounts</button>
+    <button style="font-family: Georgia; font-size: 20px; font-weight: bold;" onclick="window.location.href='{% url 'add_accounts' %}';">Create Account</button>
+    
+    <br><br>
 
-        <div class="input-group">
-        <h3>Create Account for Admin and Interviewer</h3>
-        <button class="bodybutton" onclick="window.location.href='{% url 'manage_accounts' %}';">Manage Accounts</button>
-        <button class="bodybutton" onclick="window.location.href='{% url 'add_accounts' %}';">Create Account</button>
-        </div>
-        </div>
-    </div>
+    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;"onclick="window.location.href='{% url 'Index' %}'">Sign Out</button>
 
-<script>
-    function showContent() {
-        document.getElementById("change-password-section").style.display = "block";
-    }
-</script>
-
-    <button class="bodybutton" style="font-family: Georgia; font-size: 20px; font-weight: bold;"onclick="window.location.href='{% url 'Index' %}'">Sign Out</button>
-</div>
-{% endblock %}
-
+</body>
+</html>
