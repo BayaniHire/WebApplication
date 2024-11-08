@@ -128,7 +128,6 @@ def applicant_fileupload(request, job_id):
             credentials=combined_file_content,  # Store combined file contents
             file_metadata=', '.join(file_metadata_list),  # Store concatenated file names
             submission_date=timezone.now().date(),
-            interview=None,
             applicant_status="UNDER REVIEW"
         )
         new_application.save()
