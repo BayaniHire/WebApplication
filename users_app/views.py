@@ -525,15 +525,28 @@ def login(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         
-        # Authenticate the user
         try:
-            account = AccountInformation.objects.get(username=username, password=password)
             
-            # Check role from AccountStorage
+            # Authenticate the user
+            account = AccountInformation.objects.get(username=username, password=password)
+            print("Account found:", account)  # Debug: Print the retrieved account
+            
+            # Retrieve the account status from AccountStorage using the foreign key
             account_storage = AccountStorage.objects.filter(account=account).first()
+            print("Account Storage found:", account_storage)
             
             if account_storage:
-                # Store account ID in the session
+                # Check the account status
+                if account_storage.account_status == 'new':
+                    # Store account ID in the session to reference it in change_password view
+                    request.session['account_id'] = account.account_id
+                    return redirect('Security')
+                
+                elif account_storage.account_status == 'deactivate':
+                    messages.error(request, "Account is deactivated. Please contact support.")
+                    return render(request, 'login.html')
+                
+                # If account_status is neither 'new' nor 'deactivate', proceed to role-based redirection
                 request.session['account_id'] = account.account_id
                 
                 # Redirect based on role
@@ -551,7 +564,7 @@ def login(request):
         except AccountInformation.DoesNotExist:
             return render(request, 'login.html', {"message": "Incorrect username or password."})
 
-    return render(request, 'logIn.html')
+    return render(request, 'login.html')
 
 
 def change_password(request):
