@@ -1,303 +1,40 @@
-{% load static %} 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Upload Page</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: "Helvetica", sans-serif;
-            background-color: #FFD8AD;
-            color: #5C472E;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        .background {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            width: 100%;
-            position: relative;
-        }
+{% extends "Applicant_Inheritance.html" %}
 
-        .header {
-            width: 100%;
-            height: 60px;
-            background: #5C472E;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            color: #D3B18B;
-            font-family: "Georgia";
-            font-weight: bold;
-            font-size: 24px;
-            box-shadow: 0 1px 5px rgba(0,0,0,0.3);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
+{% block title %}File Upload Page{% endblock %}
 
-        .profile-button {
-            width: 120px;
-            height: 40px;
-            background: #FFD8AD;
-            color: #5C472E;
-            border: 1px solid #5C472E;
-            border-radius: 15px;
-            font-family: "ABeeZee";
-            font-weight: bold;
-            font-size: 14px;
-            text-align: center;
-            line-height: 40px;
-            cursor: pointer;
-        }
-
-        .sidebar {
-            width: 12%;
-            background: #bea17e;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: fixed;
-            top: 60px;
-            bottom: 0;
-            left: 0;
-            border-right: 1px solid #000000;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.3);
-            overflow-y: auto;
-        }
-
-        .image-placeholder {
-            width: 100%;
-            height: 130px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .image-placeholder img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        .button {
-            width: 100%;
-            height: 60px;
-            margin-bottom: 10px;
-            background: #FFD8AD;
-            color: #5C472E;
-            border: 1px solid #5C472E;
-            border-radius: 15px;
-            font-family: "Georgia";
-            font-weight: bold;
-            font-size: 14px;
-            text-align: center;
-            line-height: 60px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .button:hover {
-            background-color: rgba(59, 47, 32, 0.3);
-            color: #FFD8AD;
-        }
-
-        .main-content {
-            margin-left: 12%;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            box-sizing: border-box;
-            flex: 1;
-            position: relative;
-        }
-
-        .upload-info {
-            font-size: 16px;
-            color: #5C472E;
-            margin-bottom: 20px;
-        }
-
-        .upload-container {
-            display: flex;
-            flex-direction: row;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .small-container {
-            width: 200px;
-            height: 200px;
-            background-color: #FFD8AD;
-            border: 1px solid #5C472E;
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            padding: 10px;
-            overflow-y: auto;
-        }
-
-        .file-name {
-            padding: 5px;
-            font-size: 16px;
-            color: #5C472E;
-            cursor: pointer;
-            margin-bottom: 5px;
-            transition: background-color 0.3s;
-        }
-
-        .file-name.selected {
-            background-color: rgba(59, 47, 32, 0.3);
-            color: #FFD8AD;
-        }
-
-        .large-container {
-            flex: 1;
-            height: 400px;
-            background-color: #FFF;
-            border: 1px solid #5C472E;
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            overflow: auto;
-        }
-
-        .button-group {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 20px;
-            position: relative; /* Changed from absolute */
-            margin-bottom: 20px;
-        }
-
-        .button-group .button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 200px;
-            height: 40px;
-            font-size: 14px;
-            background-color: #5C472E;
-            color: #FFD8AD;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .button-group .button:hover {
-            background-color: rgba(59, 47, 32, 0.3);
-            color: #FFD8AD;
-        }
-
-        .apply-button {
-            width: 200px;
-            height: 40px;
-            background-color: #5C472E;
-            color: #FFD8AD;
-            border: none;
-            border-radius: 5px;
-            font-family: "Georgia";
-            font-weight: bold;
-            font-size: 14px;
-            text-align: center;
-            line-height: 40px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, color 0.3s ease;
-            position: absolute; /* Changed to absolute */
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-        }
-
-        .apply-button:hover {
-            background-color: rgba(59, 47, 32, 0.3);
-            color: #FFD8AD;
-        }
-
-        .footer {
-            width: 100%;
-            height: 60px;
-            background: #5C472E;
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            justify-content: flex-start;
-            color: #D3B18B;
-            font-family: "Georgia";
-            font-weight: bold;
-            box-shadow: 0 -1px 5px rgba(0,0,0,0.3);
-            position: relative;
-            margin-top: auto;
-        }
-    </style>
-</head>
-<body>
-
-<div class="background">
-    <!-- Header -->
-    <div class="header">
-        <h1>BayaniHire: Applicant Center</h1>
-        <div class="profile-button" onclick="window.location.href='{% url 'profile' %}';">Profile</div>
-    </div>
-
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="image-placeholder">
-            <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo">
+{% block content %}
+<div class="main-content">
+    <form id="upload-form" action="{% url 'fileupload' job_id=job_id %}" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="upload-info">
+            Please select files to upload. Supported file types include PDF documents and images (JPEG, PNG).
         </div>
-        <div class="button" onclick="window.location.href='{% url 'homepage' %}'">Home</div>
-        <div class="button" onclick="window.location.href='{% url 'applicationstatus' %}'">Application Status</div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="main-content">
-        <form id="upload-form" action="{% url 'fileupload' job_id=job_id %}" method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="upload-info">
-                Please select files to upload. Supported file types include PDF documents and images (JPEG, PNG).
+        
+        <div class="upload-container">
+            <div class="small-container" id="file-list">
+                <!-- List of file names will be shown here -->
             </div>
-            <div class="upload-container">
-                <div class="small-container" id="file-list">
-                    <!-- List of file names will be shown here -->
-                </div>
-                <div class="large-container" id="large-container">
-                    <!-- Content for large container (file preview) -->
-                </div>
+            
+            <div class="large-container" id="large-container">
+                <!-- Content for large container (file preview) -->
             </div>
-            <input type="file" id="file-input" name="files" multiple style="display:none;">
-            <div class="button-group">
-                <button type="button" class="button" onclick="document.getElementById('file-input').click();">UPLOAD</button>
-                <button type="button" class="button" id="delete-button" onclick="deleteSelectedFiles();">DELETE</button>
-                <button type="button" class="button" id="view-button" onclick="viewSelectedFiles();">VIEW</button>
-                <button type="button" class="button" id="download-button" onclick="downloadSelectedFiles();">DOWNLOAD</button>
-                <button type="submit" class="apply-button">APPLY</button>
-            </div>
-        </form>
-    </div>
-
-    <!-- Footer -->
-    <div class="footer">
-        <p>© BayaniHire Inc.</p>
-    </div>
+        </div>
+        
+        <input type="file" id="file-input" name="files" multiple style="display:none;">
+        
+        <div class="verbutton-group">
+            <button type="button" class="button" onclick="document.getElementById('file-input').click();">UPLOAD</button>
+            <button type="button" class="button" id="delete-button" onclick="deleteSelectedFiles();">DELETE</button>
+            <button type="button" class="button" id="view-button" onclick="viewSelectedFiles();">VIEW</button>
+            <button type="button" class="button" id="download-button" onclick="downloadSelectedFiles();">DOWNLOAD</button>
+            <button type="submit" class="apply-button">APPLY</button>
+        </div>
+    </form>
 </div>
+{% endblock %}
 
+{% block script %}
 <script>
     const fileInput = document.getElementById('file-input');
     const fileList = document.getElementById('file-list');
@@ -305,26 +42,22 @@
     const deleteButton = document.getElementById('delete-button');
     const viewButton = document.getElementById('view-button');
     const downloadButton = document.getElementById('download-button');
-    const applyButton = document.getElementById('apply-button'); // Assuming you have an APPLY button
+    const applyButton = document.getElementById('apply-button');
     let selectedFile = null;
 
-    // Handle file input change
     fileInput.addEventListener('change', function(event) {
         const files = event.target.files;
 
-        // Loop through the files and add them to the file list
         for (const file of files) {
             const fileNameElement = document.createElement('div');
             fileNameElement.textContent = file.name;
             fileNameElement.className = 'file-name';
             fileNameElement.onclick = () => {
-                // Deselect previously selected file
                 if (selectedFile === file) {
                     selectedFile = null;
                     fileNameElement.classList.remove('selected');
                 } else {
                     selectedFile = file;
-                    // Remove 'selected' class from all other file names
                     const fileNames = document.getElementsByClassName('file-name');
                     for (let el of fileNames) {
                         el.classList.remove('selected');
@@ -336,23 +69,18 @@
         }
     });
 
-    // Handle delete button click
     deleteButton.addEventListener('click', () => {
         if (selectedFile) {
-            // Remove the selected file from the displayed list
             const fileNames = Array.from(fileList.getElementsByClassName('file-name'));
             const fileNameElement = fileNames.find(el => el.textContent === selectedFile.name);
             if (fileNameElement) {
                 fileList.removeChild(fileNameElement);
             }
-
-            selectedFile = null; // Clear the selected file
-            largeContainer.innerHTML = ''; // Clear the large container
+            selectedFile = null;
+            largeContainer.innerHTML = '';
         }
     });
 
-
-    // Handle view button click
     viewButton.addEventListener('click', () => {
         if (selectedFile) {
             const reader = new FileReader();
@@ -372,7 +100,6 @@
         }
     });
 
-    // Handle download button click
     downloadButton.addEventListener('click', () => {
         if (selectedFile) {
             const link = document.createElement('a');
@@ -384,28 +111,18 @@
         }
     });
 
-    // Add event listener for the APPLY button
-    applyButton.addEventListener('click', async () => {
+    applyButton.addEventListener('click', async (event) => {
+        event.preventDefault();  // Prevent default form submission
         const formData = new FormData();
         const fileNames = Array.from(fileList.getElementsByClassName('file-name'));
 
         if (fileNames.length > 0) {
-            const concatenatedFileNames = fileNames.map(el => el.textContent).join(','); // Concatenate filenames
-            formData.append('file_metadata', concatenatedFileNames); // Append concatenated filenames
+            const concatenatedFileNames = fileNames.map(el => el.textContent).join(',');
+            formData.append('file_metadata', concatenatedFileNames);
 
-            // Check if any file is selected
-            const filesToUpload = [];
-            for (const fileNameElement of fileNames) {
-                const fileName = fileNameElement.textContent;
-                const originalFile = Array.from(fileInput.files).find(file => file.name === fileName);
-                if (originalFile) {
-                    filesToUpload.push(originalFile); // Store selected files
-                }
-            }
-
-            // Append actual files
+            const filesToUpload = Array.from(fileInput.files);
             filesToUpload.forEach(file => {
-                formData.append('files', file); // Append actual files
+                formData.append('files', file);
             });
 
             try {
@@ -413,15 +130,15 @@
                     method: 'POST',
                     body: formData,
                     headers: {
-                        'X-CSRFToken': '{{ csrf_token }}' // Include CSRF token for security
+                        'X-CSRFToken': '{{ csrf_token }}'
                     }
                 });
 
                 if (response.ok) {
                     alert("Files uploaded successfully!");
-                    fileInput.value = ''; // Clear the file input
-                    fileList.innerHTML = ''; // Clear the file list
-                    largeContainer.innerHTML = ''; // Clear the large container
+                    fileInput.value = '';
+                    fileList.innerHTML = '';
+                    largeContainer.innerHTML = '';
                 } else {
                     alert("Error uploading files. Please try again.");
                 }
@@ -434,5 +151,4 @@
         }
     });
 </script>
-</body>
-</html>
+{% endblock %}
