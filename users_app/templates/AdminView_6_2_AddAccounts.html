@@ -1,64 +1,54 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>BayaniHire: Admin Center</title>
-</head>
-<body>
-    <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">BayaniHire: Admin Center</label>
-    <br><br>
-    <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo" width="500px" height="300px">
-    <br><br>
+{% extends "Admin_Inheritance.html" %}  <!-- Replace with your actual base template filename -->
 
-    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'adminprofile' %}';">Profile</button>
-    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'list_of_applicants' %}';">List of Applicants</button>
-    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'list_of_jobs' %}';">List of Jobs</button>
-    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'qualification' %}';">Qualification</button>
-    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'schedule' %}';">Schedule</button>
-    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'feedback' %}';">Feedback</button>
-    <br><br><br>
-    <label style="font-family: Georgia; font-size: 36px; font-weight: bold;">Admin User Account Setup</label>
-    <br><br>
-    <label style="font-family: Georgia; font-size: 14px; font-weight: bold;">
+{% block title %}BayaniHire: Admin Center{% endblock %}
+
+{% block content %}
+<div class="main-content" style="padding-top: 60px;">  <!-- Main content area with padding to avoid header overlap -->
+
+    <!-- Admin User Account Setup Section -->
+    <h2 style="font-size: 36px; font-weight: bold;">Admin User Account Setup</h2>
+    <p style="font-size: 14px; font-weight: bold;">
         Welcome to Admin User Account Setup, where the System Admin can add more Admins and Interviewers to the system!
-    </label>
-    <br><br>
-    
-    <form action="/admin_interviewer_account_setup/" method="post" style="font-family: Georgia; font-size: 18px; font-weight: bold;">
+    </p>
+    <br>
+
+    <!-- Account Creation Form -->
+    <form action="/admin_interviewer_account_setup/" method="post" class="account-setup-form" style="font-size: 18px; font-weight: bold;">
         {% csrf_token %}
+        
         <label style="font-size: 20px;">Role:</label>
-        <select name="role" style="font-size: 18px;" required>
+        <select name="role" class="form-control w-auto" required>
             <option value="Interviewer">Interviewer</option>
             <option value="Admin">Admin</option>
         </select>
         <br><br>
-    
+
         <label style="font-size: 20px;">Birthday:</label>
-        <input type="date" name="birthday" min="1900-01-01" max="2024-09-21" required>
+        <input type="date" name="birthday" min="1900-01-01" max="2024-09-21" class="form-control w-auto" required>
         <br><br>
-    
+
         <label style="font-size: 20px;">Gender:</label>
-        <select name="gender" style="font-size: 18px;" required>
+        <select name="gender" class="form-control w-auto" required>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
             <option value="Prefer not to say">Prefer not to say</option>
         </select>
         <br><br>
-    
+
         <label style="font-size: 20px;">First Name:</label>
-        <input type="text" name="first_name" placeholder="First Name" required>
+        <input type="text" name="first_name" placeholder="First Name" class="form-control" required>
         <br><br>
-    
+
         <label style="font-size: 20px;">Middle Name:</label>
-        <input type="text" name="middle_name" placeholder="Middle Name" required>
+        <input type="text" name="middle_name" placeholder="Middle Name" class="form-control" required>
         <br><br>
-    
+
         <label style="font-size: 20px;">Last Name:</label>
-        <input type="text" name="last_name" placeholder="Last Name" required>
+        <input type="text" name="last_name" placeholder="Last Name" class="form-control" required>
         <br><br>
-    
-        <button type="submit" style="font-size: 20px; font-weight: bold;">Create</button>
+
+        <button type="submit" class="btn btn-primary" style="font-size: 20px;">Create</button>
     </form>
-    <br><br>    
-</body>
-</html>
+
+</div>
+{% endblock %}
