@@ -1,49 +1,41 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>BayaniHire: Admin Center</title>
-</head>
-<body>
+{% extends "Admin_Inheritance.html" %}  <!-- Replace with your actual base template filename -->
 
-    <h1><b>BayaniHire: Admin Center</b></h1>
-    <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo" width="500px" height="300px">
-    
-    <button onclick="window.location.href='{% url 'adminprofile' %}';"><b>Profile</b></button>
-    <button onclick="window.location.href='{% url 'list_of_applicants' %}';"><b>List of Applicants</b></button>
-    <button onclick="window.location.href='{% url 'list_of_jobs' %}';"><b>List of Jobs</b></button>
-    <button onclick="window.location.href='{% url 'qualification' %}';"><b>Qualification</b></button>
-    <button onclick="window.location.href='{% url 'schedule' %}';"><b>Schedule</b></button>
-    <button onclick="window.location.href='{% url 'feedback' %}';"><b>Feedback</b></button>
+{% block title %}BayaniHire: Admin Center{% endblock %}
 
-    <br><br>
-    <h2>Applicant Interview Status and Interviewer Feedback </h2>
-    <input type="text" placeholder="Search">
-    <button><b>Enter</b></button>
-    <button><b>View All</b></button>
-    <button onclick="window.location.href='{% url 'view_feedback' %}';"><b>View Feedback</b></button>
+{% block content %}
+<div class="main-content" style="padding-top: 60px;">  <!-- Main content area with padding to avoid header overlap -->
+    <h2>Applicant Interview Status and Interviewer Feedback</h2>
+    <div class="search-section">
+        <input type="text" placeholder="Search" class="form-control d-inline w-25">
+        <button class="btn btn-primary"><b>Enter</b></button>
+        <button class="btn btn-secondary"><b>View All</b></button>
+        <button onclick="window.location.href='{% url 'view_feedback' %}';" class="btn btn-info"><b>View Feedback</b></button>
+    </div>
 
-    <br><br>
-    
-    <table border="1" width="100%">
-        <tr>
-            <th><b>Applicant's Name</b></th>
-            <th><b>Position Applied</b></th>
-            <th><b>Company</b></th>
-            <th><b>Status</b></th>
-        </tr>
-        <tr><td>" "</td><td>" " </td><td>" "</td><td>" "</td></tr>
-        <tr><td>" "</td><td>" " </td><td>" "</td><td>" "</td></tr>
-        <tr><td>" "</td><td>" " </td><td>" "</td><td>" "</td></tr>
-        <tr><td>" "</td><td>" " </td><td>" "</td><td>" "</td></tr> 
-        <tr><td>" "</td><td>" " </td><td>" "</td><td>" "</td></tr>
-        <tr><td>" "</td><td>" " </td><td>" "</td><td>" "</td></tr>
-        <tr><td>" "</td><td>" " </td><td>" "</td><td>" "</td></tr>
-        <tr><td>" "</td><td>" " </td><td>" "</td><td>" "</td></tr>
-        <tr><td>" "</td><td>" " </td><td>" "</td><td>" "</td></tr>
-        <tr><td>" "</td><td>" " </td><td>" "</td><td>" "</td></tr>
+    <!-- Table for Applicant Data -->
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th><b>Applicant's Name</b></th>
+                <th><b>Position Applied</b></th>
+                <th><b>Company</b></th>
+                <th><b>Status</b></th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Example rows. Replace with dynamic data as needed. -->
+            <tr><td>" "</td><td>" "</td><td>" "</td><td>" "</td></tr>
+            <tr><td>" "</td><td>" "</td><td>" "</td><td>" "</td></tr>
+            <tr><td>" "</td><td>" "</td><td>" "</td><td>" "</td></tr>
+            <tr><td>" "</td><td>" "</td><td>" "</td><td>" "</td></tr>
+            <tr><td>" "</td><td>" "</td><td>" "</td><td>" "</td></tr>
+            <tr><td>" "</td><td>" "</td><td>" "</td><td>" "</td></tr>
+            <tr><td>" "</td><td>" "</td><td>" "</td><td>" "</td></tr>
+            <tr><td>" "</td><td>" "</td><td>" "</td><td>" "</td></tr>
+            <tr><td>" "</td><td>" "</td><td>" "</td><td>" "</td></tr>
+            <tr><td>" "</td><td>" "</td><td>" "</td><td>" "</td></tr>
+        </tbody>
     </table>
 
-</body>
-</html>
+</div>
+{% endblock %}
