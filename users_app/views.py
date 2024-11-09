@@ -52,26 +52,122 @@ def Security(request):
     return render(request, "profile_forcechange.html")
 
 
+######################INTERVIEWER###########################
+
 def interviewer_applicants(request):
-    return render(request, 'Applicants.html')
+    # Get the interviewer's account ID from the session (assuming session is properly set after login)
+    account_id = request.session.get('account_id')
+    if not account_id:
+        # Redirect to login if the account_id is not found in the session
+        return redirect('login')
+
+    # Retrieve the interviewer's own InterviewStorage entries
+    interviews = InterviewStorage.objects.filter(account_id=account_id)
+
+    # Fetch applicants linked to these interviews and qualified for interview
+    qualified_applicants = ListOfApplicantsWithStatusAndCredentials.objects.filter(
+        applicant_status='QUALIFIED',
+        interview_applicant_id__in=interviews
+    ).select_related('account', 'job', 'interview_applicant_id')
+
+    # Prepare data for the template
+    applicants_data = [
+        {
+            "full_name": f"{applicant.account.first_name} {applicant.account.middle_name or ''} {applicant.account.last_name}",
+            "job_title": applicant.job.job_title,
+            "job_company": applicant.job.job_company,
+            "date_applied": applicant.submission_date,
+            "interview_date": applicant.interview_applicant_id.interview_schedule_date if applicant.interview_applicant_id else None,
+            "status": applicant.applicant_status,
+            "applicant_status_id": applicant.applicant_status_id if applicant.applicant_status_id else None  # Ensure this line is added
+        }
+        for applicant in qualified_applicants
+    ]
+
+    return render(request, 'Applicants.html', {'applicants': applicants_data})
 
 def interviewer_appointments(request):
-    return render(request, 'Appointments.html')
+    # Get the account ID from the session
+    account_id = request.session.get('account_id')
+
+    if not account_id:
+        return redirect('login')  # Redirect to login if the account_id is not in session
+
+    # Retrieve the account object based on the account_id from the session
+    account = AccountInformation.objects.get(pk=account_id)
+
+    # Fetch interview dates for the specific account
+    interview_dates = InterviewStorage.objects.filter(account=account).values_list('interview_schedule_date', flat=True)
+
+    # Pass the interview dates to the template
+    context = {
+        'interview_dates': interview_dates,
+    }
+    return render(request, 'Appointments.html', context)
 
 def interviewer_editfeedback(request):
     return render(request, 'EditFeedback.html')
 
 def interviewer_feedback(request):
-    return render(request, 'Feedback.html')
+    if request.method == 'POST':
+        # Assuming you have fields in your form named 'applicant_id', 'status', and 'feedback'
+        applicant_id = request.POST.get('applicant_id')
+        status = request.POST.get('status')
+        feedback = request.POST.get('feedback')
+
+        # Find the applicant and update their status and feedback
+        applicant = ListOfApplicantsWithStatusAndCredentials.objects.get(applicant_status_id=applicant_id)
+        applicant.interviewer_feedback_status = status
+        applicant.interviewer_feedback = feedback
+        applicant.save()
+
+        # Optionally add a message indicating the feedback was successfully updated
+        messages.success(request, 'Feedback updated successfully.')
+
+    # Get all applicants or a subset based on certain criteria
+    applicants = ListOfApplicantsWithStatusAndCredentials.objects.all()
+    return render(request, 'Feedback.html', {'applicants': applicants})
+
 
 def interviewer_history(request):
-    return render(request, 'History.html')
+    # Assuming the user's ID is stored in session
+    user_id = request.session.get('user_id')
+    
+    # Retrieve feedback entries linked to the current user
+    applicants = ListOfApplicantsWithStatusAndCredentials.objects.filter(
+        interview_applicant_id__account_id=user_id,
+        interviewer_feedback__isnull=False
+    ).order_by('-submission_date')
+    
+    return render(request, 'History.html', {'applicants': applicants})
 
 def interviewer_profile(request):
     return render(request, 'Profile.html')
 
-def interviewer_viewinfo(request):
-    return render(request, 'ViewInfo.html')
+def interviewer_viewinfo(request, applicant_status_id):
+    # Fetch the applicant using the provided applicant_status_id
+    applicant = get_object_or_404(ListOfApplicantsWithStatusAndCredentials, applicant_status_id=applicant_status_id)
+
+    # Fetch related account and job details
+    account_info = applicant.account
+    job_details = applicant.job
+
+    # Prepare the uploaded files
+    uploaded_files = applicant.file_metadata.split(",") if applicant.file_metadata else []
+    uploaded_files = [file.strip() for file in uploaded_files]
+
+    # Prepare context for rendering
+    context = {
+        'applicant': account_info,
+        'job_details': job_details,
+        'uploaded_files': uploaded_files,
+        'submission_date': applicant.submission_date,
+        'applicant_status': applicant.applicant_status,
+        'applicant_status_id': applicant_status_id  # Ensure this is included
+    }
+    return render(request, 'ViewInfo.html', context)
+
+##################INTERVIEWER######################
 
 ###################APPLICANT############################
 def applicant_homepage(request):
