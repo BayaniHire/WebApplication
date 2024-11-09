@@ -198,43 +198,52 @@ def applicant_fileupload(request, job_id):
             return JsonResponse({"error": "No files selected."}, status=400)
 
         job_instance = get_object_or_404(JobDetailsAndRequirements, job_id=job_id)
-
         account_id = request.session.get('account_id')
         if not account_id:
             return JsonResponse({"error": "User must be logged in to upload files."}, status=403)
 
         account = get_object_or_404(AccountInformation, account_id=account_id)
         role_instance = get_object_or_404(AccountStorage, account=account)
-
         if role_instance.role.lower() != "applicant":
             return JsonResponse({"error": "Only applicants can upload files."}, status=403)
 
-        # Initialize a list to hold file names for metadata and file contents
+        # Initialize for combined file content and metadata
         file_metadata_list = []
-        combined_file_content = b''  # Use bytes for combining file contents
+        combined_file_content = b''
 
         # Process each uploaded file
         for uploaded_file in uploaded_files:
             file_name = uploaded_file.name
-            file_metadata_list.append(file_name)  # Collect file names
+            file_metadata_list.append(file_name)
+            file_content = uploaded_file.read()
+            
+            # Debug: Log the file name and size
+            print(f"Processing file: {file_name} with size: {len(file_content)} bytes")
 
-            # Read the file content into a separate variable to keep track of sizes
-            file_content = uploaded_file.read()  # Read file content
-            combined_file_content += file_content  # Combine file contents into a single blob
+            # Add the file content and a unique separator
+            combined_file_content += file_content + b'<SEPARATOR>'
+        
+        # Remove the last separator if added
+        if combined_file_content.endswith(b'<SEPARATOR>'):
+            combined_file_content = combined_file_content[:-len(b'<SEPARATOR>')]
 
-        # Save a single instance with all the combined contents and metadata
+        # Debug: Log the combined content length and metadata
+        print(f"Combined content length: {len(combined_file_content)}")
+        print(f"File metadata list: {file_metadata_list}")
+
+        # Save application with combined file contents and metadata
         new_application = ListOfApplicantsWithStatusAndCredentials(
             job=job_instance,
             role=role_instance,
             account=account,
-            credentials=combined_file_content,  # Store combined file contents
-            file_metadata=', '.join(file_metadata_list),  # Store concatenated file names
+            credentials=combined_file_content,
+            file_metadata=', '.join(file_metadata_list),
             submission_date=timezone.now().date(),
+            interview_applicant_id=None,
             applicant_status="UNDER REVIEW"
         )
         new_application.save()
 
-        # Render the template with success message and uploaded files
         context = {
             'job_id': job_id,
             'uploaded_files_display': uploaded_files_display,
@@ -243,6 +252,7 @@ def applicant_fileupload(request, job_id):
         return render(request, 'Applicant_fileupload.html', context)
 
     return JsonResponse({"error": "Invalid request method."}, status=405)
+
 
 
 def applicant_applicationstatus(request):
