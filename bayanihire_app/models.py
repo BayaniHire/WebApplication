@@ -54,26 +54,25 @@ class InterviewStorage(models.Model):
     account = models.ForeignKey(AccountInformation, on_delete=models.CASCADE)
     role = models.ForeignKey(AccountStorage, on_delete=models.CASCADE)
     interview_schedule_date = models.DateField(blank=True, null=True)
-    interviewer_schedule_status = models.CharField(max_length=10, blank=True, null=True)
-    applicant_schedule_date = models.DateField(blank=True, null=True)
-    admin_message = models.TextField(blank=True, null=True)
-    interviewer_feedback = models.TextField(blank=True, null=True)
-    interviewer_feedback_status = models.CharField(max_length=20, blank=True, null=True)
-
+    interviewer_name = models.CharField(max_length=50, blank=True, null=True)
+  
     class Meta:
         db_table = 'interview_storage'
-
 
 class ListOfApplicantsWithStatusAndCredentials(models.Model):
     applicant_status_id = models.AutoField(primary_key=True)
     role = models.ForeignKey(AccountStorage, on_delete=models.CASCADE)
     account = models.ForeignKey(AccountInformation, on_delete=models.CASCADE)
     job = models.ForeignKey(JobDetailsAndRequirements, on_delete=models.CASCADE)
-    interview = models.ForeignKey(InterviewStorage, null=True, blank=True, on_delete=models.CASCADE)
+    interview_applicant_id = models.ForeignKey(InterviewStorage, null=True, blank=True, on_delete=models.CASCADE)
     applicant_status = models.CharField(max_length=30, blank=True, null=True)
     credentials = models.BinaryField(blank=True, null=True)
     file_metadata = models.TextField(blank=True, null=True)
     submission_date = models.DateField(blank=True, null=True)
+    applicant_schedule_date = models.DateField(blank=True, null=True)
+    admin_message = models.TextField(blank=True, null=True)
+    interviewer_feedback = models.TextField(blank=True, null=True)
+    interviewer_feedback_status = models.CharField(max_length=20, blank=True, null=True)
 
     class Meta:
         db_table = 'list_of_applicants_with_status_and_credentials'
