@@ -1,37 +1,17 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>BayaniHire Admin Center</title>
-</head>
-<body>
-    <!-- Logo -->
-    <div>
-        <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo" width="200" height="200">
-    </div>
+{% extends "Admin_Inheritance.html" %}  <!-- Replace with your actual base template filename -->
 
-    <!-- Buttons -->
-    <div>
-        <button onclick="window.location.href='{% url 'list_of_applicants' %}';">List of Applicants</button>
-        <button onclick="window.location.href='{% url 'list_of_jobs' %}';">List of Jobs</button>
-        <button onclick="window.location.href='{% url 'qualification' %}';">Qualification</button>
-        <button onclick="window.location.href='{% url 'schedule' %}';">Schedule</button>
-        <button onclick="window.location.href='{% url 'feedback' %}';">Feedback</button>
-    </div>
+{% block title %}BayaniHire Admin Center{% endblock %}
 
-    <!-- Title and Profile -->
-    <div>
-        <h1>BayaniHire Admin Center</h1>
-        <button onclick="window.location.href='{% url 'adminprofile' %}';">Profile</button>
-    </div>
+{% block content %}
+<div class="main-content" style="padding-top: 60px;">  <!-- Main content area with padding to avoid header overlap -->
+
     <h2>Interviewer Schedule</h2>
     <p>Kindly choose the interviewer's name and interview date.</p>
     
-    <!-- Left Side Content -->
-    <form action="{% url 'schedule' %}" method="post">
+    <!-- Interviewer Selection Form -->
+    <form action="{% url 'schedule' %}" method="post" class="mb-4">
         {% csrf_token %}
-        <table border="1">
+        <table class="table table-bordered">
             <caption>Interviewer Names</caption>
             {% for name in interviewer_names %}
                 <tr>
@@ -44,27 +24,31 @@
         </table>
     
         <label for="interview_date">Interview Date:</label>
-        <input type="date" name="interview_date" required>
+        <input type="date" name="interview_date" class="form-control w-auto d-inline" required>
     
-        <button type="submit">Send</button>
+        <button type="submit" class="btn btn-primary mt-2">Send</button>
     </form>
     
-    <!-- Display the interview schedule data -->
-    <table border="1" style="margin-top: 20px;">
-        <tr>
-            <th>Interviewer Name</th>
-            <th>Date Given</th>
-        </tr>
-        {% for interview in formatted_interview_data %}
+    <!-- Interview Schedule Display Table -->
+    <table class="table table-bordered mt-4">
+        <thead>
             <tr>
-                <td>{{ interview.name }}</td>
-                <td>{{ interview.date }}</td>
+                <th>Interviewer Name</th>
+                <th>Date Given</th>
             </tr>
-        {% empty %}
-            <tr>
-                <td colspan="2">No interviews scheduled</td>
-            </tr>
-        {% endfor %}
+        </thead>
+        <tbody>
+            {% for interview in formatted_interview_data %}
+                <tr>
+                    <td>{{ interview.name }}</td>
+                    <td>{{ interview.date }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="2" class="text-center">No interviews scheduled</td>
+                </tr>
+            {% endfor %}
+        </tbody>
     </table>
-</body>
-</html>
+</div>
+{% endblock %}
