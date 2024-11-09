@@ -1,63 +1,45 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>BayaniHire Admin Center</title>
-</head>
-<body>
-    <!-- Logo -->
-    <div>
-        <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo" width="200" height="200">
-    </div>
+{% extends "Admin_Inheritance.html" %}  <!-- Replace with your actual base template filename -->
 
-    <!-- Buttons -->
-    <div>
-        <button onclick="window.location.href='{% url 'list_of_applicants' %}';">List of Applicants</button>
-        <button onclick="window.location.href='{% url 'list_of_jobs' %}';">List of Jobs</button>
-        <button onclick="window.location.href='{% url 'qualification' %}';">Qualification</button>
-        <button onclick="window.location.href='{% url 'schedule' %}';">Schedule</button>
-        <button onclick="window.location.href='{% url 'feedback' %}';">Feedback</button>
-    </div>
+{% block title %}BayaniHire Admin Center{% endblock %}
 
-    <!-- Title and Profile -->
-    <div>
-        <h1>BayaniHire Admin Center</h1>
-        <button onclick="window.location.href='{% url 'adminprofile' %}';">Profile</button>
-    </div>
-    <h2>Create Job Details & Requirements</h2>
-    <form action="{% url 'admin_creatingjob' %}" method="POST" style="font-family: Georgia; font-size: 18px; font-weight: bold;">
+{% block content %}
+<div class="main-content" style="padding-top: 60px;">  <!-- Main content area with padding to avoid header overlap -->
+
+    <h2>Create/Edit Job Details & Requirements</h2>
+    
+    <form action="{% url 'admin_creatingjob' %}" method="post" style="font-family: Georgia; font-size: 18px; font-weight: bold;">
         {% csrf_token %}
-        <table>
+        <table class="table">
             <tr>
                 <td><strong>Status:</strong></td>
                 <td>
-                    <select name="status" required>
+                    <select name="status" class="form-control" required>
                         <option value="ACTIVE">ACTIVE</option>
                         <option value="CLOSE">CLOSE</option>
                     </select>
                 </td>
                 <td><strong>Date:</strong></td>
-                <td><input type="date" name="date" value="{{ today_date }}" readonly></td> <!-- Use today_date -->
+                <td><input type="date" name="date" value="2024-09-20" class="form-control" readonly></td>
             </tr>
             <tr>
                 <td><strong>Job Title</strong></td>
-                <td><input type="text" name="job_title" placeholder="Job Title" required></td>
+                <td><input type="text" name="job_title" placeholder="Job Title" class="form-control" required></td>
                 <td><strong>Job Benefits</strong></td>
-                <td><textarea name="job_benefits" placeholder="Job Benefits" required></textarea></td>
+                <td><textarea name="job_benefits" placeholder="Job Benefits" class="form-control" required></textarea></td>
             </tr>
             <tr>
                 <td><strong>Company</strong></td>
-                <td><input type="text" name="company" placeholder="Company" required></td>
+                <td><input type="text" name="company" placeholder="Company" class="form-control" required></td>
             </tr>
             <tr>
                 <td><strong>Job Description</strong></td>
-                <td><textarea name="job_description" placeholder="Job Description" required></textarea></td>
+                <td><textarea name="job_description" placeholder="Job Description" class="form-control" required></textarea></td>
                 <td><strong>Job Requirements</strong></td>
-                <td><textarea name="job_requirements" placeholder="Job Requirements" required></textarea></td>
+                <td><textarea name="job_requirements" placeholder="Job Requirements" class="form-control" required></textarea></td>
             </tr>
         </table>
-        <button type="submit">Upload</button>
+        <button type="submit" class="btn btn-success">Save/Upload</button>
     </form>
-</body>
-</html>
+
+</div>
+{% endblock %}
