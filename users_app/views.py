@@ -582,11 +582,27 @@ def confirm_send_schedule(request):
         return redirect('list_of_applicants')  # Redirect to a confirmation or success page
     return redirect('send_schedule')
 
-
-
-
 def open_schedule_list(request):
-    return render(request, 'AdminView_3_2_OpenScheduleList.html')
+    interviewer_name = request.GET.get('interviewer', None)
+    search_query = request.GET.get('search', '')
+    view_all = request.GET.get('view_all', '')
+
+    if view_all:
+        applicants = ListOfApplicantsWithStatusAndCredentials.objects.all()
+    elif interviewer_name:
+        interviews = InterviewStorage.objects.filter(interviewer_name=interviewer_name)
+        applicants = ListOfApplicantsWithStatusAndCredentials.objects.filter(
+            interview_applicant_id__in=interviews,
+            account__first_name__icontains=search_query
+        ).distinct()
+    else:
+        applicants = ListOfApplicantsWithStatusAndCredentials.objects.none()
+
+    # Correcting the distinct interviewer query to use the correct primary key field
+    interviewer_ids = InterviewStorage.objects.values('interviewer_name').annotate(max_id=Max('interview_applicant_id')).values('max_id')
+    interviewers = InterviewStorage.objects.filter(interview_applicant_id__in=interviewer_ids)
+
+    return render(request, 'AdminView_3_2_OpenScheduleList.html', {'applicants': applicants, 'interviewers': interviewers})
 
 def schedule(request):
     # Get AccountStorage entries where the role is 'interviewer'
@@ -664,13 +680,73 @@ def schedule_view(request):
     return render(request, 'AdminView_4_Schedule.html', context)
 
 def feedback(request):
-    return render(request, 'AdminView_5_Feedback.html')
+    applicants = ListOfApplicantsWithStatusAndCredentials.objects.select_related('account', 'job').all()
+    first_applicant_id = applicants.first().applicant_status_id if applicants.exists() else None
+    return render(request, 'AdminView_5_Feedback.html', {
+        'applicants': applicants,
+        'first_applicant_id': first_applicant_id
+    })
 
-def view_feedback(request):
-    return render(request, 'AdminView_5_1_ViewFeedback.html')
+@require_http_methods(["GET", "POST"])
+def view_feedback(request, applicant_status_id):
+    # Fetch the specific applicant using the provided ID
+    applicant = get_object_or_404(ListOfApplicantsWithStatusAndCredentials, pk=applicant_status_id)
+    
+    if request.method == "POST":
+        # Update the applicant's status with data from the form
+        new_status = request.POST.get('applicant_status')
+        if new_status:
+            applicant.applicant_status = new_status
+            applicant.save()
+            # Redirect to the same page to show updated status
+            return redirect('feedback')
+
+    # For GET requests or initial form rendering
+    interviewer_name = applicant.interview_applicant_id.interviewer_name if applicant.interview_applicant_id else "No interviewer assigned"
+    context = {
+        'interviewer_name': interviewer_name,
+        'applicant_name': f"{applicant.account.first_name} {applicant.account.last_name}",
+        'interview_status': applicant.interviewer_feedback_status,
+        'interview_feedback': applicant.interviewer_feedback,
+        'applicant_status_id': applicant_status_id  # Needed to build the form action URL
+    }
+    
+    return render(request, 'AdminView_5_1_ViewFeedback.html', context)
+
+
 
 def adminprofile(request):
-    return render(request, 'AdminView_6_Profile.html')
+    # Assuming the user's ID is stored in session
+    account_id = request.session.get('account_id')
+    user = get_object_or_404(AccountInformation, account_id=account_id)
+    
+    if request.method == "POST":
+        # Change Password Logic
+        current_password = request.POST.get('current_password')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+        
+        # Check if the current password matches
+        if user.password != current_password:
+            messages.error(request, "Current password is incorrect.")
+        elif new_password == current_password:
+            messages.error(request, "New password must be different from the current password.")
+        elif new_password != confirm_password:
+            messages.error(request, "New password and confirm password do not match.")
+        else:
+            # Update the password
+            user.password = new_password
+            user.save()
+            messages.success(request, "Password updated successfully.")
+            return redirect('adminprofile')
+
+    # Display profile info
+    context = {
+        'username': user.username,
+        'full_name': f"{user.first_name} {user.middle_name or ''} {user.last_name}",
+        'email': user.email
+    }
+    return render(request, 'AdminView_6_Profile.html', context)
 
 def add_accounts(request):
     return render(request, 'AdminView_6_2_AddAccounts.html')
@@ -708,9 +784,10 @@ def admin_interviewer_account_setup(request):
             first_name = request.POST.get('first_name')
             middle_name = request.POST.get('middle_name')
             last_name = request.POST.get('last_name')
+            email = request.POST.get('email')
 
             # Ensure all required fields are provided
-            if not (role and birthday and gender and first_name and last_name):
+            if not (role and birthday and gender and first_name and last_name and email):
                 return render(request, 'users_app/AdminView_6_2_AddAccounts.html', {"message": "Missing required fields. Please fill out the form completely."})
 
             # Check if the birthday is not empty and compute age
@@ -719,10 +796,17 @@ def admin_interviewer_account_setup(request):
             age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
 
             # Generate default username and password
-            username = f"{first_name.lower().replace(' ', '')}@bynhr.com"  # Remove spaces from the first name
+            base_username = f"{first_name.lower().replace(' ', '')}@bynhr.com"
             password = last_name.lower().replace(' ', '')  # Use the last name as the default password and remove spaces
 
-            # Step 1: Save data to AccountInformation
+            # Check if the username already exists and make it unique if needed
+            username = base_username
+            count = 1
+            while AccountInformation.objects.filter(username=username).exists():
+                username = f"{base_username}_{count}"
+                count += 1
+
+            # Step 1: Save data to AccountInformation, including the email field
             account_info = AccountInformation(
                 first_name=first_name,
                 middle_name=middle_name,
@@ -731,6 +815,7 @@ def admin_interviewer_account_setup(request):
                 gender=gender,
                 username=username,
                 password=password,
+                email=email,
                 age=age
             )
             account_info.save()  # Save to the database
@@ -744,6 +829,7 @@ def admin_interviewer_account_setup(request):
             account_storage.save()  # Save to the database
 
             # Redirect to the profile admin page
+            messages.success(request, f"Account created successfully with username: {username}")
             return redirect('adminprofile')
 
         except Exception as e:
@@ -797,7 +883,6 @@ def admin_creatingjob(request):
 
     # Render the form if it's a GET request
     return render(request, 'users_app/create_job.html')
-
 
 ###########################ADMIN RETRIEVAL####################################
 
