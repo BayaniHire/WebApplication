@@ -1,50 +1,30 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>BayaniHire Admin Center</title>
-</head>
-<body>
-    <!-- Logo -->
-    <div>
-        <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo" width="200" height="200">
-    </div>
+{% extends "Admin_Inheritance.html" %}  <!-- Replace with your actual base template filename -->
 
-    <!-- Buttons -->
-    <div>
-        <button onclick="window.location.href='{% url 'list_of_applicants' %}';">List of Applicants</button>
-        <button onclick="window.location.href='{% url 'list_of_jobs' %}';">List of Jobs</button>
-        <button onclick="window.location.href='{% url 'qualification' %}';">Qualification</button>
-        <button onclick="window.location.href='{% url 'schedule' %}';">Schedule</button>
-        <button onclick="window.location.href='{% url 'feedback' %}';">Feedback</button>
-    </div>
+{% block title %}BayaniHire Admin Center{% endblock %}
 
-    <!-- Title and Profile -->
-    <div>
-        <h1>BayaniHire Admin Center</h1>
-        <button onclick="window.location.href='{% url 'adminprofile' %}';">Profile</button>
-    </div>
+{% block content %}
+<div class="main-content" style="padding-top: 60px;">  <!-- Main content area with padding to avoid header overlap -->
     <h2>Applicant Interview Schedule</h2>
-    
+
+    <!-- Form for Scheduling -->
     <form method="POST" action="{% url 'confirm_send_schedule' %}">
-        
         {% csrf_token %}
+        
+        <!-- Hidden Fields for Data Submission -->
         <input type="hidden" name="interviewer_name" value="{{ interviewer_name }}">
         <input type="hidden" name="schedule_date" value="{{ schedule_date }}">
         <input type="hidden" name="interview_message" value="{{ interview_message }}">
-    
+        
         {% for applicant in applicants %}
-        <!-- Ensure that applicant_ids[] is used to capture all IDs as a list -->
-        <input type="hidden" name="applicant_ids[]" value="{{ applicant.applicant_status_id }}">
+            <input type="hidden" name="applicant_ids[]" value="{{ applicant.applicant_status_id }}">
         {% endfor %}
-    
+
         <table width="100%">
             <tr>
                 <!-- Qualified Applicants List -->
                 <td valign="top" width="50%">
                     <p>Shown on the list are the Qualified Applicants.</p>
-                    <table border="1" width="100%">
+                    <table>
                         <tr>
                             <th>FOR INTERVIEW</th>
                             <th>Job Applied</th>
@@ -58,10 +38,9 @@
                     </table>
                     <p><button type="button">View All</button></p>
                     <p>Interview message</p>
-                    <!-- This textarea should be readonly if you do not intend users to modify it on this page -->
-                    <textarea name="interview_message">{{ interview_message }}</textarea>
+                    <textarea name="interview_message" readonly>{{ interview_message }}</textarea>
                 </td>
-    
+
                 <!-- Interviewer Details -->
                 <td valign="top" width="50%">
                     <p>Name of Interviewer</p>
@@ -73,6 +52,5 @@
             </tr>
         </table>
     </form>
-    
-</body>
-</html>
+</div>
+{% endblock %}
