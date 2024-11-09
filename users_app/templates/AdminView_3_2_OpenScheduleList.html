@@ -1,50 +1,38 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>BayaniHire Admin Center</title>
-</head>
-<body>
-    <!-- Logo -->
-    <div>
-        <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo" width="200" height="200">
-    </div>
+{% extends "Admin_Inheritance.html" %}  <!-- Replace with your actual base template filename -->
 
-    <!-- Buttons -->
-    <div>
-        <button onclick="window.location.href='{% url 'list_of_applicants' %}';">List of Applicants</button>
-        <button onclick="window.location.href='{% url 'list_of_jobs' %}';">List of Jobs</button>
-        <button onclick="window.location.href='{% url 'qualification' %}';">Qualification</button>
-        <button onclick="window.location.href='{% url 'schedule' %}';">Schedule</button>
-        <button onclick="window.location.href='{% url 'feedback' %}';">Feedback</button>
-    </div>
+{% block title %}BayaniHire Admin Center{% endblock %}
 
-    <!-- Title and Profile -->
-    <div>
-        <h1>BayaniHire Admin Center</h1>
-        <button onclick="window.location.href='{% url 'adminprofile' %}';">Profile</button>
-    </div>
+{% block content %}
+<div class="main-content" style="padding-top: 60px;">  <!-- Main content area with padding to avoid header overlap -->
+
     <h2>List of Qualified Applicants</h2>
-    <div>
+
+    <!-- Search Section -->
+    <div class="search-section">
         <label for="searchInterviewer">Search Interviewer:</label><br>
-        <select id="searchInterviewer">
+        <select id="searchInterviewer" class="form-control">
             <option>Select</option>
-            <!-- Additional options can be added here -->
+            <!-- Add additional interviewer options here -->
         </select>
-        <button>View All</button>
+        <button class="btn btn-primary">View All</button>
     </div>
-    
-    <table border="1" width="100%">
-        <tr>
-            <th>List of Qualified Applicants</th>
-            <th>Interview Date</th>
-        </tr>
-        <tr><td>Applicant 1</td><td>Date 1</td></tr>
-        <tr><td>Applicant 2</td><td>Date 2</td></tr>
-        <tr><td>Applicant 3</td><td>Date 3</td></tr>
-        <tr><td>Applicant 4</td><td>Date 4</td></tr>
-        <tr><td>Applicant 5</td><td>Date 5</td></tr>
+
+    <!-- Qualified Applicants Table -->
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>List of Qualified Applicants</th>
+                <th>Interview Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>Applicant 1</td><td>Date 1</td></tr>
+            <tr><td>Applicant 2</td><td>Date 2</td></tr>
+            <tr><td>Applicant 3</td><td>Date 3</td></tr>
+            <tr><td>Applicant 4</td><td>Date 4</td></tr>
+            <tr><td>Applicant 5</td><td>Date 5</td></tr>
+        </tbody>
     </table>
-</body>
-</html>
+
+</div>
+{% endblock %}
