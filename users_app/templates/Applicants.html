@@ -10,22 +10,29 @@
                     <th>Date Applied</th>
                     <th>Interview Date</th>
                     <th>Status</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
+                {% for applicant in applicants %}
                 <tr>
-                    <td>John Doe</td>
-                    <td>Software Engineer</td>
-                    <td>10/10/2024</td>
-                    <td>10/15/2024</td>
-                    <td>Interviewed</td>
+                    <td>{{ applicant.full_name }}</td>
+                    <td>{{ applicant.job_title }}</td>
+                    <td>{{ applicant.date_applied }}</td>
+                    <td>{{ applicant.interview_date }}</td>
+                    <td>{{ applicant.status }}</td>
+                    <td>
+                        {% if applicant.applicant_status_id %}
+                            <button class="bodybutton" onclick="location.href='{% url 'INTviewinfo' applicant.applicant_status_id %}'">View Details</button>
+                        {% else %}
+                            <span>No Action Available</span>
+                        {% endif %}
+                    </td>
                 </tr>
-                <!-- Add more rows as needed -->
+                {% endfor %}
             </tbody>
         </table>
 
-        
-        <button class="bodybutton" onclick="window.location.href='{% url 'INTviewinfo' %}'">View Info and Credentials</button>
         <div class="qualified-applicants">
             <h2>Qualified Applicants</h2>
         </div>

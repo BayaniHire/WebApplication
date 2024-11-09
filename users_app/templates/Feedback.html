@@ -1,38 +1,30 @@
 {% extends "Interviewer_Inheritance.html" %}
 
 {% block body %}
-    <div class="main-content">
-        <label style="font-family: Georgia; font-size: 36px; font-weight: bold;">Applicant Name:</label>
-        <select class="dropdown"; font-family: Georgia;  font-size: 20px;">
-            <option>Applicant 1</option>
-            <option>Applicant 2</option>
-            <option>Applicant 3</option>
-            <option>Applicant 4</option>
-            <option>Applicant 5</option>
-            <option>Applicant 6</option>
-            <option>Applicant 7</option>
-            <option>Applicant 8</option>
-            <option>Applicant 9</option>
-            <option>Applicant 10</option>
-            <option>Applicant 11</option>
-            <option>Applicant 12</option>
-        </select>
-        <br><br>
+<div class="main-content">
+    <form method="POST">
+        {% csrf_token %}
+        <div class="main-content">
+            <label style="font-family: Georgia; font-size: 36px; font-weight: bold;">Applicant Name:</label>
+            <select name="applicant_id" class="dropdown" style="font-family: Georgia; font-size: 20px;">
+                {% for applicant in applicants %}
+                <option value="{{ applicant.applicant_status_id }}">{{ applicant.account.first_name }} {{ applicant.account.middle_name }} {{ applicant.account.last_name }}</option>
+                {% endfor %}
+            </select>
+            <br><br>
 
-        <label style="font-family: Georgia; font-size: 36px; font-weight: bold;">Applicant Status:</label>
-        <select class="dropdown" font-family: Georgia; font-size: 28px;">
-            <option>PASSED</option>
-            <option>FAILED</option>
-        </select>
-        <br>
+            <label style="font-family: Georgia; font-size: 36px; font-weight: bold;">Applicant Status:</label>
+            <select name="status" class="dropdown" style="font-family: Georgia; font-size: 28px;">
+                <option>PASSED</option>
+                <option>FAILED</option>
+            </select>
+            <br>
 
-        <label style="font-family: Georgia; font-size: 36px; font-weight: bold;">Interviewer Remarks:</label>
-        <textarea class="remarks-textarea" style="font-family: Georgia; font-size: 18px;"></textarea>
-        <button class="bodybutton" style="font-family: Georgia; font-size: 18px;">Submit Feedback</button>
-        <br>
-
-        <div class="qualified-applicants">
-            <h2>Feedback Center</h2>
+            <label style="font-family: Georgia; font-size: 36px; font-weight: bold;">Interviewer Remarks:</label>
+            <textarea name="feedback" class="remarks-textarea" style="font-family: Georgia; font-size: 18px;"></textarea>
+            <button type="submit" class="bodybutton" style="font-family: Georgia; font-size: 18px;">Submit Feedback</button>
+            <br>
         </div>
-    </div>
+    </form>
+</div>
 {% endblock %}

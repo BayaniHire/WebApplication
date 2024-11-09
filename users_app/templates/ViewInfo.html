@@ -1,76 +1,53 @@
-{% load static %}<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BayaniHire: Interviewer Center</title>
-</head>
-<body>
+{% extends "Interviewer_Inheritance.html" %}
 
-    <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">BayaniHire: Interviewer Center</label>
-    <br><br>
-    
-    <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo" width="500px" height="300px">
-    <br><br>
+{% block body %}
+    <div class="main-content">
+        <table width="100%">
+            <tr>
+                <td valign="top"> <!-- Group 1 -->
+                    <table>
+                        <tr><td>Name:</td><td>{{ applicant.first_name }} {{ applicant.middle_name }} {{ applicant.last_name }}</td></tr>
+                        <tr><td>Applied For:</td><td>{{ job_details.job_title }}</td></tr>
+                        <tr><td>Date Applied:</td><td>{{ submission_date }}</td></tr>
+                        <tr><td>Age:</td><td>{{ applicant.age }}</td></tr>
+                        <tr><td>Gender:</td><td>{{ applicant.gender }}</td></tr>
+                        <tr><td>Current Address:</td><td>{{ applicant.house_no }}, {{ applicant.street_village }}, {{ applicant.barangay }}, {{ applicant.city_municipality }}, {{ applicant.province }}, {{ applicant.state }} ({{ applicant.zipcode }})</td></tr>
+                        <tr><td>Mobile Number:</td><td>{{ applicant.mobile_number }}</td></tr>
+                        <tr><td>Email:</td><td>{{ applicant.email }}</td></tr>
+                        <tr><td>Username:</td><td>{{ applicant.username }}</td></tr>
+                    </table>
+                    <label>File Upload</label>
+                    <ul>
+                        {% if uploaded_files %}
+                            {% for file_name in uploaded_files %}
+                                <li>
+                                    {{ file_name }}
+                                    <button onclick="window.location.href='{% url 'viewing_files' file_name=file_name %}';">View File</button>
+                                    <button>Download</button>
+                                    <button onclick="printFile('{{ file_name }}')">Print</button>
+                                </li>
+                            {% endfor %}
+                        {% else %}
+                            <li>No files uploaded.</li>
+                        {% endif %}
+                    </ul>
+                </td>
+                <td valign="top"> <!-- Group 2 -->
+                    <table>
+                        <tr><td>Job Title:</td><td>{{ job_details.job_title }}</td></tr>
+                        <tr><td>Company:</td><td>{{ job_details.job_company }}</td></tr>
+                    </table>
+                    <textarea readonly placeholder="Job Requirements">{{ job_details.job_requirements }}</textarea><br>
+                    <label>Status: {{ applicant_status }}</label><br>
+                    
+                    <!-- Hidden input for applicant_status_id -->
+                    <input type="hidden" id="applicantStatusId" value="{{ applicant_status_id }}">
 
-    <button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTprofile' %}'">Profile</button>
-    <button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTappointments' %}'">Appointments</button>
-    <button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTapplicants' %}'">Applicants</button>
-    <button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTfeedback' %}'">Interview Feedback</button>
-    <button style="font-family: Georgia; font-size: 14px;" onclick="window.location.href='{% url 'INTeditfeedback' %}'">Feedback History</button>
-
-    <br><br>
-
-    <label style="font-family: Georgia; font-size: 24px;">Applied For:</label> <span style="font-family: Georgia; font-size: 16px;">*INSERT TEXT HERE*</span><br>
-    <label style="font-family: Georgia; font-size: 24px;">Name:</label> <span style="font-family: Georgia; font-size: 16px;">*INSERT TEXT HERE*</span><br>
-    <label style="font-family: Georgia; font-size: 24px;">Gender:</label> <span style="font-family: Georgia; font-size: 16px;">*INSERT TEXT HERE*</span><br>
-    <label style="font-family: Georgia; font-size: 24px;">Age:</label> <span style="font-family: Georgia; font-size: 16px;">*INSERT TEXT HERE*</span><br>
-    <label style="font-family: Georgia; font-size: 24px;">Current Address:</label> <span style="font-family: Georgia; font-size: 16px;">*INSERT TEXT HERE*</span><br>
-    <label style="font-family: Georgia; font-size: 24px;">Phone Number:</label> <span style="font-family: Georgia; font-size: 16px;">*INSERT TEXT HERE*</span><br>
-    <label style="font-family: Georgia; font-size: 24px;">Email:</label> <span style="font-family: Georgia; font-size: 16px;">*INSERT TEXT HERE*</span><br>
-    <label style="font-family: Georgia; font-size: 24px;">Username:</label> <span style="font-family: Georgia; font-size: 16px;">*INSERT TEXT HERE*</span>
-
-    <br><br>
-
-    <table border="1" style="font-family: Georgia; font-size: 20px;">
-        <tr>
-            <th>Files Uploaded</th>
-        </tr>
-        <tr>
-            <td>1</td>
-        </tr>
-        <tr>
-            <td>2</td>
-        </tr>
-        <tr>
-            <td>3</td>
-        </tr>
-    </table>
-    <button style="font-family: Georgia; font-size: 18px;">View File</button> <button style="font-family: Georgia; font-size: 18px;">Download</button> <button style="font-family: Georgia; font-size: 18px;">Print</button>
-    <br><br>
-
-    <label style="font-family: Georgia; font-size: 24px;">Job Title:</label> <span style="font-family: Georgia; font-size: 16px;">*INSERT TEXT HERE*</span><br>
-    <label style="font-family: Georgia; font-size: 24px;">Job Requirements:</label>
-    <br>
-    <textarea rows="10" cols="50" style="font-family: Georgia; font-size: 16px;">
-*INSERT TEXT HERE*
-*INSERT TEXT HERE*
-*INSERT TEXT HERE*
-*INSERT TEXT HERE*
-*INSERT TEXT HERE*
-*INSERT TEXT HERE*
-*INSERT TEXT HERE*
-*INSERT TEXT HERE*
-*INSERT TEXT HERE*
-    </textarea>
-
-    <br><br>
-
-    <button style="font-family: Georgia; font-size: 20px;" onclick="window.location.href='{% url 'INTapplicants' %}'">Back</button>
-    
-    <br><br>
-
-    <label style="font-family: Georgia; font-size: 40px;font-weight: bold;">Applicant Information</label>
-
-</body>
-</html>
+                
+                
+                    
+                </td>
+            </tr>
+        </table>
+    </div>
+{% endblock %}

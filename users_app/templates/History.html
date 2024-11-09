@@ -1,30 +1,25 @@
 {% extends "Interviewer_Inheritance.html" %}
 
 {% block body %}
-  <div class="main-content">
+<div class="main-content">
     <table border="0" style="font-size: 18px;">
         <tr>
             <th>Interviewed Applicant List</th>
         </tr>
-        <tr><td>1</td></tr>
-        <tr><td>2</td></tr>
-        <tr><td>3</td></tr>
-        <tr><td>4</td></tr>
-        <tr><td>5</td></tr>
-        <tr><td>6</td></tr>
-        <tr><td>7</td></tr>
-        <tr><td>8</td></tr>
-        <tr><td>9</td></tr>
-        <tr><td>10</td></tr>
-        <tr><td>11</td></tr>
-        <tr><td>12</td></tr>
+        {% for applicant in applicants %}
+        <tr>
+            <td>{{ applicant.account.first_name }} {{ applicant.account.last_name }}</td>
+            <td>
+                <button onclick="window.location.href='{% url 'view_feedback' applicant.applicant_status_id %}'">
+                    View Feedback
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
     </table>
-
-    <button style="font-weight: bold;" class="bodybutton" onclick="window.location.href='{% url 'INTeditfeedback' %}'">View Feedback</button>
-    <br>
 
     <div class="qualified-applicants">
       <h2>Feedback History</h2>
-  </div>
-  </div>
+    </div>
+</div>
 {% endblock %}
