@@ -6,32 +6,36 @@
 <div class="main-content" style="padding-top: 60px;">  <!-- Main content area with padding to avoid header overlap -->
 
     <h2>List of Qualified Applicants</h2>
-
-    <!-- Search Section -->
-    <div class="search-section">
-        <label for="searchInterviewer">Search Interviewer:</label><br>
-        <select id="searchInterviewer" class="form-control">
-            <option>Select</option>
-            <!-- Add additional interviewer options here -->
-        </select>
-        <button class="btn btn-primary">View All</button>
+    <div>
+        <form action="" method="get">
+            <label for="searchInterviewer">Search Interviewer:</label><br>
+            <select id="searchInterviewer" name="interviewer">
+                <option value="">Select</option>
+                <!-- Loop through Interviewers -->
+                {% for interviewer in interviewers %}
+                <option value="{{ interviewer.interviewer_name }}" {% if request.GET.interviewer == interviewer.interviewer_name %}selected{% endif %}>
+                    {{ interviewer.interviewer_name }}
+                </option>
+                {% endfor %}
+            </select>
+            <input type="text" name="search" placeholder="Search Applicants" value="{{ request.GET.search }}">
+            <button type="submit">Search</button>  <!-- Search button added here -->
+            <button type="submit" name="view_all" value="1">View All</button> <!-- View All button to reset the search -->
+        </form>
     </div>
-
-    <!-- Qualified Applicants Table -->
-    <table class="table table-bordered mt-3">
-        <thead>
-            <tr>
-                <th>List of Qualified Applicants</th>
-                <th>Interview Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr><td>Applicant 1</td><td>Date 1</td></tr>
-            <tr><td>Applicant 2</td><td>Date 2</td></tr>
-            <tr><td>Applicant 3</td><td>Date 3</td></tr>
-            <tr><td>Applicant 4</td><td>Date 4</td></tr>
-            <tr><td>Applicant 5</td><td>Date 5</td></tr>
-        </tbody>
+    
+    <table border="1" width="100%">
+        <tr>
+            <th>List of Qualified Applicants</th>
+            <th>Interview Date</th>
+        </tr>
+        <!-- Loop through Applicants based on selection -->
+        {% for applicant in applicants %}
+        <tr>
+            <td>{{ applicant.account.first_name }} {{ applicant.account.last_name }}</td>
+            <td>{{ applicant.applicant_schedule_date }}</td>
+        </tr>
+        {% endfor %}
     </table>
 
 </div>
