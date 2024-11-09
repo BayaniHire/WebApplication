@@ -1,41 +1,14 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>BayaniHire Admin Center</title>
-</head>
-<body>
-    <!-- Logo -->
-    <div>
-        <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo" width="200" height="200">
-    </div>
+{% extends "Admin_Inheritance.html" %}  <!-- Replace with your actual base template filename -->
 
-    <!-- Buttons -->
-    <div>
-        <button onclick="window.location.href='{% url 'list_of_applicants' %}';">List of Applicants</button>
-        <button onclick="window.location.href='{% url 'list_of_jobs' %}';">List of Jobs</button>
-        <button onclick="window.location.href='{% url 'qualification' %}';">Qualification</button>
-        <button onclick="window.location.href='{% url 'schedule' %}';">Schedule</button>
-        <button onclick="window.location.href='{% url 'feedback' %}';">Feedback</button>
-    </div>
+{% block title %}BayaniHire: Admin Center - Viewing of File{% endblock %}
 
-    <!-- Title and Profile -->
-    <div>
-        <h1>BayaniHire Admin Center</h1>
-        <button onclick="window.location.href='{% url 'adminprofile' %}';">Profile</button>
-    </div>
+{% block content %}
+    <!-- Section Title -->
     <h2>Viewing of File</h2>
 
-    <!-- Check if the file is an image -->
-    {% if file_name.endswith('.jpg') or file_name.endswith('.png') or file_name.endswith('.gif') %}
-        <img src="{{ file_name }}" alt="View File" width="600" height="400">
-    {% else %}
-        <p>This file type cannot be displayed directly. Please download it instead:</p>
-        <a href="{{ file_name }}">Download {{ file_name }}</a>
-    {% endif %}
+    <!-- Image Placeholder for file viewing -->
+    <img src="{% static 'image_placeholder.jpg' %}" alt="View File" width="600" height="400">
 
     <!-- Back Button -->
     <p><button onclick="history.back()">Back</button></p>
-</body>
-</html>
+{% endblock %}
