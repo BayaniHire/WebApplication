@@ -27,7 +27,8 @@ from django.db.models.functions import Concat
 from django.db.models import Value
 from django.db import transaction
 from django.urls import reverse
-
+from django.db.models import Max
+from django.views.decorators.http import require_http_methods
 
 
 def Index(request):
