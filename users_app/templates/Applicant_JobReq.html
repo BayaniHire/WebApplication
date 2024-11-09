@@ -1,131 +1,8 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Job Details</title>
-    <style>
-        /* Your existing CSS styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: "Helvetica", sans-serif;
-            background-color: #FFD8AD;
-            color: #D3B18B;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            padding: 0;
-            margin: 0;
-        }
-        .header {
-            width: 100%;
-            height: 60px;
-            background: #5C472E;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            color: #D3B18B;
-            font-family: "Georgia";
-            font-weight: bold;
-            font-size: 24px;
-            box-shadow: 0 1px 5px rgba(0,0,0,0.3);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-        .profile-button {
-            width: 120px;
-            height: 40px;
-            background: #FFD8AD;
-            color: #5C472E;
-            border: 1px solid #5C472E;
-            border-radius: 15px;
-            font-family: "ABeeZee";
-            font-weight: bold;
-            font-size: 14px;
-            text-align: center;
-            line-height: 40px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .profile-button:hover {
-            background-color: rgba(59, 47, 32, 0.3);
-            color: #FFD8AD;
-        }
-        .main-content {
-            flex-grow: 1;
-            background: #FFD8AD;
-            padding: 20px;
-            margin: 20px 12%;
-            border: 0px solid #000000;
-            box-sizing: border-box;
-            color: #000000;
-            border-radius: 15px;
-            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
-        }
-        .job-title {
-            font-size: 24px;
-            color: #5C472E;
-            margin-bottom: 10px;
-        }
-        .job-description, .job-requirements, .job-benefits, .job-status {
-            font-size: 16px;
-            margin-bottom: 20px;
-            color: #000000;
-        }
-        .job-date {
-            font-size: 12px; /* Smaller font for date */
-            color: #888888;
-        }
-        .footer {
-            width: 100%;
-            height: 60px;
-            background: #5C472E;
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            justify-content: flex-start;
-            color: #D3B18B;
-            font-family: "Georgia";
-            font-weight: bold;
-            position: relative;
-            box-shadow: 0 -1px 5px rgba(0,0,0,0.3);
-        }
-        .apply-button {
-            width: 150px;
-            height: 40px;
-            background: #FFD8AD;
-            color: #5C472E;
-            border: 1px solid #5C472E;
-            border-radius: 15px;
-            font-family: "ABeeZee";
-            font-weight: bold;
-            font-size: 14px;
-            text-align: center;
-            line-height: 40px;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: background-color 0.3s ease;
-        }
-        .apply-button:hover {
-            background-color: rgba(59, 47, 32, 0.3);
-            color: #FFD8AD;
-        }
-    </style>
-</head>
-<body>
+{% extends "Applicant_Inheritance.html" %}
 
-<div class="header">
-    <h1>BayaniHire: Applicant Center</h1>
-    <div class="profile-button" onclick="window.location.href='{% url 'profile' %}';">Profile</div>
-</div>
+{% block title %}Job Details{% endblock %}
 
+{% block content %}
 <div class="main-content">
     <h2 class="job-title">{{ job_details.job_title }}</h2>
     <p class="job-description"><strong>Description:</strong> {{ job_details.job_description }}</p>
@@ -133,15 +10,8 @@
     <p class="job-company"><strong>Company:</strong> {{ job_details.job_company }}</p>
     <p class="job-benefits"><strong>Benefits:</strong> {{ job_details.job_benefits }}</p>
     <p class="job-status"><strong>Status:</strong> {{ job_details.job_status }}</p>
-    <p class="job-date"><strong></strong>Date Published: {{ job_details.job_date_published }}</p>
+    <p class="job-date"><strong>Date Published:</strong> {{ job_details.job_date_published }}</p>
 
     <button class="apply-button" onclick="window.location.href='{% url 'fileupload' job_details.job_id %}'">Apply Now</button>
 </div>
-
-<!-- Footer -->
-<div class="footer">
-    <p>© BayaniHire Inc.</p>
-</div>
-
-</body>
-</html>
+{% endblock %}
