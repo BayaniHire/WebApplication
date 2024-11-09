@@ -24,17 +24,6 @@
         <div class="large-container">
             <div class="file-preview" id="file-preview">
                 <p>Select a file and click VIEW to preview it.</p>
-                {% for file in uploaded_files %}
-                    {% if file.metadata|slice:"-4:" == ".jpg" or file.metadata|slice:"-4:" == ".png" or file.metadata|slice:"-4:" == ".jpeg" %}
-                        <img src="data:image/jpeg;base64,{{ file.data }}" 
-                             alt="{{ file.metadata }}" style="max-width: 100%; height: auto; display: none;" />
-                    {% elif file.metadata|slice:"-4:" == ".pdf" %}
-                        <embed src="data:application/pdf;base64,{{ file.data }}" 
-                               type="application/pdf" width="100%" height="400px" style="display: none;" />
-                    {% else %}
-                        <p>Unsupported file type: {{ file.metadata }}</p>
-                    {% endif %}
-                {% endfor %}
             </div>
         </div>
     </div>
@@ -45,6 +34,7 @@
     </div>
 </div>
 {% endblock %}
+
 
 {% block script %}
 <script>
