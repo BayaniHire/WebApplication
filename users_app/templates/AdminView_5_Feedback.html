@@ -4,38 +4,78 @@
 
 {% block content %}
 <div class="main-content" style="padding-top: 60px;">  <!-- Main content area with padding to avoid header overlap -->
-    <h2>Applicant Interview Status and Interviewer Feedback</h2>
-    <div class="search-section">
-        <input type="text" placeholder="Search" class="form-control d-inline w-25">
-        <button class="btn btn-primary"><b>Enter</b></button>
-        <button class="btn btn-secondary"><b>View All</b></button>
-        <button onclick="window.location.href='{% url 'view_feedback' %}';" class="btn btn-info"><b>View Feedback</b></button>
-    </div>
 
-    <!-- Table for Applicant Data -->
-    <table class="table table-bordered mt-3">
+    <h2>Applicant Interview Status and Interviewer Feedback </h2>
+    <input type="text" id="searchInput" placeholder="Search" onkeypress="enterSearch(event)">
+    <button onclick="searchTable()"><b>Enter</b></button>
+    <button onclick="resetSearch()"><b>View All</b></button>
+    
+    <br><br>
+    
+    <table id="applicantsTable" border="1" width="100%">
         <thead>
             <tr>
                 <th><b>Applicant's Name</b></th>
                 <th><b>Position Applied</b></th>
                 <th><b>Company</b></th>
-                <th><b>Status</b></th>
+                <th><b>Interview Status</b></th>
+                <th><b>Action</b></th>
             </tr>
         </thead>
         <tbody>
-            <!-- Example rows. Replace with dynamic data as needed. -->
-            <tr><td>" "</td><td>" "</td><td>" "</td><td>" "</td></tr>
-            <tr><td>" "</td><td>" "</td><td>" "</td><td>" "</td></tr>
-            <tr><td>" "</td><td>" "</td><td>" "</td><td>" "</td></tr>
-            <tr><td>" "</td><td>" "</td><td>" "</td><td>" "</td></tr>
-            <tr><td>" "</td><td>" "</td><td>" "</td><td>" "</td></tr>
-            <tr><td>" "</td><td>" "</td><td>" "</td><td>" "</td></tr>
-            <tr><td>" "</td><td>" "</td><td>" "</td><td>" "</td></tr>
-            <tr><td>" "</td><td>" "</td><td>" "</td><td>" "</td></tr>
-            <tr><td>" "</td><td>" "</td><td>" "</td><td>" "</td></tr>
-            <tr><td>" "</td><td>" "</td><td>" "</td><td>" "</td></tr>
+            {% for applicant in applicants %}
+            {% if applicant.interviewer_feedback_status %}
+            <tr>
+                <td>{{ applicant.account.first_name }} {{ applicant.account.last_name }}</td>
+                <td>{{ applicant.job.job_title }}</td>
+                <td>{{ applicant.job.job_company }}</td>
+                <td>{{ applicant.interviewer_feedback_status }}</td>
+                <td>
+                    <button onclick="window.location.href='{% url 'view_feedback' applicant.applicant_status_id %}';">
+                        View Feedback
+                    </button>
+                </td>
+            {% endif %}
+            {% endfor %}
         </tbody>
     </table>
+    
+    <script>
+    function searchTable() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("searchInput");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("applicantsTable");
+        tr = table.getElementsByTagName("tr");
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[0];  // Adjust the index if necessary
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+    
+    function enterSearch(event) {
+        if (event.keyCode === 13) {  // 13 is the keycode for the Enter key
+            searchTable();
+        }
+    }
+    
+    function resetSearch() {
+        var table, tr, i;
+        table = document.getElementById("applicantsTable");
+        tr = table.getElementsByTagName("tr");
+        for (i = 0; i < tr.length; i++) {
+            tr[i].style.display = "";
+        }
+        document.getElementById("searchInput").value = '';  // Reset search input
+    }
+    </script>
 
 </div>
 {% endblock %}
