@@ -1,0 +1,205 @@
+/* Background and Body Styles */
+body {
+    background: linear-gradient(180deg, #8c592a, rgba(255, 255, 255, 0)), #d2b486;
+    margin: 0;
+    padding: 0;
+}
+
+/* Navbar Styles */
+.navbar {
+    background: none; /* Set no background */
+    padding: 15px; /* Keep padding as you like */
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    display: flex;
+    justify-content: flex-end;
+    border: none; /* Remove any border */
+}
+
+.signin-btn,
+.login-btn {
+    color: white;
+    font-weight: bold;
+    font-size: xx-large;
+    text-decoration: none;
+    margin-left: 20px;
+    padding: 10px 20px;
+}
+
+.login-btn {
+    background-color: black;
+    border-radius: 20px;
+}
+
+@media (max-width: 768px) {
+    .signin-btn,
+    .login-btn {
+        font-size: 18px; /* Smaller font size for buttons */
+        padding: 8px 16px; /* Adjust button padding */
+    }
+}
+
+/* Further adjust button size for very small screens (mobile) */
+@media (max-width: 480px) {
+    .signin-btn,
+    .login-btn {
+        font-size: 16px; /* Even smaller font size for small screens */
+        padding: 6px 12px; /* Smaller padding for small screens */
+    }
+}
+
+/* Header Styles */
+.header {
+    position: relative;
+    width: 100%; /* Full width of the container */
+    height: 400px; /* Adjust the height of the header */
+    overflow: hidden;
+}
+
+.header img.background {
+    width: 100%;
+    height: auto;
+}
+
+.header img {
+    width: 100%; /* Make the image take up the full width of the header */
+    height: 100%; /* Make the image fill the header's height */
+    object-fit: cover; /* Make sure the image covers the header area (without stretching) */
+    display: block;
+    object-fit: cover; /* Ensure the background image fills the header area */
+    display: block;
+}
+
+/* Content Area Styles */
+.content-area {
+    background-color: #4c2f27;
+    color: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    margin-top: 100px; /* Adjust for navbar */
+    max-width: 1200px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.header .logo {
+    position: absolute; /* Position the logo inside the header */
+    top: 50%; /* Vertically center the logo */
+    left: 50%; /* Horizontally center the logo */
+    transform: translate(-50%, -50%); /* Adjust position to center exactly */
+    width: 450px; /* Set the logo width */
+    height: auto; /* Maintain aspect ratio of the logo */
+}
+
+
+.content-area h2 {
+    font-size: 3rem;
+    font-family: 'Times New Roman', Times, serif;
+    text-align: center;
+}
+
+.content-area p {
+    font-size: 1.25rem;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 1rem 0;
+}
+
+@media (max-width: 768px) {
+    .content-area h2 {
+        font-size: 2rem; /* Smaller font size for smaller screens */
+    }
+
+    .content-area p {
+        font-size: 1rem; /* Smaller font size for paragraphs */
+    }
+}
+
+@media (max-width: 480px) {
+    .content-area h2 {
+        font-size: 1.5rem; /* Even smaller font size for small screens */
+    }
+
+    .content-area p {
+        font-size: 0.875rem; /* Smaller font size for paragraphs on very small screens */
+    }
+}
+
+.bold-text {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+/* Form Styles for Input Fields and Labels */
+form label {
+    font-size: 1.25rem; /* Larger font for labels */
+    color: white;
+    font-family: Arial, sans-serif;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+form input[type="text"],
+form input[type="email"],
+form input[type="password"],
+form input[type="date"],
+form select {
+    width: 100%; /* Full width in the container */
+    padding: 1rem; /* Increase padding for larger fields */
+    font-size: 1.25rem; /* Larger font for input text */
+    border-radius: 0.5rem;
+    border: none;
+    box-sizing: border-box;
+    margin-bottom: 1rem;
+}
+
+form input[type="text"]:focus,
+form input[type="email"]:focus,
+form input[type="password"]:focus,
+form input[type="date"]:focus,
+form select:focus {
+    outline: 2px solid #8c592a; /* Focus style to match color scheme */
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    form label {
+        font-size: 1rem; /* Adjust label font for smaller screens */
+    }
+
+    form input[type="text"],
+    form input[type="email"],
+    form input[type="password"],
+    form input[type="date"],
+    form select {
+        padding: 0.75rem;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    form label {
+        font-size: 0.875rem;
+    }
+
+    form input[type="text"],
+    form input[type="email"],
+    form input[type="password"],
+    form input[type="date"],
+    form select {
+        padding: 0.5rem;
+        font-size: 0.875rem;
+    }
+}
+
+
+
+/* Footer Styles */
+footer {
+    background: linear-gradient(180deg, #202020, #454545, #8a8989);
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    font-size: 1rem;
+}

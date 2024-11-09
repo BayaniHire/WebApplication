@@ -1,0 +1,311 @@
+body {
+    background: linear-gradient(180deg, #8c592a, rgba(255, 255, 255, 0)), #d2b486;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.navbar {
+    background: none;
+    padding: 15px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+.navdiv {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 30px;
+}
+
+/* Header Styles */
+.header {
+    position: relative;
+    width: 100%; /* Full width of the container */
+    height: 400px; /* Adjust the height of the header */
+    overflow: hidden;
+}
+
+.header img.background {
+    width: 100%;
+    height: auto;
+}
+
+.header img {
+    width: 100%; /* Make the image take up the full width of the header */
+    height: 100%; /* Make the image fill the header's height */
+    object-fit: cover; /* Make sure the image covers the header area (without stretching) */
+    display: block;
+    object-fit: cover; /* Ensure the background image fills the header area */
+    display: block;
+}
+
+.header .logo {
+    position: absolute; /* Position the logo inside the header */
+    top: 50%; /* Vertically center the logo */
+    left: 50%; /* Horizontally center the logo */
+    transform: translate(-50%, -50%); /* Adjust position to center exactly */
+    width: 450px; /* Set the logo width */
+    height: auto; /* Maintain aspect ratio of the logo */
+}
+
+.signin-btn,
+.login-btn, .home-btn {
+    color: white;
+    font-weight: bold;
+    font-size: xx-large;
+    text-decoration: none;
+    margin-left: 20px;
+    padding: 10px 20px;
+}
+
+.login-btn {
+    background-color: black;
+    border-radius: 20px;
+}
+
+@media (max-width: 768px) {
+    .signin-btn,
+    .login-btn, .home-btn {
+        font-size: 18px; /* Smaller font size for buttons */
+        padding: 8px 16px; /* Adjust button padding */
+    }
+}
+
+/* Further adjust button size for very small screens (mobile) */
+@media (max-width: 480px) {
+    .signin-btn,
+    .login-btn, .home-btn {
+        font-size: 16px; /* Even smaller font size for small screens */
+        padding: 6px 12px; /* Smaller padding for small screens */
+    }
+}
+
+.custom-button {
+    color: white;
+    font-weight: bold;
+    font-size: xx-large;
+    text-decoration: none;
+    margin-left: 20px;
+    padding: 10px 20px;
+    background-color: black; /* Use black background for your button */
+    border-radius: 20px; /* Rounded corners */
+    border: none; /* No border */
+}
+
+.custom-button:hover {
+    background-color: #333; /* Darker background on hover */
+}
+
+@media (max-width: 768px) {
+    .custom-button {
+        font-size: 18px; /* Smaller font size for buttons */
+        padding: 8px 16px; /* Adjust button padding */
+    }
+}
+
+@media (max-width: 480px) {
+    .custom-button {
+        font-size: 16px; /* Even smaller font size for small screens */
+        padding: 6px 12px; /* Smaller padding for small screens */
+    }
+}
+
+.content-area {
+    background-color: #4c2f27;
+    color: white;
+    padding: 30px;
+    border-radius: 1rem;
+    margin-top: 100px; /* Adjust for navbar */
+    max-width: 1200px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+.content-area h2 {
+    font-size: 3rem;
+    font-family: 'Times New Roman', Times, serif;
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+@media (max-width: 768px) {
+    .content-area h2 {
+        font-size: 2rem; /* Smaller font size for smaller screens */
+        margin-bottom: 30px;
+    }
+
+}
+
+/* Form Styling */
+.register-form label {
+    display: block;
+    margin-bottom: 18px;
+    font-size: 18px;
+    font-weight: bold;
+    color: gray;
+}
+.form-control {
+    border-radius: 5px;            /* Set border radius */
+    border: 1px solid pink;        /* Border color */
+    background-color: pink;        /* Background color */
+    color: #333;                   /* Text color */
+    
+}
+
+.form-label {
+    margin-bottom: 5px; /* Reduce space between label and input */
+    font-weight: bold; /* Keep labels bold for visibility */
+}
+
+/* Change border color on focus */
+.form-control:focus {
+    border-color: #007bff;         /* Change border color on focus */
+    background-color: #fff;        /* Background color on focus */
+    outline: none;                 /* Remove default outline */
+}
+
+.input-group-text {
+    background-color: #f0f0f0;
+    color: #333;
+    border-radius: 5px;
+}
+
+/* Button Styling */
+.button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+.button-container button {
+    background-color: black;
+    color: white;
+    padding: 10px 20px;
+    font-size: 18px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    width: 50%;
+}
+.button-container button:hover {
+    background-color: #333;
+}
+
+/* log in container */
+.terms-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 15px;
+    color: pink;
+}
+.terms-container input[type="checkbox"] {
+    transform: scale(1.2);
+    margin-right: 10px;
+}
+.terms-container label {
+    display: inline;
+    color: #ddd;
+}
+.terms-container a {
+    color: #fff;
+    text-decoration: none;
+}
+.terms-container a:hover {
+    text-decoration: underline;
+}
+
+.input-group-text {
+    background-color: none;
+    color: #333;
+    border-radius: 5px;
+    margin-left: 5px; /* Adjust space between username and suffix */
+}
+
+/* Modal Styling */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1001; /* Sit on top */
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(180deg, #8c592a, rgba(255, 255, 255, 0)), #d2b486; 
+    color: black; /* Black text */
+    padding: 20px;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 800px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    box-sizing: border-box;
+}
+
+/* Modal Content Area */
+.modal-content {
+    display: flex;
+    align-items: flex-start;
+    background: transparent;
+    color: black;
+}
+
+.modal-content img {
+    width: 128px;
+    height: 128px;
+    margin-right: 20px;
+    border-radius: 10%;
+    object-fit: cover;
+}
+
+.modal-content .modal-text {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 500px;
+}
+
+/* Close Button */
+.close-btn {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+}
+
+.close-btn:hover {
+    background-color: darkred;
+}
+
+/* Checkbox inside Modal */
+.modal-checkbox-container {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+}
+.modal-checkbox-container input[type="checkbox"] {
+    transform: scale(1.2);
+    margin-right: 10px;
+    cursor: pointer;
+}
+.modal-checkbox-container label {
+    cursor: pointer;
+}
+
+/* Responsive Modal */
+@media (max-width: 600px) {
+    .modal-content {
+        flex-direction: column;
+        align-items: center;
+    }
+    .modal-content img {
+        margin-bottom: 20px;
+        margin-right: 0;
+    }
+}
+
+
+
