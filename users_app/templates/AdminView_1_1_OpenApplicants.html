@@ -30,50 +30,47 @@
         <tr>
             <td valign="top"> <!-- Group 1 -->
                 <table>
-                    <tr><td>Name:</td><td>{{ applicant.first_name }} {{ applicant.middle_name }} {{ applicant.last_name }}</td></tr>
-                    <tr><td>Applied For:</td><td>{{ job_details.job_title }}</td></tr>
-                    <tr><td>Date Applied:</td><td>{{ submission_date }}</td></tr> <!-- Now displaying submission date -->
-                    <tr><td>Age:</td><td>{{ applicant.age }}</td></tr>
-                    <tr><td>Gender:</td><td>{{ applicant.gender }}</td></tr>
-                    <tr><td>Current Address:</td><td>{{ applicant.house_no }}, {{ applicant.street_village }}, {{ applicant.barangay }}, {{ applicant.city_municipality }}, {{ applicant.province }}, {{ applicant.state }} ({{ applicant.zipcode }})</td></tr>
-                    <tr><td>Mobile Number:</td><td>{{ applicant.mobile_number }}</td></tr>
-                    <tr><td>Email:</td><td>{{ applicant.email }}</td></tr>
-                    <tr><td>Username:</td><td>{{ applicant.username }}</td></tr>
+                    <tr><td>Name:</td><td>John Michael A. Quiambao</td></tr>
+                    <tr><td>Applied For:</td><td>Cookerist</td></tr>
+                    <tr><td>Date Applied:</td><td>September 20, 2024</td></tr>
+                    <tr><td>Age:</td><td>21</td></tr>
+                    <tr><td>Gender:</td><td>Male</td></tr>
+                    <tr><td>Current Address:</td><td>Imus Cavite</td></tr>
+                    <tr><td>Mobile Number:</td><td>09123456789</td></tr>
+                    <tr><td>Email:</td><td>yourstrulyjohn@gmail.com</td></tr>
+                    <tr><td>Username:</td><td>john@bynhr.com</td></tr>
                 </table>
                 <label>File Upload</label>
-                <ul>
-                    {% if uploaded_files %}
-                        {% for file_name in uploaded_files %}
-                            <li>
-                                {{ file_name }}
-                                <button onclick="window.location.href='{% url 'viewing_files' file_name=file_name %}';">View File</button>
-                                <button> Download</button>
-                                <button onclick="printFile('{{ file_name }}')">Print</button>
-                            </li>
-                        {% endfor %}
-                    {% else %}
-                        <li>No files uploaded.</li>
-                    {% endif %}
-                </ul>
+                <table width="100%" border="1">
+                    <tr>
+                        <td>File List Here</td>
+                    </tr>
+                    <tr>
+                        <td>File List Here</td>
+                    </tr>
+                    <tr>
+                        <td>File List Here</td>
+                    </tr>
+                    <tr>
+                        <td>File List Here</td>
+                    </tr>
+                </table>
+                <button onclick="window.location.href='{% url 'viewing_files' %}';">View File</button>
+                <button>Download</button><br>
+                <button>Print</button>
             </td>
             <td valign="top"> <!-- Group 2 -->
                 <table>
-                    <tr><td>Job Title:</td><td>{{ job_details.job_title }}</td></tr>
-                    <tr><td>Company:</td><td>{{ job_details.job_company }}</td></tr>
+                    <tr><td>Job Title:</td><td>Bank Accountant</td></tr>
+                    <tr><td>Company:</td><td>BDO</td></tr>
                 </table>
-                <textarea readonly placeholder="Job Requirements">{{ job_details.job_requirements }}</textarea><br>
-                <label>Status: {{ applicant_status }}</label><br> <!-- Now displaying applicant status -->
+                <textarea placeholder="Job Requirements"></textarea><br>
+                <label>Status: STATUS OF THE APPLICANT</label><br>
                 <p>Please select new status:</p>
-                <form method="POST" action="{% url 'update_applicant_status' applicant_status_id=applicant_status_id %}">
-                    {% csrf_token %}
-                    <select name="new_status">
-                        <option value="FOR INTERVIEW">FOR INTERVIEW</option>
-                        <option value="FAILED TO MEET REQUIREMENTS">FAILED TO MEET REQUIREMENTS</option>
-                        <option value="INCOMPLETE">INCOMPLETE</option>
-                        <option value="REJECTED">REJECTED</option>
-                    </select>
-                    <button type="submit">Save</button>
-                </form>
+                <select>
+                    <option>Status</option>
+                </select>
+                <button>Save</button>
             </td>
         </tr>
     </table>
