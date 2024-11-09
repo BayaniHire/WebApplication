@@ -5,34 +5,36 @@
 {% block content %}
 <div class="main-content" style="padding-top: 60px;">  <!-- Main content area with padding to avoid header overlap -->
 
-    <!-- Section Title -->
-    <h2 class="text-bold" style="font-size: 36px;">Interviewer Feedback</h2>
+   <label style="font-family: Georgia; font-size: 36px; font-weight: bold;">Interviewer Feedback</label>
     <br><br>
-
-    <!-- Feedback Details -->
-    <div class="feedback-details">
-        <p><strong>Interviewer Name:</strong> <span>*INSERT INTERVIEWER NAME*</span></p>
-        <p><strong>Applicant Name:</strong> <span>*INSERT APPLICANT NAME*</span></p>
-        <p><strong>Interview Status:</strong> <span>*INTERVIEW STATUS*</span></p>
-    </div>
-
-    <!-- Status Update -->
-    <div class="status-update">
-        <label for="final-status" class="text-bold" style="font-size: 20px;">Update the final status of the applicant:</label>
-        <select id="final-status" class="form-control" style="width: auto;">
-            <option>PASSED</option>
-            <option>FAILED</option>
-        </select>
-    </div>
+    
+    <label style="font-family: Georgia; font-size: 20px; font-weight: bold;">Interviewer Name:</label>
+    <label style="font-family: Georgia; font-size: 18px;">{{ interviewer_name }}</label>
     <br>
-
-    <!-- Feedback Text Area -->
-    <label for="feedback" class="text-bold" style="font-size: 20px;">Interviewer's Feedback:</label>
-    <textarea id="feedback" readonly class="form-control" style="width: 300px; height: 100px;">*INTERVIEWER FEEDBACK*</textarea>
+    
+    <label style="font-family: Georgia; font-size: 20px; font-weight: bold;">Applicant Name:</label>
+    <label style="font-family: Georgia; font-size: 18px;">{{ applicant_name }}</label>
+    <br>
+    
+    <label style="font-family: Georgia; font-size: 20px; font-weight: bold;">Interview Status:</label>
+    <label style="font-family: Georgia; font-size: 18px;">{{ interview_status }}</label>
+    <br>
+    
+    <form action="{% url 'view_feedback' applicant_status_id %}" method="post">
+        {% csrf_token %}
+        <label style="font-family: Georgia; font-size: 20px; font-weight: bold;">Update the final status of the applicant:</label>
+        <select name="applicant_status" style="font-family: Georgia; font-size: 18px;">
+            <option value="PASSED">PASSED</option>
+            <option value="FAILED">FAILED</option>
+        </select>
+        <br>
+        <button type="submit" style="font-family: Georgia; font-size: 20px; font-weight: bold;">Update Status</button>
+    </form>
+    
+    <label style="font-family: Georgia; font-size: 20px; font-weight: bold;">Interviewer's Feedback:</label>
+    <br>
+    <textarea readonly style="font-family: Georgia; font-size: 18px; width: 300px; height: 100px;">{{ interview_feedback }}</textarea>
     <br><br>
-
-    <!-- Update Button -->
-    <button class="btn btn-primary" style="font-size: 20px;">Update Status</button>
-
+    
 </div>
 {% endblock %}
