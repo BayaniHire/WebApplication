@@ -7,19 +7,33 @@ class AccountInformationForm(forms.ModelForm):
         model = AccountInformation
         fields = [
             'first_name', 'middle_name', 'last_name', 'username', 
-            'password', 'house_no', 'street_village', 'barangay',  # Added new fields
-            'city_municipality', 'province', 'state', 'zipcode',  # Added state field
+            'password', 'house_no', 'street_village', 'barangay', 
+            'city_municipality', 'province', 'state', 'zipcode', 
             'email', 'mobile_number', 'birth_date', 'age', 'gender'
         ]
         widgets = {
-            'birth_date': forms.DateInput(attrs={'type': 'date'}),  # Birthdate input as date type
-            'gender': forms.Select(choices=[
+            'first_name': forms.TextInput(attrs={'placeholder': 'First Name','required': True}),
+            'middle_name': forms.TextInput(attrs={'placeholder': 'Middle Name','required': True}),
+            'last_name': forms.TextInput(attrs={'placeholder': 'Last Name','required': True}),
+            'house_no': forms.TextInput(attrs={'placeholder': 'House No.','required': True}),
+            'street_village': forms.TextInput(attrs={'placeholder': 'Street/Village','required': True}),
+            'barangay': forms.TextInput(attrs={'placeholder': 'Barangay','required': True}),
+            'city_municipality': forms.TextInput(attrs={'placeholder': 'City/Municipality','required': True}),
+            'province': forms.TextInput(attrs={'placeholder': 'Province','required': True}),
+            'state': forms.TextInput(attrs={'placeholder': 'State','required': True}),
+            'zipcode': forms.TextInput(attrs={'placeholder': 'Zip Code','required': True}),
+            'email': forms.EmailInput(attrs={'placeholder': 'Email Address','required': True}),
+            'mobile_number': forms.TextInput(attrs={'placeholder': 'Mobile Number','required': True}),
+            'birth_date': forms.DateInput(attrs={'type': 'date','required': True}),
+            'username': forms.TextInput(attrs={'placeholder': 'Username','required':True}),
+            'password': forms.PasswordInput(attrs={'placeholder': 'Password','required': True}),
+            'gender': forms.Select(attrs={'required': True},choices=[
                 ('male', 'Male'),
                 ('female', 'Female'),
                 ('prefer-not-to-say', 'Prefer not to say'),
             ]),
-            'password': forms.PasswordInput(),
         }
+    
 
     def clean_username(self):
         username = self.cleaned_data.get('username')
