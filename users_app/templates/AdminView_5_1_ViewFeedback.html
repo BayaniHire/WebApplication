@@ -1,51 +1,38 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BayaniHire: Admin Center</title>
-</head>
-<body>
-    <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">BayaniHire: Admin Center</label>
-    <br>
-    <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo" width="500px" height="300px">
+{% extends "Admin_Inheritance.html" %}  <!-- Replace with your actual base template filename -->
+
+{% block title %}BayaniHire: Admin Center{% endblock %}
+
+{% block content %}
+<div class="main-content" style="padding-top: 60px;">  <!-- Main content area with padding to avoid header overlap -->
+
+    <!-- Section Title -->
+    <h2 class="text-bold" style="font-size: 36px;">Interviewer Feedback</h2>
     <br><br>
-    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'adminprofile' %}';">Profile</button>
-    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'list_of_applicants' %}';">List of Applicants</button>
-    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'list_of_jobs' %}';">List of Jobs</button>
-    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'qualification' %}';">Qualification</button>
-    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'schedule' %}';">Schedule</button>
-    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="window.location.href='{% url 'feedback' %}';">Feedback</button>
+
+    <!-- Feedback Details -->
+    <div class="feedback-details">
+        <p><strong>Interviewer Name:</strong> <span>*INSERT INTERVIEWER NAME*</span></p>
+        <p><strong>Applicant Name:</strong> <span>*INSERT APPLICANT NAME*</span></p>
+        <p><strong>Interview Status:</strong> <span>*INTERVIEW STATUS*</span></p>
+    </div>
+
+    <!-- Status Update -->
+    <div class="status-update">
+        <label for="final-status" class="text-bold" style="font-size: 20px;">Update the final status of the applicant:</label>
+        <select id="final-status" class="form-control" style="width: auto;">
+            <option>PASSED</option>
+            <option>FAILED</option>
+        </select>
+    </div>
+    <br>
+
+    <!-- Feedback Text Area -->
+    <label for="feedback" class="text-bold" style="font-size: 20px;">Interviewer's Feedback:</label>
+    <textarea id="feedback" readonly class="form-control" style="width: 300px; height: 100px;">*INTERVIEWER FEEDBACK*</textarea>
     <br><br>
-    
-    <label style="font-family: Georgia; font-size: 36px; font-weight: bold;">Interviewer Feedback</label>
-    <br><br>
-    
-    <label style="font-family: Georgia; font-size: 20px; font-weight: bold;">Interviewer Name:</label>
-    <label style="font-family: Georgia; font-size: 18px;">*INSERT INTERVIEWER NAME*</label>
-    <br>
-    
-    <label style="font-family: Georgia; font-size: 20px; font-weight: bold;">Applicant Name:</label>
-    <label style="font-family: Georgia; font-size: 18px;">*INSERT APPLICANT NAME*</label>
-    <br>
-    
-    <label style="font-family: Georgia; font-size: 20px; font-weight: bold;">Interview Status:</label>
-    <label style="font-family: Georgia; font-size: 18px;">*INTERVIEW STATUS*</label>
-    <br>
-    
-    <label style="font-family: Georgia; font-size: 20px; font-weight: bold;">Update the final status of the applicant:</label>
-    <select style="font-family: Georgia; font-size: 18px;">
-        <option>PASSED</option>
-        <option>FAILED</option>
-    </select>
-    <br>
-    
-    <label style="font-family: Georgia; font-size: 20px; font-weight: bold;">Interviewer's Feedback:</label>
-    <br>
-    <textarea readonly style="font-family: Georgia; font-size: 18px; width: 300px; height: 100px;">*INTERVIEWER FEEDBACK*</textarea>
-    <br><br>
-    
-    <button style="font-family: Georgia; font-size: 20px; font-weight: bold;">Update Status</button>
-</body>
-</html>
+
+    <!-- Update Button -->
+    <button class="btn btn-primary" style="font-size: 20px;">Update Status</button>
+
+</div>
+{% endblock %}
