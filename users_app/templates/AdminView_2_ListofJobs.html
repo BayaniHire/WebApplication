@@ -1,59 +1,53 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>BayaniHire Admin Center</title>
-</head>
-<body>
-    <!-- Logo -->
-    <div>
-        <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo" width="200" height="200">
-    </div>
+{% extends "Admin_Inheritance.html" %}  <!-- Replace with your actual base template filename -->
 
-    <!-- Buttons -->
-    <div>
-        <button onclick="window.location.href='{% url 'list_of_applicants' %}';">List of Applicants</button>
-        <button onclick="window.location.href='{% url 'list_of_jobs' %}';">List of Jobs</button>
-        <button onclick="window.location.href='{% url 'qualification' %}';">Qualification</button>
-        <button onclick="window.location.href='{% url 'schedule' %}';">Schedule</button>
-        <button onclick="window.location.href='{% url 'feedback' %}';">Feedback</button>
-    </div>
+{% block title %}BayaniHire Admin Center{% endblock %}
 
-    <!-- Title and Profile -->
-    <div>
-        <h1>BayaniHire Admin Center</h1>
-        <button onclick="window.location.href='{% url 'adminprofile' %}';">Profile</button>
-    </div>
+{% block content %}
+<div class="main-content" style="padding-top: 60px;">  <!-- Main content area with padding to avoid header overlap -->
     <h2>List of All Jobs</h2>
-    <p>Active Jobs: <font color="red">{{ active_jobs_count }}</font></p>
-    <select>
-        <option>Sort</option>
-    </select>
-    <button>View All</button>
-    <button onclick="window.location.href='{% url 'create_job_details' %}';">Create Job</button>
-    <input type="text" placeholder="Search">
-    <button>Enter</button>
-    <table border="1" width="100%">
-        <tr>
-            <th>Job Position Offer</th>
-            <th>Company</th>
-            <th>Date Posted</th>
-            <th>Status</th>
-            <th>Action</th> <!-- Column for the action button -->
-        </tr>
-        {% for job in jobs %}
-        <tr>
-            <td>{{ job.job_title }}</td>
-            <td>{{ job.job_company }}</td>
-            <td>{{ job.job_date_published }}</td>
-            <td>{{ job.job_status }}</td>
-            <td>
-                <!-- Edit button with URL for the specific job ID -->
-                <button onclick="window.location.href='{% url 'edit_job_details' job.job_id %}';">Edit Job</button>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-</body>
-</html>
+    <p>Active Jobs: <span style="color: red;">{{ active_jobs_count }}</span></p>
+
+    <!-- Sort, View All, and Create Job Section -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <select class="form-control w-auto">
+            <option>Sort</option>
+        </select>
+        <button class="btn btn-secondary" onclick="window.location.href='{% url 'create_job_details' %}';">Create Job</button>
+        <button class="btn btn-primary">View All</button>
+        <input type="text" class="form-control w-25" placeholder="Search">
+        <button class="btn btn-secondary">Enter</button>
+    </div>
+
+    <!-- Jobs Table -->
+    <div class="table-container">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Job Position Offer</th>
+                    <th>Company</th>
+                    <th>Date Posted</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for job in jobs %}
+                <tr>
+                    <td>{{ job.job_title }}</td>
+                    <td>{{ job.job_company }}</td>
+                    <td>{{ job.job_date_published }}</td>
+                    <td>{{ job.job_status }}</td>
+                    <td>
+                        <button class="btn btn-info btn-sm" onclick="window.location.href='{% url 'edit_job_details' job.job_id %}';">Edit Job</button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center;">No jobs available.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
