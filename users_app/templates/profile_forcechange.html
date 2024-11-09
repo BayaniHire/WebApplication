@@ -1,17 +1,18 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>BayaniHire - Force Change Password</title>
+    <link rel="stylesheet" href="{% static 'css/popup.css' %}"> <!-- Link to the new CSS file -->
 </head>
 <body>
 
     <div class="content-area">
         <!-- Header Section with Image and Title -->
         <div class="header-section">
-            <img src="{% static 'password.png' %}" alt="Password Icon" width="128" height="128">
+            <img src="{% static 'password.png' %}" alt="Password Icon" width="128" height="128" class="content-image">
             <h2>Change Your Password</h2>
         </div>
 
