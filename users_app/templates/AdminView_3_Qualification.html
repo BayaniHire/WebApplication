@@ -1,132 +1,46 @@
+{% extends "Admin_Inheritance.html" %}  <!-- Replace with your actual base template filename -->
 
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>BayaniHire Admin Center</title>
-</head>
-<body>
-    <!-- Logo -->
-    <div>
-        <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo" width="200" height="200">
-    </div>
+{% block title %}BayaniHire Admin Center{% endblock %}
 
-    <!-- Buttons -->
-    <div>
-        <button onclick="window.location.href='{% url 'list_of_applicants' %}';">List of Applicants</button>
-        <button onclick="window.location.href='{% url 'list_of_jobs' %}';">List of Jobs</button>
-        <button onclick="window.location.href='{% url 'qualification' %}';">Qualification</button>
-        <button onclick="window.location.href='{% url 'schedule' %}';">Schedule</button>
-        <button onclick="window.location.href='{% url 'feedback' %}';">Feedback</button>
-    </div>
+{% block content %}
+<div class="main-content" style="padding-top: 60px;">  <!-- Main content area with padding to avoid header overlap -->
 
-    <!-- Title and Profile -->
-    <div>
-        <h1>BayaniHire Admin Center</h1>
-        <button onclick="window.location.href='{% url 'adminprofile' %}';">Profile</button>
-    </div>
-    <h2>List of Qualified Applicants</h2>
-    
-    <form method="POST" action="{% url 'send_schedule' %}" id="interviewer-form">
+    <h2>Create Job Details & Requirements</h2>
+
+    <!-- Job Creation Form -->
+    <form action="{% url 'admin_creatingjob' %}" method="POST" style="font-family: Georgia; font-size: 18px; font-weight: bold;">
         {% csrf_token %}
-        <table width="100%">
+        <table class="table">
             <tr>
-                <!-- Interviewers List -->
-                <td valign="top" width="50%">
-                    <p>Here is the list of available Interviewers. Kindly select an Interviewer.</p>
-                    <table border="1" width="100%" id="interviewer-table">
-                        {% for interviewer in interviewers %}
-                            <tr>
-                                <td>
-                                    <input type="radio" name="selected_interviewer" value="{{ interviewer.interviewer_id }}" 
-                                        onclick="selectInterviewer({{ interviewer.schedule_dates|safe }}, '{{ interviewer.interviewer_name }}');" required>
-                                    {{ interviewer.interviewer_name }}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </table>
+                <td><strong>Status:</strong></td>
+                <td>
+                    <select name="status" class="form-control" required>
+                        <option value="ACTIVE">ACTIVE</option>
+                        <option value="CLOSE">CLOSE</option>
+                    </select>
                 </td>
-
-                <!-- Schedule Dates List -->
-                <td valign="top" width="50%">
-                    <p>Available Schedule Dates</p>
-                    <table border="1" width="100%" id="schedule-table">
-                        <tbody id="schedule-dates-list">
-                            <!-- Schedule dates will be dynamically populated here -->
-                        </tbody>
-                    </table>
-                </td>
+                <td><strong>Date:</strong></td>
+                <td><input type="date" name="date" value="{{ today_date }}" class="form-control" readonly></td> <!-- Uses today_date variable -->
+            </tr>
+            <tr>
+                <td><strong>Job Title</strong></td>
+                <td><input type="text" name="job_title" placeholder="Job Title" class="form-control" required></td>
+                <td><strong>Job Benefits</strong></td>
+                <td><textarea name="job_benefits" placeholder="Job Benefits" class="form-control" required></textarea></td>
+            </tr>
+            <tr>
+                <td><strong>Company</strong></td>
+                <td><input type="text" name="company" placeholder="Company" class="form-control" required></td>
+            </tr>
+            <tr>
+                <td><strong>Job Description</strong></td>
+                <td><textarea name="job_description" placeholder="Job Description" class="form-control" required></textarea></td>
+                <td><strong>Job Requirements</strong></td>
+                <td><textarea name="job_requirements" placeholder="Job Requirements" class="form-control" required></textarea></td>
             </tr>
         </table>
-
-        <script>
-            function selectInterviewer(scheduleDates, interviewerName) {
-                document.getElementById("interviewer-name-input").value = interviewerName; // Set hidden input value for interviewer name
-                const scheduleTable = document.getElementById("schedule-dates-list");
-                scheduleTable.innerHTML = ""; // Clear previous dates
-
-                if (scheduleDates.length > 0) {
-                    scheduleDates.forEach(date => {
-                        let row = document.createElement("tr");
-                        let cell = document.createElement("td");
-                        let radioButton = document.createElement("input");
-
-                        radioButton.type = "radio";
-                        radioButton.name = "selected_schedule_date";
-                        radioButton.value = date;
-                        radioButton.required = true;
-
-                        cell.appendChild(radioButton);
-                        cell.appendChild(document.createTextNode(" " + date));
-                        row.appendChild(cell);
-                        scheduleTable.appendChild(row);
-                    });
-                } else {
-                    let row = document.createElement("tr");
-                    let cell = document.createElement("td");
-                    cell.textContent = "No available schedule dates";
-                    row.appendChild(cell);
-                    scheduleTable.appendChild(row);
-                }
-            }
-        </script>
-        <input type="hidden" id="interviewer-name-input" name="interviewer_name">
-        <!-- Applicants and Jobs Table with Control Buttons -->
-        <table width="100%">
-            <tr>
-                <td valign="top" width="75%">
-                    <p>Here is the list of available Interviewees. Kindly select an Interviewee.</p>
-                    
-                    <table border="1" width="100%">
-                        <tr>
-                            <th>Qualified for Interview</th>
-                            <th>Job Applied</th>
-                        </tr>
-                        
-                        {% for applicant in applicants %}
-                        <tr>
-                            <td>
-                                {{ applicant.full_name }}
-                                <!-- Hidden inputs to pass data -->
-                                <input type="hidden" name="applicant_name" value="{{ applicant.full_name }}">
-                                <input type="hidden" name="job_details" value="{{ applicant.job_title }} at {{ applicant.job_company }}">
-                            </td>
-                            <td>{{ applicant.job_title }} at {{ applicant.job_company }}</td>
-                        </tr>
-                        {% endfor %}
-                    </table>
-                </td>
-                <!-- Control Buttons -->
-                <td valign="top" width="25%">
-                    <br><br><br>
-                    <button type="submit">Send</button><br><br>
-                    <button type="button" onclick="window.location.href='{% url 'open_schedule_list' %}';">Open Schedule List</button>
-                </td>
-            </tr>
-        </table>
+        <button type="submit" class="btn btn-success">Upload</button>
     </form>
-    
 
-</body>
-</html>
+</div>
+{% endblock %}
