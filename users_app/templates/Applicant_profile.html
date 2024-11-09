@@ -1,368 +1,63 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Applicant Profile</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: "Helvetica", sans-serif;
-            background-color: #FFD8AD;
-            color: #D3B18B;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            padding: 0;
-            margin: 0;
-        }
-        .background {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            background: #FFD8AD;
-            color: #444444;
-            width: 100%;
-            margin: 0;
-        }
+{% extends "Applicant_Inheritance.html" %}
 
-        .header {
-            width: 100%;
-            height: 60px;
-            background: #5C472E;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            color: #D3B18B;
-            font-family: "Georgia";
-            font-weight: bold;
-            font-size: 24px;
-            box-shadow: 0 1px 5px rgba(0,0,0,0.3);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-        .center-text {
-            margin: 0;
-        }
-        .profile-button {
-            width: 120px;
-            height: 40px;
-            background: #FFD8AD;
-            color: #5C472E;
-            border: 1px solid #5C472E;
-            border-radius: 15px;
-            font-family: "Georgia";
-            font-weight: bold;
-            font-size: 14px;
-            text-align: center;
-            line-height: 40px;
-            cursor: pointer;
-        }
-        .profile-button:hover {
-            background-color: rgba(190, 161, 126, 0.8);
-            color: #ffe2be;
-        }
+{% block title %}Applicant Profile{% endblock %}
 
-        .content-area {
-            display: flex;
-            flex: 1;
-            margin: 20px 0;
-            padding: 0 20px;
-            box-sizing: border-box;
-        }
-
-        .sidebar {
-            width: 12%;
-            background: #bea17e;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: fixed;
-            top: 60px;
-            bottom: 0;
-            left: 0;
-            border-right: 1px solid #000000;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.3);
-            overflow-y: auto;
-        }
-        .image-placeholder {
-            width: 100%;
-            height: 130px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .image-placeholder img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-        .button {
-            width: 100%;
-            height: 60px;
-            margin-bottom: 10px;
-            background: #FFD8AD;
-            color: #5C472E;
-            border: 1px solid #5C472E;
-            border-radius: 15px;
-            font-family: "Georgia";
-            font-weight: bold;
-            font-size: 14px;
-            text-align: center;
-            line-height: 60px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .button:hover {
-            background-color: rgba(59, 47, 32, 0.3);
-            color: #FFD8AD;
-        }
-
-        .main-content {
-            flex-grow: 1;
-            background: #FFD8AD;
-            padding: 20px;
-            margin-left: 12%;
-            border: 0px solid #000000;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            min-height: 0;
-            box-sizing: border-box;
-        }
-
-        .insert-text {
-            color: #000000;
-            font-family: "Georgia";
-            font-weight: bold;
-            font-size: 36px;
-            margin-bottom: 20px;
-        }
-
-        .features-title {
-            font-family: "Georgia";
-            font-weight: bold;
-            font-size: 30px;
-            color: #000;
-            margin-bottom: 10px;
-        }
-
-        .text-placeholder {
-            font-family: "Georgia";
-            font-weight: 400;
-            font-size: 20px;
-            color: #000000;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            font-size: 16px;
-            border: 1px solid #5C472E;
-            border-radius: 5px;
-            box-sizing: border-box;
-            background-color: #ffe9cf;
-        }
-
-        .footer {
-            width: 100%;
-            height: 60px;
-            background: #5C472E;
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            justify-content: flex-start;
-            color: #D3B18B;
-            font-family: "Georgia";
-            font-weight: bold;
-            position: relative;
-            box-shadow: 0 -1px 5px rgba(0,0,0,0.3);
-        }
-
-        .password-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .edit-password-button {
-            background-color: #5C472E;
-            color: white;
-            width: 150px;
-            height: 60px;
-            border: 1px solid #000000;
-            border-radius: 15px;
-            font-family: "Georgia";
-            font-weight: bold;
-            font-size: 17px;
-            text-align: center;
-            line-height: 60px;
-            cursor: pointer;
-        }
-        .edit-password-button:hover {
-            background-color: rgba(37, 25, 10, 0.85);
-            color: #FFD8AD;
-        }
-
-        .save-button {
-            background-color: #5C472E;
-            color: white;
-            width: 150px;
-            height: 40px;
-            border: 1px solid #5C472E;
-            border-radius: 15px;
-            font-family: "Georgia";
-            font-weight: bold;
-            font-size: 20px;
-            text-align: center;
-            line-height: 40px;
-            cursor: pointer;
-        }
-        .save-button:hover {
-            background-color: rgba(37, 25, 10, 0.85);
-            color: #FFD8AD;
-        }
-        .change-password-section {
-            display: none;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .change-password-buttons {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-
-        .password-section input {
-            color: #a5937e;
-            height: 60px;
-        }
-
-        @media (max-width: 768px) {
-            .header {
-                height: 80px;
-                font-size: 18px;
-            }
-            .center-text {
-                font-size: 20px;
-            }
-            .sidebar {
-                width: 15%;
-            }
-            .main-content {
-                margin-left: 15%;
-                padding: 20px;
-            }
-            .insert-text {
-                font-size: 24px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .sidebar {
-                width: 20%;
-            }
-            .main-content {
-                margin-left: 20%;
-                padding: 15px;
-            }
-            .insert-text {
-                font-size: 18px;
-            }
-        }
-    </style>
-</head>
-<body>
-
-<div class="background">
-    <div class="header">
-        <h1 class="center-text">BayaniHire: Applicant Center</h1>
-        <div class="profile-button" onclick="window.location.href='{% url 'profile' %}';">Profile</div>
-
+{% block content %}
+<div class="features-title" id="ApplicantProfile">User Profile</div>
+<div class="text-placeholder" id="Appliprofileusername">
+    <b>Username:</b> <span>Insert Username Here</span>
+</div>
+<div class="text-placeholder" id="Appliprofilename">
+    <b>Name:</b> <span>Insert Name Here</span>
+</div>
+<div class="text-placeholder" id="Appliprofileemail">
+    <b>Email:</b> <span>Insert Email Here</span>
+</div>
+<br />
+<div class="features-title" id="AppliPassword">Password</div>
+<div class="password-section">
+    <div class="text-placeholder">
+        <b>Password:</b> <i>*HIDDEN*</i>
     </div>
-    
-    <div class="content-area">
-        <div class="sidebar">
-            <div class="image-placeholder">
-                <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo">
-            </div>
-            <div class="button" onclick="window.location.href='{% url 'homepage' %}'">Home</div>
-            <div class="button" onclick="window.location.href='{% url 'applicationstatus' %}'">Application Status</div>
-        </div>
-        
-        <div class="main-content">
-            <div class="features-title" id="ApplicantProfile">User Profile</div>
-            <div class="text-placeholder" id="Appliprofileusername">
-                <b>Username:</b> <span>Insert Username Here</span>
-            </div>
-            <div class="text-placeholder" id="Appliprofilename">
-                <b>Name:</b> <span>Insert Name Here</span>
-            </div>
-            <div class="text-placeholder" id="Appliprofileemail">
-                <b>Email:</b> <span>Insert Email Here</span>
-            </div>
-            <br />
-            <div class="features-title" id="AppliPassword">Password</div>
-            <div class="password-section">
-                <div class="text-placeholder">
-                    <b>Password:</b> <i>*HIDDEN*</i>
-                </div>
-                <button class="edit-password-button" id="AppliEditButton">Edit Password</button>
-            </div>
-            <div class="features-title" id="AppliChangePassword">Change Password</div>
-            <div class="change-password-section">
-                <div class="text-placeholder">
-                    <b>Password:</b> <input type="password" class="input-field" placeholder="Current Password">
-                </div>
-                <div class="text-placeholder">
-                    <b>New Password:</b> <input type="password" class="input-field" placeholder="New Password">
-                </div>
-                <div class="text-placeholder">
-                    <b>Confirm Password:</b> <input type="password" class="input-field" placeholder="Confirm Password">
-                </div>
-                <div class="change-password-buttons">
-                    <button class="save-button">Save</button>
-                </div>
-            </div>
-        </div>
-        <div class="profile-button" onclick="signOut()">Sign Out</div>
+    <button class="edit-password-button" id="AppliEditButton">Edit Password</button>
+</div>
+<div class="features-title" id="AppliChangePassword">Change Password</div>
+<div class="change-password-section" style="display: none;"> <!-- Initially hidden -->
+    <div class="text-placeholder">
+        <b>Password:</b> <input type="password" class="input-field" placeholder="Current Password">
     </div>
-
-    <div class="footer">
-        <p>© BayaniHire Inc.</p>
+    <div class="text-placeholder">
+        <b>New Password:</b> <input type="password" class="input-field" placeholder="New Password">
     </div>
+    <div class="text-placeholder">
+        <b>Confirm Password:</b> <input type="password" class="input-field" placeholder="Confirm Password">
+    </div>
+    <div class="change-password-buttons">
+        <button class="save-button">Save</button>
+    </div>
+</div>
+<div class="profile-button" onclick="signOut()">Sign Out</div>
+{% endblock %}
 
+{% block script %}
 <script>
-    document.getElementById('AppliEditButton').addEventListener('click', function() {
-        var changePasswordSection = document.querySelector('.change-password-section');
-        if (changePasswordSection.style.display === 'none' || changePasswordSection.style.display === '') {
-            changePasswordSection.style.display = 'flex';
-        } else {
-            changePasswordSection.style.display = 'none';
-        }
+    document.addEventListener("DOMContentLoaded", function() {
+        // Toggle display of the change password section
+        document.getElementById('AppliEditButton').addEventListener('click', function() {
+            var changePasswordSection = document.querySelector('.change-password-section');
+            if (changePasswordSection.style.display === 'none' || changePasswordSection.style.display === '') {
+                changePasswordSection.style.display = 'flex'; // Show the section
+            } else {
+                changePasswordSection.style.display = 'none'; // Hide the section
+            }
+        });
     });
 
+    // Function to sign out, moved outside DOMContentLoaded for global access
     function signOut() {
-        // Clear session data or tokens (example, adapt as needed)
         sessionStorage.clear();
         localStorage.clear();
-
-        // Redirect to the login page
         window.location.href = "{% url 'login' %}";
     }
 </script>
-
-</body>
-</html>
+{% endblock %}
