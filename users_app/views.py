@@ -22,6 +22,11 @@ import os
 from django.conf import settings
 from django.contrib import messages
 from datetime import date
+from django.db.models import Prefetch
+from django.db.models.functions import Concat
+from django.db.models import Value
+from django.db import transaction
+from django.urls import reverse
 
 
 
@@ -374,17 +379,193 @@ def create_job_details(request):
     today_date = date.today().strftime("%Y-%m-%d")  # Format today's date as YYYY-MM-DD
     return render(request, 'AdminView_2_2_CreateJobDetails.html', {'today_date': today_date})
 
-def qualification(request):
-    return render(request, 'AdminView_3_Qualification.html')
 
+def qualification(request):
+    interviewers = InterviewStorage.objects.select_related('account')
+    grouped_interviewers = {}
+
+    for interviewer in interviewers:
+        account_id = interviewer.account_id
+        interviewer_name = interviewer.interviewer_name
+        if account_id not in grouped_interviewers:
+            grouped_interviewers[account_id] = {
+                "interviewer_id": interviewer.account_id,
+                "interviewer_name": interviewer_name,
+                "schedule_dates": []
+            }
+        grouped_interviewers[account_id]["schedule_dates"].append(str(interviewer.interview_schedule_date))
+
+    interviewer_data = list(grouped_interviewers.values())
+
+    applicants = (
+        ListOfApplicantsWithStatusAndCredentials.objects.select_related('account', 'job')
+        .filter(applicant_status='FOR INTERVIEW')
+        .values(
+            'account__first_name', 'account__middle_name', 'account__last_name',
+            'job__job_title', 'job__job_company'
+        )
+    )
+
+    applicant_data = [
+        {
+            "full_name": f"{applicant['account__first_name']} {applicant['account__middle_name'] or ''} {applicant['account__last_name']}".strip(),
+            "job_title": applicant['job__job_title'],
+            "job_company": applicant['job__job_company']
+        }
+        for applicant in applicants
+    ]
+
+    if request.method == 'POST':
+        # Capture the selected applicant and interviewer details
+        selected_applicant_full_name = request.POST.get('selected_applicant_full_name')
+        selected_job_details = request.POST.get('selected_job_details')
+        
+        # Redirect to the send_schedule view with the selected data
+        return redirect('send_schedule', applicant_name=selected_applicant_full_name, job_details=selected_job_details)
+
+    return render(request, 'AdminView_3_Qualification.html', {
+        'interviewers': interviewer_data,
+        'applicants': applicant_data
+    })
+    
 def send_schedule(request):
-    return render(request, 'AdminView_3_1_Send.html')
+      # Fetch all applicants who are set for interview
+    applicants = ListOfApplicantsWithStatusAndCredentials.objects.filter(
+        applicant_status='FOR INTERVIEW'
+    ).select_related('account', 'job', 'interview_applicant_id')  # assuming foreign key is loaded properly
+
+    # Prepare data for display in template
+    applicant_data = [
+        {
+            "full_name": f"{applicant.account.first_name} {applicant.account.middle_name or ''} {applicant.account.last_name}".strip(),
+            "job_title": applicant.job.job_title,
+            "job_company": applicant.job.job_company,
+            "applicant_status_id": applicant.applicant_status_id,
+            "interview_applicant_id": applicant.interview_applicant_id_id if applicant.interview_applicant_id else None
+        }
+        for applicant in applicants
+    ]
+    
+    if request.method == "POST":
+        interviewer_name = request.POST.get('interviewer_name')
+        schedule_date = request.POST.get('selected_schedule_date')
+        
+    
+       
+        return render(request, 'AdminView_3_1_Send.html', {
+            'interviewer_name': interviewer_name,
+            'schedule_date': schedule_date,
+            'applicants': applicant_data  # Include updated applicants in the response
+        })
+# GET request: Render page with initial applicant data
+    return render(request, 'AdminView_3_1_Send.html', {
+        'applicants': applicant_data
+    })
+
+def confirm_send_schedule(request):
+    if request.method == "POST":
+        interviewer_name = request.POST.get('interviewer_name')
+        schedule_date = request.POST.get('schedule_date')
+        interview_message = request.POST.get('interview_message')
+        applicant_ids = request.POST.getlist('applicant_ids[]')  # Note the brackets to fetch a list
+
+        # Find interview instance or handle error
+        interview_instance = InterviewStorage.objects.filter(interviewer_name=interviewer_name, interview_schedule_date=schedule_date).first()
+        if not interview_instance:
+            return redirect('send_schedule')  # Consider adding error messaging here
+
+        with transaction.atomic():
+            for applicant_id in applicant_ids:
+                applicant = get_object_or_404(ListOfApplicantsWithStatusAndCredentials, applicant_status_id=applicant_id)
+                applicant.interview_applicant_id = interview_instance
+                applicant.applicant_schedule_date = schedule_date
+                applicant.admin_message = interview_message
+                applicant.applicant_status = 'QUALIFIED'
+                applicant.save()
+
+        return redirect('list_of_applicants')  # Redirect to a confirmation or success page
+    return redirect('send_schedule')
+
+
+
 
 def open_schedule_list(request):
     return render(request, 'AdminView_3_2_OpenScheduleList.html')
 
 def schedule(request):
-    return render(request, 'AdminView_4_Schedule.html')
+    # Get AccountStorage entries where the role is 'interviewer'
+    interviewers = AccountStorage.objects.filter(role='interviewer').select_related('account')
+    
+    # Extract full names from related AccountInformation records
+    interviewer_names = [
+        f"{i.account.first_name or ''} {i.account.middle_name or ''} {i.account.last_name or ''}".strip()
+        for i in interviewers
+    ]
+
+    if request.method == "POST":
+        # Retrieve the selected interviewer name and interview date from the form
+        selected_interviewer_name = request.POST.get('selected_interviewer')
+        interview_date = request.POST.get('interview_date')
+
+        # Find the selected interviewer in AccountStorage by matching full name
+        selected_interviewer = next(
+            (i for i in interviewers if f"{i.account.first_name or ''} {i.account.middle_name or ''} {i.account.last_name or ''}".strip() == selected_interviewer_name), 
+            None
+        )
+
+        if selected_interviewer:
+            # Save the interview schedule date in InterviewStorage with concatenated full name
+            InterviewStorage.objects.create(
+                account=selected_interviewer.account,
+                role=selected_interviewer,
+                interview_schedule_date=interview_date,
+                interviewer_name=selected_interviewer_name,  # Save full name as concatenated interviewer_name
+            )
+
+        # Redirect to the same page with a success message
+        return redirect('schedule')
+
+    # Retrieve interview records with interviewer names and scheduled dates for display
+    interview_data = InterviewStorage.objects.select_related('account').values(
+        'account__first_name', 'account__middle_name', 'account__last_name', 'interview_schedule_date'
+    )
+
+    # Format interviewer names and dates for display
+    formatted_interview_data = [
+        {
+            "name": f"{entry['account__first_name'] or ''} {entry['account__middle_name'] or ''} {entry['account__last_name'] or ''}".strip(),
+            "date": entry['interview_schedule_date']
+        }
+        for entry in interview_data
+    ]
+
+    # Pass interviewer names and interview schedule data to the template
+    context = {
+        'interviewer_names': interviewer_names,
+        'formatted_interview_data': formatted_interview_data,
+    }
+    return render(request, 'AdminView_4_Schedule.html', context)
+
+def schedule_view(request):
+    # Retrieve interview records with interviewer names and scheduled dates
+    interview_data = InterviewStorage.objects.select_related('account').values(
+        'account__first_name', 'account__middle_name', 'account__last_name', 'interview_schedule_date'
+    )
+
+    # Format interviewer names and dates for display
+    formatted_interview_data = [
+        {
+            "name": f"{entry['account__first_name'] or ''} {entry['account__middle_name'] or ''} {entry['account__last_name'] or ''}".strip(),
+            "date": entry['interview_schedule_date']
+        }
+        for entry in interview_data
+    ]
+
+    # Pass formatted interview data to the template
+    context = {
+        'formatted_interview_data': formatted_interview_data,
+    }
+    return render(request, 'AdminView_4_Schedule.html', context)
 
 def feedback(request):
     return render(request, 'AdminView_5_Feedback.html')
@@ -497,7 +678,11 @@ def admin_creatingjob(request):
             account = get_object_or_404(AccountInformation, account_id=account_id)
         else:
             return redirect('login')  # Redirect to login if no user is logged in
-
+        
+         # Validate required fields
+        if not (status and job_title and company and job_description and job_requirements):
+            return render(request, 'users_app/create_job.html', {'error': 'All fields are required'})
+        
         # Create and save the job entry
         new_job = JobDetailsAndRequirements(
             account=account,
@@ -517,7 +702,9 @@ def admin_creatingjob(request):
     # Render the form if it's a GET request
     return render(request, 'users_app/create_job.html')
 
+
 ###########################ADMIN RETRIEVAL####################################
+
 
 ############################index##########################################
 def login(request):
