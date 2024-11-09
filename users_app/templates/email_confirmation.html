@@ -1,10 +1,11 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>BayaniHire - Email Confirmation</title>
+    <link rel="stylesheet" href="{% static 'css/popup.css' %}"> <!-- Link to the popup CSS file -->
 </head>
 <body>
 
@@ -18,13 +19,11 @@
         </p>
 
         <!-- Icon Image -->
-        <img src="{% static 'mobile.png' %}" alt="Confirmation Icon" width="128" height="128">
-
-        
+        <img src="{% static 'mobile.png' %}" alt="Confirmation Icon" width="128" height="128" class="content-image">
 
         <!-- Additional Instructions with Resend Link -->
         <p class="additional-instructions">
-            Didn't receive the OTP code? <a href=>Resend OTP Code</a>
+            Didn't receive the OTP code? <a href="#">Resend OTP Code</a> <!-- Use a placeholder link for now -->
         </p>
 
         <!-- OTP Confirmation Form -->
@@ -37,7 +36,7 @@
             <!-- Buttons: Cancel and Verify -->
             <div class="button-container">
                 <button type="button" class="cancel-btn" onclick="window.location.href='{% url 'login' %}'">Cancel</button>
-                <button type="submit" class="verify-btn">Verify</button>
+                <button type="verify" class="submit-btn">Verify</button>
             </div>
         </form>
     </div>
