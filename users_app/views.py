@@ -142,6 +142,7 @@ def applicant_fileupload(request, job_id):
 
     return JsonResponse({"error": "Invalid request method."}, status=405)
 
+
 def applicant_applicationstatus(request):
     # Ensure the user is logged in using session data
     account_id = request.session.get('account_id')
