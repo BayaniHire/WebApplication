@@ -13,13 +13,15 @@ urlpatterns = [
     path('FchangePassword/', views.FchangePassword, name = 'FchangePassword'),
     path('security/', views.Security, name='Security'),
     
+     ##########INTERVIEWER###########################
     path('dashboard_interviewer/', views.interviewer_appointments, name='INTappointments'),
     path('profile_interviewer/', views.interviewer_profile, name='INTprofile'),
     path('applicants/', views.interviewer_applicants, name='INTapplicants'),
-    path('viewinfo/', views.interviewer_viewinfo, name='INTviewinfo'),
+    path('viewinfo/<int:applicant_status_id>/', views.interviewer_viewinfo, name='INTviewinfo'),
     path('editfeedback/', views.interviewer_editfeedback, name='INTeditfeedback'),
     path('feedback/', views.interviewer_feedback, name='INTfeedback'),
     path('history/', views.interviewer_history, name='INThistory'),
+    ##########INTERVIEWER###########################
 ##########################APPLICANT###############################################
     path('dashboard_applicant/', views.applicant_homepage, name='homepage'),
     path('jobreq/<int:job_id>/', views.applicant_jobreq, name='jobreq'),
