@@ -1,62 +1,56 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>BayaniHire Admin Center</title>
-</head>
-<body>
-    <!-- Logo -->
-    <div>
-        <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo" width="200" height="200">
-    </div>
+{% extends "Admin_Inheritance.html" %}  <!-- Replace with your actual base template filename -->
 
-    <!-- Buttons -->
-    <div>
-        <button onclick="window.location.href='{% url 'list_of_applicants' %}';">List of Applicants</button>
-        <button onclick="window.location.href='{% url 'list_of_jobs' %}';">List of Jobs</button>
-        <button onclick="window.location.href='{% url 'qualification' %}';">Qualification</button>
-        <button onclick="window.location.href='{% url 'schedule' %}';">Schedule</button>
-        <button onclick="window.location.href='{% url 'feedback' %}';">Feedback</button>
-    </div>
+{% block title %}BayaniHire Admin Center{% endblock %}
 
-    <!-- Title and Profile -->
-    <div>
-        <h1>BayaniHire Admin Center</h1>
-        <button onclick="window.location.href='{% url 'adminprofile' %}';">Profile</button>
-    </div>
+{% block content %}
+<div class="main-content" style="padding-top: 60px;">  <!-- Main content area with padding to avoid header overlap -->
+
     <h2>List of Applicants</h2>
-    <p>Number of New Applicants: <font color="red">{{ total_applicants }}</font></p>
-    <select>
-        <option>Sort</option>
-    </select>
+    <p>Number of New Applicants: <span style="color: red;">{{ total_applicants }}</span></p>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <select class="form-control w-auto">
+            <option>Sort</option>
+        </select>
+        <input type="text" class="form-control w-25" placeholder="Search">
+        <button class="btn btn-secondary">Enter</button>
+    </div>
     
-    <button>View All</button>
-    <input type="text" placeholder="Search">
-    <button>Enter</button>
-    <table border="1" width="100%">
-        <tr>
-            <th>No.</th>
-            <th>Applicant Name</th>
-            <th>Company</th>
-            <th>Position Applied</th>
-            <th>Date Applied</th>
-            <th>Status</th>
-            <th>Action</th> <!-- Column for action buttons -->
-        </tr>
-        {% for applicant in applicant_data %}
-        <tr>
-            <td>{{ applicant.no }}</td>
-            <td>{{ applicant.full_name }}</td>
-            <td>{{ applicant.company }}</td>
-            <td>{{ applicant.position_applied }}</td>
-            <td>{{ applicant.date_applied }}</td>
-            <td>{{ applicant.status }}</td>
-            <td>
-                <button onclick="location.href='{% url 'open_applicants' applicant.applicant_status_id %}';">Open</button>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-</body>
-</html>
+    <div class="table-container">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead class="thead-dark">
+                <tr>
+                    <th>No.</th>
+                    <th>Applicant Name</th>
+                    <th>Company</th>
+                    <th>Position Applied</th>
+                    <th>Date Applied</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if applicant_data %}
+                    {% for applicant in applicant_data %}
+                    <tr>
+                        <td>{{ applicant.no }}</td>
+                        <td>{{ applicant.full_name }}</td>
+                        <td>{{ applicant.company }}</td>
+                        <td>{{ applicant.position_applied }}</td>
+                        <td>{{ applicant.date_applied }}</td>
+                        <td>{{ applicant.status }}</td>
+                        <td>
+                            <button class="btn btn-info btn-sm" onclick="window.location.href='{% url 'open_applicants' applicant.applicant_status_id %}';">Open</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7" style="text-align: center;">No applicants found.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
