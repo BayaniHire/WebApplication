@@ -26,34 +26,53 @@
         <button onclick="window.location.href='{% url 'adminprofile' %}';">Profile</button>
     </div>
     <h2>Applicant Interview Schedule</h2>
-    <table width="100%">
-        <tr>
-            <!-- Qualified Applicants List -->
-            <td valign="top" width="50%">
-                <p>Shown on the list are the Qualified Applicants.</p>
-                <table border="1" width="100%">
-                    <tr><td>Applicant 1</td></tr>
-                    <tr><td>Applicant 2</td></tr>
-                    <tr><td>Applicant 3</td></tr>
-                    <tr><td>Applicant 4</td></tr>
-                    <tr><td>Applicant 5</td></tr>
-                </table>
-                <p><button>View All</button></p>
-                <p>Interview message</p>
-                <textarea></textarea> <!-- Large text area -->
-            </td>
-            <!-- Interviewer Details -->
-            <td valign="top" width="50%">
-                <p>Name of Interviewer</p>
-                <input type="text" placeholder="Interviewer Name">
-                <p>Schedule Date</p>
-                <input type="text" placeholder="dd-mm-yyyy">
-                <p>Location</p>
-                <!-- Placeholder for Google Map (static image as a placeholder in pure HTML) -->
-                <img src="https://via.placeholder.com/400x200.png?text=Google+Map" alt="Google Map" width="100%">
-                <p><button>Send</button></p>
-            </td>
-        </tr>
-    </table>
+    
+    <form method="POST" action="{% url 'confirm_send_schedule' %}">
+        
+        {% csrf_token %}
+        <input type="hidden" name="interviewer_name" value="{{ interviewer_name }}">
+        <input type="hidden" name="schedule_date" value="{{ schedule_date }}">
+        <input type="hidden" name="interview_message" value="{{ interview_message }}">
+    
+        {% for applicant in applicants %}
+        <!-- Ensure that applicant_ids[] is used to capture all IDs as a list -->
+        <input type="hidden" name="applicant_ids[]" value="{{ applicant.applicant_status_id }}">
+        {% endfor %}
+    
+        <table width="100%">
+            <tr>
+                <!-- Qualified Applicants List -->
+                <td valign="top" width="50%">
+                    <p>Shown on the list are the Qualified Applicants.</p>
+                    <table border="1" width="100%">
+                        <tr>
+                            <th>FOR INTERVIEW</th>
+                            <th>Job Applied</th>
+                        </tr>
+                        {% for applicant in applicants %}
+                        <tr>
+                            <td>{{ applicant.full_name }}</td>
+                            <td>{{ applicant.job_title }} at {{ applicant.job_company }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    <p><button type="button">View All</button></p>
+                    <p>Interview message</p>
+                    <!-- This textarea should be readonly if you do not intend users to modify it on this page -->
+                    <textarea name="interview_message">{{ interview_message }}</textarea>
+                </td>
+    
+                <!-- Interviewer Details -->
+                <td valign="top" width="50%">
+                    <p>Name of Interviewer</p>
+                    <input type="text" name="interviewer_name_display" value="{{ interviewer_name }}" readonly>
+                    <p>Schedule Date</p>
+                    <input type="text" name="schedule_date_display" value="{{ schedule_date }}" readonly>
+                    <p><button type="submit">Send</button></p>
+                </td>
+            </tr>
+        </table>
+    </form>
+    
 </body>
 </html>

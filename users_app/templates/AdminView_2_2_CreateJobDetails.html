@@ -26,7 +26,7 @@
         <button onclick="window.location.href='{% url 'adminprofile' %}';">Profile</button>
     </div>
     <h2>Create Job Details & Requirements</h2>
-    <form action="{% url 'admin_creatingjob' %}" method="post" style="font-family: Georgia; font-size: 18px; font-weight: bold;">
+    <form action="{% url 'admin_creatingjob' %}" method="POST" style="font-family: Georgia; font-size: 18px; font-weight: bold;">
         {% csrf_token %}
         <table>
             <tr>
