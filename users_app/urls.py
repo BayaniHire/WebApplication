@@ -39,6 +39,7 @@ urlpatterns = [
     path('edit-job/<int:job_id>/', views.edit_job_details, name='edit_job_details'), 
     path('qualification/', views.qualification, name='qualification'),
     path('send_schedule/', views.send_schedule, name='send_schedule'),
+    path('confirm_send_schedule/', views.confirm_send_schedule, name='confirm_send_schedule'),
     path('open_schedule_list/', views.open_schedule_list, name='open_schedule_list'),
     path('schedule/', views.schedule, name='schedule'),
     path('admin_feedback/', views.feedback, name='feedback'),
@@ -50,6 +51,7 @@ urlpatterns = [
     path('admin_interviewer_account_setup/', views.admin_interviewer_account_setup, name='admin_interviewer_account_setup'),
     path('admin_creatingjob/', views.admin_creatingjob, name='admin_creatingjob'),
     path('applicant/update/<int:applicant_status_id>/', views.update_applicant_status, name='update_applicant_status'),
+    
 ##########################ADMIN##########################################
 
     ###wag po galawin pang log in to
