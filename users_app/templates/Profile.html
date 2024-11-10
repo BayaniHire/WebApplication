@@ -1,51 +1,58 @@
 {% extends "Interviewer_Inheritance.html" %}
 
 {% block body %}
-<div class="main-content">
+<div class="main-content" style="padding-top: 60px;">
     <h2 style="font-family: Georgia; font-size: 36px; font-weight: bold;">User Profile:</h2>
 
     <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">Username: </label>
-    <span style="font-family: Georgia; font-size: 24px;">*INSERT USERNAME HERE*</span>
+    <span style="font-family: Georgia; font-size: 24px;">{{ username }}</span>
     <br>
 
     <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">Name: </label>
-    <span style="font-family: Georgia; font-size: 24px;">*INSERT NAME HERE*</span>
+    <span style="font-family: Georgia; font-size: 24px;">{{ full_name }}</span>
     <br>
 
     <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">Email: </label>
-    <span style="font-family: Georgia; font-size: 24px;">*INSERT EMAIL HERE*</span>
+    <span style="font-family: Georgia; font-size: 24px;">{{ email }}</span>
     <br>
 
-    <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">PASSWORD: </label>
+    <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">Password: </label>
     <span style="font-family: Georgia; font-size: 24px;">*HIDDEN*</span>
     <br>
-    <button class="bodybutton" style="font-family: Georgia; font-size: 20px; font-weight: bold;" onclick="showContent()">Change Password</button>
-    <div id="password-section" class="hidden-content">
-        <div class="input-group">
-            <label>Current Password:</label>
-            <input class="inputarea" type="password" placeholder="Enter Current Password">
-        </div>
-    
-        <div class="input-group">
-            <label>New Password:</label>
-            <input class="inputarea" type="password" placeholder="Enter New Password Here">
-        </div>
-    
-        <div class="input-group">
-            <label>Confirm Password:</label>
-            <input class="inputarea" type="password" placeholder="Enter New Password Here">
-        </div>
-        <div class="input-group">
-        <button class="bodybutton">Save</button>
-         </div>
+
+    <button class="bodybutton" style="font-family: Georgia; font-size: 20px; font-weight: bold;" onclick="togglePasswordSection()">Change Password</button>
+
+    <div id="password-section" class="hidden-content" style="display: none;">
+        <form method="post" action="{% url 'INTprofile' %}">
+            {% csrf_token %}
+            <div class="input-group">
+                <label>Current Password:</label>
+                <input class="inputarea" type="password" name="current_password" placeholder="Enter Current Password">
+            </div>
+
+            <div class="input-group">
+                <label>New Password:</label>
+                <input class="inputarea" type="password" name="new_password" placeholder="Enter New Password Here">
+            </div>
+
+            <div class="input-group">
+                <label>Confirm Password:</label>
+                <input class="inputarea" type="password" name="confirm_password" placeholder="Confirm New Password">
+            </div>
+
+            <div class="input-group">
+                <button type="submit" class="bodybutton">Save</button>
+            </div>
+        </form>
     </div>
-    
+
     <script>
-        function showContent() {
-            document.getElementById("password-section").style.display = "block";
+        function togglePasswordSection() {
+            const passwordSection = document.getElementById("password-section");
+            passwordSection.style.display = passwordSection.style.display === "none" ? "block" : "none";
         }
     </script>
 
-    <button class="bodybutton" style="font-family: Georgia; font-size: 20px; font-weight: bold;"onclick="window.location.href='{% url 'Index' %}'">Sign Out</button>
+    <button class="bodybutton" style="font-family: Georgia; font-size: 20px; font-weight: bold;" onclick="window.location.href='{% url 'Index' %}'">Sign Out</button>
 </div>
 {% endblock %}
