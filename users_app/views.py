@@ -758,6 +758,38 @@ def adminprofile(request):
         'email': user.email
     }
     return render(request, 'AdminView_6_Profile.html', context)
+def interviewer_profile(request):
+    # Get the interviewer's account ID from the session
+    account_id = request.session.get('account_id')
+    user = get_object_or_404(AccountInformation, account_id=account_id)
+
+    if request.method == "POST":
+        # Change Password Logic
+        current_password = request.POST.get('current_password')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+        
+        # Check if the current password matches
+        if user.password != current_password:
+            messages.error(request, "Current password is incorrect.")
+        elif new_password == current_password:
+            messages.error(request, "New password must be different from the current password.")
+        elif new_password != confirm_password:
+            messages.error(request, "New password and confirm password do not match.")
+        else:
+            # Update the password
+            user.password = new_password
+            user.save()
+            messages.success(request, "Password updated successfully.")
+            return redirect('INTprofile')  # Redirect to the interviewer profile page
+
+    # Display profile info
+    context = {
+        'username': user.username,
+        'full_name': f"{user.first_name} {user.middle_name or ''} {user.last_name}",
+        'email': user.email
+    }
+    return render(request, 'Profile.html', context)
 
 def add_accounts(request):
     return render(request, 'AdminView_6_2_AddAccounts.html')
