@@ -1,81 +1,101 @@
-{% extends "Admin_Inheritance.html" %}  <!-- Replace with your actual base template filename -->
+{% extends "Admin_Inheritance.html" %}
 
 {% block title %}BayaniHire: Admin Center{% endblock %}
 
 {% block content %}
-<div class="main-content" style="padding-top: 60px;">  <!-- Main content area with padding to avoid header overlap -->
+<div class="main-content" style="padding: 0; margin: 0; text-align: center; display: flex; flex-direction: column; align-items: center;"></div>
+    <h2 style="font-size: 36px; font-weight: bold; text-align: center;">Applicant Interview Status and Feedback</h2>
 
-    <h2>Applicant Interview Status and Interviewer Feedback </h2>
-    <input type="text" id="searchInput" placeholder="Search" onkeypress="enterSearch(event)">
-    <button onclick="searchTable()"><b>Enter</b></button>
-    <button onclick="resetSearch()"><b>View All</b></button>
-    
-    <br><br>
-    
+    <!-- Search, Sorting, and Rows per Page Form -->
+    <form method="GET" action="" class="form-inline" id="filterForm">
+        <input type="text" name="search" id="search-input" value="{{ search_query }}" placeholder="Search by Applicant's Name" class="form-control mr-2">
+        <button type="submit" class="btn btn-secondary mr-2">Search</button>
+
+        <!-- Sort by Name -->
+        <select name="name_sort" class="form-control mr-2" onchange="document.getElementById('filterForm').submit()">
+            <option value="asc" {% if sort_order == 'asc' %}selected{% endif %}>Name Ascending</option>
+            <option value="desc" {% if sort_order == 'desc' %}selected{% endif %}>Name Descending</option>
+        </select>
+
+        <!-- Rows per Page -->
+        <input type="number" name="rows" min="1" max="10" value="{{ rows_per_page }}" class="form-control mr-2" placeholder="Rows per page">
+        <button type="submit" class="btn btn-primary">Set Rows</button>
+    </form>
+
     <table id="applicantsTable" border="1" width="100%">
         <thead>
             <tr>
-                <th><b>Applicant's Name</b></th>
-                <th><b>Position Applied</b></th>
-                <th><b>Company</b></th>
-                <th><b>Interview Status</b></th>
-                <th><b>Action</b></th>
+                <th>No.</th>
+                <th>Applicant's Name</th>
+                <th>Position Applied</th>
+                <th>Company</th>
+                <th>Interview Status</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
-            {% for applicant in applicants %}
-            {% if applicant.interviewer_feedback_status %}
-            <tr>
-                <td>{{ applicant.account.first_name }} {{ applicant.account.last_name }}</td>
-                <td>{{ applicant.job.job_title }}</td>
-                <td>{{ applicant.job.job_company }}</td>
-                <td>{{ applicant.interviewer_feedback_status }}</td>
-                <td>
-                    <button onclick="window.location.href='{% url 'view_feedback' applicant.applicant_status_id %}';">
-                        View Feedback
-                    </button>
-                </td>
+            {% if applicants %}
+                {% for applicant in applicants %}
+                <tr>
+                    <td>{{ page_obj.start_index|add:forloop.counter0 }}</td>
+                    <td>{{ applicant.account.first_name }} {{ applicant.account.last_name }}</td>
+                    <td>{{ applicant.job.job_title }}</td>
+                    <td>{{ applicant.job.job_company }}</td>
+                    <td>{{ applicant.interviewer_feedback_status }}</td>
+                    <td>
+                        <button class="btn btn-info btn-sm" onclick="window.location.href='{% url 'view_feedback' applicant.applicant_status_id %}';">View Feedback</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="6" style="text-align: center;">No applicants found.</td>
+                </tr>
             {% endif %}
-            {% endfor %}
         </tbody>
     </table>
-    
-    <script>
-    function searchTable() {
-        var input, filter, table, tr, td, i, txtValue;
-        input = document.getElementById("searchInput");
-        filter = input.value.toUpperCase();
-        table = document.getElementById("applicantsTable");
-        tr = table.getElementsByTagName("tr");
-        for (i = 0; i < tr.length; i++) {
-            td = tr[i].getElementsByTagName("td")[0];  // Adjust the index if necessary
-            if (td) {
-                txtValue = td.textContent || td.innerText;
-                if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    tr[i].style.display = "";
-                } else {
-                    tr[i].style.display = "none";
-                }
-            }
-        }
-    }
-    
-    function enterSearch(event) {
-        if (event.keyCode === 13) {  // 13 is the keycode for the Enter key
-            searchTable();
-        }
-    }
-    
-    function resetSearch() {
-        var table, tr, i;
-        table = document.getElementById("applicantsTable");
-        tr = table.getElementsByTagName("tr");
-        for (i = 0; i < tr.length; i++) {
-            tr[i].style.display = "";
-        }
-        document.getElementById("searchInput").value = '';  // Reset search input
-    }
-    </script>
 
+    <!-- Pagination Controls -->
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1&name_sort={{ sort_order }}&rows={{ rows_per_page }}&search={{ search_query }}">First</a>
+            <a href="?page={{ page_obj.previous_page_number }}&name_sort={{ sort_order }}&rows={{ rows_per_page }}&search={{ search_query }}">Previous</a>
+        {% endif %}
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}&name_sort={{ sort_order }}&rows={{ rows_per_page }}&search={{ search_query }}">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}&name_sort={{ sort_order }}&rows={{ rows_per_page }}&search={{ search_query }}">Last</a>
+        {% endif %}
+    </div>
 </div>
+
+<script>
+// Function to perform live search on the entire dataset
+document.getElementById('search-input').addEventListener('input', function() {
+    const searchValue = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#applicantsTable tbody tr');
+    let matchFound = false;
+
+    rows.forEach(row => {
+        const applicantName = row.cells[1].textContent.toLowerCase();
+        if (applicantName.includes(searchValue)) {
+            row.style.display = '';  // Show matching rows
+            matchFound = true;
+        } else {
+            row.style.display = 'none';  // Hide non-matching rows
+        }
+    });
+
+    // If no match is found, display a "No results found" row
+    if (!matchFound) {
+        const noResultsRow = document.createElement('tr');
+        noResultsRow.innerHTML = '<td colspan="6" style="text-align: center;">No results found.</td>';
+        document.querySelector('#applicantsTable tbody').appendChild(noResultsRow);
+    } else {
+        // Remove "No results found" message if there are matches
+        const noResultsRow = document.querySelector('#applicantsTable tbody tr.no-results');
+        if (noResultsRow) noResultsRow.remove();
+    }
+});
+</script>
 {% endblock %}
