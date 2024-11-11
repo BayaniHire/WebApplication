@@ -726,27 +726,52 @@ def confirm_send_schedule(request):
         return redirect('list_of_applicants')  # Redirect to a confirmation or success page
     return redirect('send_schedule')
 
+
 def open_schedule_list(request):
     interviewer_name = request.GET.get('interviewer', None)
-    search_query = request.GET.get('search', '')
-    view_all = request.GET.get('view_all', '')
+    search_query = request.GET.get('search', '').strip()
+    sort_order = request.GET.get('date_sort', 'asc')
+    rows_param = request.GET.get('rows', '5')
+    rows_per_page = max(min(int(rows_param), 10), 1) if rows_param.isdigit() else 5
 
-    if view_all:
-        applicants = ListOfApplicantsWithStatusAndCredentials.objects.all()
-    elif interviewer_name:
+    # Base queryset of applicants
+    applicants = ListOfApplicantsWithStatusAndCredentials.objects.none()
+
+    if interviewer_name:
+        # Filter applicants by the selected interviewer
         interviews = InterviewStorage.objects.filter(interviewer_name=interviewer_name)
         applicants = ListOfApplicantsWithStatusAndCredentials.objects.filter(
             interview_applicant_id__in=interviews,
             account__first_name__icontains=search_query
         ).distinct()
-    else:
-        applicants = ListOfApplicantsWithStatusAndCredentials.objects.none()
 
-    # Correcting the distinct interviewer query to use the correct primary key field
+        # Apply date sorting if an interviewer is selected
+        if sort_order == 'desc':
+            applicants = applicants.order_by('-applicant_schedule_date')
+        else:
+            applicants = applicants.order_by('applicant_schedule_date')
+
+    # Pagination
+    paginator = Paginator(applicants, rows_per_page)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+
+    # Retrieve distinct interviewers
     interviewer_ids = InterviewStorage.objects.values('interviewer_name').annotate(max_id=Max('interview_applicant_id')).values('max_id')
     interviewers = InterviewStorage.objects.filter(interview_applicant_id__in=interviewer_ids)
 
-    return render(request, 'AdminView_3_2_OpenScheduleList.html', {'applicants': applicants, 'interviewers': interviewers})
+    # Context for rendering
+    context = {
+        'applicants': page_obj,
+        'interviewers': interviewers,
+        'search_query': search_query,
+        'interviewer_name': interviewer_name,
+        'sort_order': sort_order,
+        'rows_per_page': rows_per_page,
+        'page_obj': page_obj,
+    }
+
+    return render(request, 'AdminView_3_2_OpenScheduleList.html', context)
 
 def schedule(request):
     # Get AccountStorage entries where the role is 'interviewer'
