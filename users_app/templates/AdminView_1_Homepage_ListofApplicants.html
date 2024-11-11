@@ -3,19 +3,19 @@
 {% block title %}BayaniHire Admin Center{% endblock %}
 
 {% block content %}
-<div class="main-content" style="padding: 0; margin: 0; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 0;">
-    <h2 style="font-size: 36px; font-weight: bold;">List of Applicants</h2>
+<div class="main-content container" style="padding: 0; margin: 0; text-align: center; display: flex; flex-direction: column; align-items: center;"></div>
+    <h2 style="font-size: 36px; font-weight: bold; text-align: center;">List of Applicants</h2>
     <p style="font-size: 14px; font-weight: bold;">
         Welcome to List of Applicants, where the System Admin can manage all the applicants applied in this system.
     </p>
     <p>Number of New Applicants: <span style="color: red;">{{ total_applicants }}</span></p>
 
-    <form method="GET" action="" class="form-inline">
+    <form method="GET" action="" class="d-flex align-items-center mb-3">
         <select name="sort" class="form-control mr-2" onchange="this.form.submit()">
             <option value="asc" {% if sort_order == 'asc' %}selected{% endif %}>Sort Name A-Z</option>
             <option value="desc" {% if sort_order == 'desc' %}selected{% endif %}>Sort Name Z-A</option>
         </select>
-
+    
         <select name="date_sort" class="form-control mr-2" onchange="this.form.submit()">
             <option value="asc" {% if date_sort == 'asc' %}selected{% endif %}>Date Applied Ascending</option>
             <option value="desc" {% if date_sort == 'desc' %}selected{% endif %}>Date Applied Descending</option>
@@ -29,6 +29,7 @@
     
         <button type="submit" class="btn btn-primary">Set Rows</button>
     </form>
+    
     <!-- Table displaying applicant data -->
     <div class="table-container">
         <table style="width: 100%; border-collapse: collapse;">
