@@ -3,6 +3,13 @@
 {% block title %}BayaniHire Admin Center{% endblock %}
 
 {% block content %}
+<style>
+    /* Remove borders from all tables and table cells */
+    table, th, td {
+        border: none;
+    }
+</style>
+
 <div class="main-content container" style="padding: 0; margin: 0; text-align: center; display: flex; flex-direction: column; align-items: center;"></div>
     <h2 style="font-size: 36px; font-weight: bold; text-align: center;">Qualification</h2>
     <p style="font-size: 14px; font-weight: bold; text-align: center;">
@@ -11,12 +18,12 @@
 
     <form method="POST" action="{% url 'send_schedule' %}" id="interviewer-form">
         {% csrf_token %}
-        <table width="100%">
+        <table style="width: 100%; border: none;">
             <tr>
                 <!-- Interviewers List -->
                 <td valign="top" width="50%">
                     <p>Here is the list of available Interviewers. Kindly select an Interviewer.</p>
-                    <table border="1" width="100%" id="interviewer-table">
+                    <table width="100%" id="interviewer-table">
                         {% for interviewer in interviewers %}
                             <tr>
                                 <td>
@@ -99,10 +106,9 @@
                     </table>
                 </td>
                 <!-- Control Buttons -->
-                <td valign="top" width="25%">
-                    <br><br><br>
-                    <button type="submit">Send</button><br><br>
-                    <button type="button" onclick="window.location.href='{% url 'open_schedule_list' %}';">Open Schedule List</button>
+                <td class="button-container" width="25%">
+                    <button class="button" type="submit">Send</button>
+                    <button class="button" type="button" onclick="window.location.href='{% url 'open_schedule_list' %}';">Open Schedule List</button>
                 </td>
             </tr>
         </table>
