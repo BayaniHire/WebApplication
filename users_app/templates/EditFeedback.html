@@ -2,32 +2,47 @@
 
 {% block body %}
 <div class="main-content">
-    <label class="header-label">Applicant Name:</label>
+    <form method="POST">
+        {% csrf_token %}
+        
+        <!-- Applicant Name -->
+        <label class="header-label">Applicant Name:</label>
+        <label class="sub-label">{{ applicant.account.first_name }} {{ applicant.account.last_name }}</label>
+        <br><br>
 
-    <label class="sub-label">*INSERT APPLICANT NAME*</label>
+        <!-- Applicant Status -->
+        <label class="header-label">Applicant Status:</label>
+        <select name="status" id="status_dropdown" class="dropdown" required disabled>
+            <option value="PASSED" {% if applicant.interviewer_feedback_status == 'PASSED' %}selected{% endif %}>PASSED</option>
+            <option value="FAILED" {% if applicant.interviewer_feedback_status == 'FAILED' %}selected{% endif %}>FAILED</option>
+        </select>
+        <br><br>
+
+        <!-- Interviewer Remarks -->
+        <label class="header-label">Interviewer Remarks:</label>
+        <textarea name="feedback" id="remarks_textarea" class="remarks-textarea" disabled>{{ applicant.interviewer_feedback }}</textarea>
+        <br><br>
+
+        <!-- Update Feedback Button -->
+        <button type="submit" class="bodybutton" id="update_button" disabled>Update Feedback</button>
+        <br><br>
+
+        <!-- Edit Feedback Button -->
+        <button type="button" id="edit_feedback_button" class="bodybutton" onclick="enableEdit()">Edit Feedback</button>
+    </form>
+
     <br>
-
-    <label class="header-label">Applicant Status:</label>
-    <select class="dropdown">
-        <option>PASSED</option>
-        <option>FAILED</option>
-    </select>
-    <br>
-
-    <label class="header-label">Interviewer Remarks:</label>
-
-    <textarea class="remarks-textarea"></textarea>
-
-
-    <button class="bodybutton">Submit Feedback</button>
-
-    <button class="bodybutton">Edit Feedback</button>
-
+    <!-- Back Button -->
     <button class="bodybutton" onclick="window.location.href='{% url 'INThistory' %}'">Back</button>
-    <br>
-
-    <div class="qualified-applicants">
-        <h2>Feedback History</h2>
-    </div>
 </div>
+
+<script>
+    // Function to enable the dropdown and remarks textarea when "Edit Feedback" is clicked
+    function enableEdit() {
+        document.getElementById("status_dropdown").disabled = false;
+        document.getElementById("remarks_textarea").disabled = false;
+        document.getElementById("update_button").disabled = false;  // Enable the update button
+        document.getElementById("edit_feedback_button").disabled = true;  // Disable the button after clicking it
+    }
+</script>
 {% endblock %}
