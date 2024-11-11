@@ -2,43 +2,43 @@
 
 {% block body %}
 <div class="main-content" style="padding-top: 60px;">
-    <h2 style="font-family: Georgia; font-size: 36px; font-weight: bold;">User Profile:</h2>
+    <h2 style="font-family: Georgia; font-size: 36px; color: rgb(53, 36, 13); font-weight: bold;">User Profile:</h2>
 
-    <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">Username: </label>
-    <span style="font-family: Georgia; font-size: 24px;">{{ username }}</span>
+    <label style="color: rgb(53, 36, 13);font-family: Georgia; font-size: 30px; font-weight: bold;">Username: </label>
+    <span style="color: rgb(53, 36, 13);font-family: Georgia; font-size: 24px;">{{ username }}</span>
     <br>
 
-    <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">Name: </label>
-    <span style="font-family: Georgia; font-size: 24px;">{{ full_name }}</span>
+    <label style="color: rgb(53, 36, 13);font-family: Georgia; font-size: 30px; font-weight: bold;">Name: </label>
+    <span style="color: rgb(53, 36, 13);font-family: Georgia; font-size: 24px;">{{ full_name }}</span>
     <br>
 
-    <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">Email: </label>
-    <span style="font-family: Georgia; font-size: 24px;">{{ email }}</span>
+    <label style="color: rgb(53, 36, 13);font-family: Georgia; font-size: 30px; font-weight: bold;">Email: </label>
+    <span style="color: rgb(53, 36, 13);font-family: Georgia; font-size: 24px;">{{ email }}</span>
     <br>
 
-    <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">Password: </label>
-    <span style="font-family: Georgia; font-size: 24px;">*HIDDEN*</span>
+    <label style="color: rgb(53, 36, 13);font-family: Georgia; font-size: 30px; font-weight: bold;">Password: </label>
+    <span style="color: rgb(53, 36, 13);font-family: Georgia; font-size: 24px;">*HIDDEN*</span>
     <br>
 
     <button class="bodybutton" style="font-family: Georgia; font-size: 20px; font-weight: bold;" onclick="togglePasswordSection()">Change Password</button>
 
     <div id="password-section" class="change-password-section" style="display: none;">
         <div class="input-group">
-            <label>Current Password:</label>
+            <label style="color: rgb(53, 36, 13);">Current Password:</label>
             <input class="inputarea" type="password" placeholder="Current Password">
         </div>
 
         <div class="input-group">
-            <label>New Password:</label>
+            <label style="color: rgb(53, 36, 13);"> New Password: </label>
             <input class="inputarea" type="password" placeholder="New Password">
         </div>
 
         <div class="input-group">
-            <label>Confirm Password:</label>
+            <label style="color: rgb(53, 36, 13);">Confirm Password:</label>
             <input class="inputarea" type="password" placeholder="Confirm Password">
         </div>
 
-        <div class="input-group">
+        <div class="input-group" style="color: rgb(53, 36, 13);">
             <button type="button" class="save-button bodybutton">Save</button>
         </div>
     </div>
