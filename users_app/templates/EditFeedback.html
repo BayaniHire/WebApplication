@@ -6,12 +6,12 @@
         {% csrf_token %}
         
         <!-- Applicant Name -->
-        <label class="header-label">Applicant Name:</label>
-        <label class="sub-label">{{ applicant.account.first_name }} {{ applicant.account.last_name }}</label>
+        <label style="color: rgb(53, 36, 13)" class="header-label">Applicant Name:</label>
+        <label style="color: rgb(48, 34, 15)" class="sub-label">{{ applicant.account.first_name }} {{ applicant.account.last_name }}</label>
         <br><br>
 
         <!-- Applicant Status -->
-        <label class="header-label">Applicant Status:</label>
+        <label style="color: rgb(53, 36, 13)" class="header-label">Applicant Status:</label>
         <select name="status" id="status_dropdown" class="dropdown" required disabled>
             <option value="PASSED" {% if applicant.interviewer_feedback_status == 'PASSED' %}selected{% endif %}>PASSED</option>
             <option value="FAILED" {% if applicant.interviewer_feedback_status == 'FAILED' %}selected{% endif %}>FAILED</option>
@@ -19,7 +19,7 @@
         <br><br>
 
         <!-- Interviewer Remarks -->
-        <label class="header-label">Interviewer Remarks:</label>
+        <label style="color: rgb(53, 36, 13)" class="header-label">Interviewer Remarks:</label>
         <textarea name="feedback" id="remarks_textarea" class="remarks-textarea" disabled>{{ applicant.interviewer_feedback }}</textarea>
         <br><br>
 
