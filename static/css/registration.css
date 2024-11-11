@@ -89,13 +89,13 @@ body {
     text-decoration: none;
     margin-left: 20px;
     padding: 10px 20px;
-    background-color: black; /* Use black background for your button */
+    background-color: #8c592a; /* Use black background for your button */
     border-radius: 20px; /* Rounded corners */
     border: none; /* No border */
 }
 
 .custom-button:hover {
-    background-color: #333; /* Darker background on hover */
+    background-color: #d2b486; /* Darker background on hover */
 }
 
 @media (max-width: 768px) {
@@ -143,12 +143,12 @@ body {
     margin-bottom: 18px;
     font-size: 18px;
     font-weight: bold;
-    color: gray;
+    color: white;
 }
 .form-control {
     border-radius: 5px;            /* Set border radius */
-    border: 1px solid pink;        /* Border color */
-    background-color: pink;        /* Background color */
+    border: 1px solid  #8c592a;        /* Border color */
+    background-color: #d2b486;        /* Background color */
     color: #333;                   /* Text color */
     
 }
@@ -178,7 +178,7 @@ body {
     margin-top: 30px;
 }
 .button-container button {
-    background-color: black;
+    background-color:  #8c592a; 
     color: white;
     padding: 10px 20px;
     font-size: 18px;
@@ -188,7 +188,7 @@ body {
     width: 50%;
 }
 .button-container button:hover {
-    background-color: #333;
+    background-color:  #d2b486; 
 }
 
 /* log in container */
@@ -197,7 +197,7 @@ body {
     justify-content: center;
     align-items: center;
     margin-top: 15px;
-    color: pink;
+    color:  #8c592a;
 }
 .terms-container input[type="checkbox"] {
     transform: scale(1.2);
@@ -306,6 +306,10 @@ body {
         margin-right: 0;
     }
 }
+
+
+
+
 
 
 
