@@ -59,5 +59,72 @@
         localStorage.clear();
         window.location.href = "{% url 'login' %}";
     }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const saveButton = document.querySelector('.save-button');
+        const currentPasswordInput = document.querySelector('input[placeholder="Current Password"]'); // Add current password input
+        const newPasswordInput = document.querySelector('input[placeholder="New Password"]');
+        const confirmPasswordInput = document.querySelector('input[placeholder="Confirm Password"]');
+        const errorMessage = document.createElement("div"); // Error message container
+    
+        errorMessage.style.color = "red";
+        errorMessage.style.marginTop = "5px";
+        document.querySelector('.change-password-section').appendChild(errorMessage);
+    
+        saveButton.addEventListener("click", function () {
+            const currentPassword = currentPasswordInput.value;  // Capture current password
+            const newPassword = newPasswordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+    
+            // Check if password is at least 6 characters long
+            if (newPassword.length < 6) {
+                errorMessage.textContent = "Your password is too short! You need 6+ characters.";
+                return;
+            }
+    
+            // Check if passwords match
+            if (newPassword !== confirmPassword) {
+                errorMessage.textContent = "Passwords don’t match.";
+                return;
+            }
+    
+            // Clear error message if validation passes
+            errorMessage.textContent = "";
+    
+            // AJAX request to Django backend to update the password
+            const accountId = "{{ request.session.account_id }}";  // Fetch account ID from session
+            fetch("{% url 'update_password' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}",
+                },
+                body: JSON.stringify({
+                    account_id: accountId,  // Use the accountId from session
+                    current_password: currentPassword, // Include current password
+                    new_password: newPassword,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Server response:", data);  // Log the server response for debugging
+                if (data.success) {
+                    alert("Password updated successfully!");
+                    currentPasswordInput.value = "";
+                    newPasswordInput.value = "";
+                    confirmPasswordInput.value = "";
+                    document.querySelector('.change-password-section').style.display = 'none';
+                } else {
+                    errorMessage.textContent = data.error || "Failed to update password."; // Show specific error
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                errorMessage.textContent = "An error occurred. Please try again.";
+            });
+        });
+    });
+    
+    
 </script>
 {% endblock %}
