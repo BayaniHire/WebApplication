@@ -1,0 +1,15 @@
+.table-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px; /* Space between tables */
+    padding: 20px;
+}
+
+.left-table, .right-table {
+    width: 45%; /* Adjust the width as needed */
+}
+
+.table {
+    width: 100%; /* Full width within each container */
+    border-collapse: collapse;
+}
