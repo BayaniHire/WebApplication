@@ -1,52 +1,137 @@
-{% extends "Admin_Inheritance.html" %}  <!-- Replace with your actual base template filename -->
+{% extends "Admin_Inheritance.html" %}
 
 {% block title %}BayaniHire: Admin Center{% endblock %}
 
 {% block content %}
-<div class="main-content" style="padding-top: 60px;">  <!-- Main content area with padding to avoid header overlap -->
-    <!-- Admin Manage Accounts Section -->
-    <h2 style="font-size: 36px; font-weight: bold;">Admin Manage Accounts</h2>
-    <p style="font-size: 14px; font-weight: bold;">
-        Welcome to Admin Manage Accounts, where the System Admin can manage all the accounts registered in the system
-    </p>
-    <br>
 
-    <!-- Search and Filter Options -->
-    <div class="search-section mb-4" style="font-family: Georgia;">
-        <input type="text" placeholder="Search by username..." class="form-control d-inline w-auto" style="padding: 10px;">
-        <button class="btn btn-primary">Enter</button>
-        <select class="form-control d-inline w-auto" style="padding: 10px;">
-            <option value="role-admin">Sort by Admin Role</option>
-            <option value="role-interviewer">Sort by Interviewer Role</option>
-            <option value="role-applicant">Sort by Applicant Role</option>
-            <option value="role-new">Sort by New Role</option>
-            <option value="status-activated">Sort by Activated Status</option>
-            <option value="status-deactivated">Sort by Deactivated Status</option>
-        </select>
-        <button class="btn btn-info">View More</button>
-        <button class="btn btn-success">Reactivated</button>
-        <button class="btn btn-danger">Deactivated</button>
+<div class="main-content" style="padding: 0; margin: 0; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 0;">
+    <div class="text-center" style="font-family: Georgia; text-align: center; margin: 0 auto;">
+        <h2 style="font-size: 36px; font-weight: bold;">Admin Manage Accounts</h2>
+        <p style="font-size: 14px; font-weight: bold;">
+            Welcome to Admin Manage Accounts, where the System Admin can manage all the accounts registered in the system.
+        </p>
+        <br>
     </div>
 
-    <!-- Account Management Table -->
-    <table class="table table-bordered" style="font-family: Georgia; width: 80%;">
+    <!-- Search Input -->
+
+
+    <div class="row-selection mb-4 d-flex align-items-center" style="font-family: Georgia; gap: 10px;">
+        <!-- Sort and Rows Form -->
+        <form method="GET" id="sort-form" class="d-flex align-items-center" style="gap: 10px;">
+            <input type="number" id="row-count" name="rows" placeholder="Enter number of rows..." min="1" max="10" 
+                   class="form-control w-auto" style="padding: 10px;" value="{{ request.GET.rows|default:'5' }}">
+            <button type="submit" class="btn btn-secondary">Set Rows</button>
+            <select id="sort-select" class="form-control w-auto" name="sort" onchange="document.getElementById('sort-form').submit()">
+                <option value="asc" {% if request.GET.sort == 'asc' %}selected{% endif %}>Sort Username A-Z</option>
+                <option value="desc" {% if request.GET.sort == 'desc' %}selected{% endif %}>Sort Username Z-A</option>
+            </select>
+        </form>
+    
+        <!-- Search Form -->
+        <form method="GET" action="{% url 'manage_accounts' %}" class="d-flex align-items-center" style="gap: 10px;">
+            <input type="text" id="search-input" name="search" placeholder="Search by username..." value="{{ search_query }}" 
+                   class="form-control w-auto" style="padding: 10px;">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+    </div>
+
+    <table id="accounts-table" class="table table-bordered" style="font-family: Georgia; width: 80%;">
         <thead>
             <tr>
                 <th>No.</th>
                 <th>Username</th>
                 <th>Role</th>
                 <th>Account Status</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            <!-- Example rows. Replace with dynamic data as needed. -->
-            <tr><td>" "</td><td>" "</td><td>" "</td><td>" "</td></tr>
-            <tr><td>" "</td><td>" "</td><td>" "</td><td>" "</td></tr>
-            <tr><td>" "</td><td>" "</td><td>" "</td><td>" "</td></tr>
-            <tr><td>" "</td><td>" "</td><td>" "</td><td>" "</td></tr>
-            <tr><td>" "</td><td>" "</td><td>" "</td><td>" "</td></tr>
+            {% for account in page_obj %}
+            <tr class="account-row {{ account.role }} {{ account.account_status }}">
+                <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
+                <td class="username">{{ account.account.username }}</td>
+                <td>{{ account.role }}</td>
+                <td>{{ account.account_status }}</td>
+                <td>
+                    <form method="post" action="?{{ request.GET.urlencode }}">
+                        {% csrf_token %}
+                        <input type="hidden" name="role_id" value="{{ account.role_id }}">
+                        <input type="hidden" name="search" value="{{ request.GET.search }}">
+                        <input type="hidden" name="sort" value="{{ request.GET.sort }}">
+                        <input type="hidden" name="rows" value="{{ request.GET.rows }}">
+                        <input type="hidden" name="page" value="{{ request.GET.page }}">
+                        
+                        <button type="submit" name="action" value="reactivate" class="btn btn-success" {% if account.account_status == 'active' or account.account_status == 'new' %}disabled{% endif %}>Reactivate</button>
+                        <button type="submit" name="action" value="deactivate" class="btn btn-danger" {% if account.account_status == 'deactivated' or account.account_status == 'new' %}disabled{% endif %}>Deactivate</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+            <!-- Row for "No Match Found" message -->
+            <tr id="no-match" style="display: none;">
+                <td colspan="5" style="text-align: center;">No match found</td>
+            </tr>
         </tbody>
     </table>
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1&sort={{ request.GET.sort }}&rows={{ request.GET.rows }}&search={{ search_query }}">First</a>
+                <a href="?page={{ page_obj.previous_page_number }}&sort={{ request.GET.sort }}&rows={{ request.GET.rows }}&search={{ search_query }}">Previous</a>
+            {% endif %}
     
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span>
+    
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}&sort={{ request.GET.sort }}&rows={{ request.GET.rows }}&search={{ search_query }}">Next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}&sort={{ request.GET.rows }}&search={{ search_query }}">Last</a>
+            {% endif %}
+        </span>
+    </div>
 </div>
+
+<script>
+function searchTable() {
+    let input = document.getElementById('search-input').value.toLowerCase();
+    let rows = document.querySelectorAll('#accounts-table .account-row');
+    let noMatch = document.getElementById('no-match');
+    let matchFound = false;
+
+    rows.forEach(row => {
+        let username = row.querySelector('.username').textContent.toLowerCase();
+        if (username.includes(input)) {
+            row.style.display = '';
+            matchFound = true;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    noMatch.style.display = matchFound ? 'none' : '';
+}
+
+function setRowCount() {
+    document.getElementById('sort-form').submit();
+}
+
+function sortTable() {
+    let sortOption = document.getElementById('sort-select').value;
+    let table = document.getElementById('accounts-table');
+    let rows = Array.from(table.rows).slice(1); // Get all rows except the header
+    let sortAsc = sortOption === 'asc';
+    
+    rows.sort((a, b) => {
+        let valA = a.cells[1].textContent.trim().toLowerCase(); // Username cell
+        let valB = b.cells[1].textContent.trim().toLowerCase();
+        return sortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+    });
+
+    rows.forEach(row => table.tBodies[0].appendChild(row));
+}
+</script>
+
 {% endblock %}
