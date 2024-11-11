@@ -4,27 +4,27 @@
 <div class="main-content">
     <form method="POST">
         {% csrf_token %}
-        <div class="main-content">
-            <label style="font-family: Georgia; font-size: 36px; font-weight: bold;">Applicant Name:</label>
-            <select name="applicant_id" class="dropdown" style="font-family: Georgia; font-size: 20px;">
-                {% for applicant in applicants %}
-                <option value="{{ applicant.applicant_status_id }}">{{ applicant.account.first_name }} {{ applicant.account.middle_name }} {{ applicant.account.last_name }}</option>
-                {% endfor %}
-            </select>
-            <br><br>
+        <label style="font-family: Georgia; font-size: 36px; font-weight: bold; color: rgb(71, 48, 17);">Applicant Name:  </label><br><br>
+        <select name="applicant_id" class="dropdown" style="font-family: Georgia; font-size: 20px;" required>
+            <option value="" selected disabled>-- Select Applicant --</option>
+            {% for applicant in applicants %}
+            <option value="{{ applicant.applicant_status_id }}">{{ applicant.account.first_name }} {{ applicant.account.middle_name }} {{ applicant.account.last_name }}</option>
+            {% endfor %}
+        </select>
+        <br><br><br>
 
-            <label style="font-family: Georgia; font-size: 36px; font-weight: bold;">Applicant Status:</label>
-            <select name="status" class="dropdown" style="font-family: Georgia; font-size: 28px;">
-                <option>PASSED</option>
-                <option>FAILED</option>
-            </select>
-            <br>
+        <label style="font-family: Georgia; font-size: 36px; font-weight: bold; color: rgb(71, 48, 17);">Applicant Status:  </label><br><br>
+        <select name="status" class="dropdown" style="font-family: Georgia; font-size: 28px;" required>
+            <option value="" disabled selected>-- Select Status --</option>
+            <option>PASSED</option>
+            <option>FAILED</option>
+        </select>
+        <br><br><br><br>
 
-            <label style="font-family: Georgia; font-size: 36px; font-weight: bold;">Interviewer Remarks:</label>
-            <textarea name="feedback" class="remarks-textarea" style="font-family: Georgia; font-size: 18px;"></textarea>
-            <button type="submit" class="bodybutton" style="font-family: Georgia; font-size: 18px;">Submit Feedback</button>
-            <br>
-        </div>
+        <label style="font-family: Georgia; font-size: 36px; font-weight: bold; color: rgb(71, 48, 17);">Interviewer Remarks:</label>
+        <textarea name="feedback" class="remarks-textarea" style="font-family: Georgia; font-size: 18px;"></textarea><br><br>
+        <button type="submit" class="bodybutton" style="font-family: Georgia; font-size: 18px;">Submit Feedback</button>
+        <br>
     </form>
 </div>
 {% endblock %}
