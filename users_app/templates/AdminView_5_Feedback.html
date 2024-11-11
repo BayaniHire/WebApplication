@@ -30,6 +30,7 @@
                 <th>Position Applied</th>
                 <th>Company</th>
                 <th>Interview Status</th>
+                <th>Applicant Final Status</th> 
                 <th>Action</th>
             </tr>
         </thead>
@@ -42,6 +43,7 @@
                     <td>{{ applicant.job.job_title }}</td>
                     <td>{{ applicant.job.job_company }}</td>
                     <td>{{ applicant.interviewer_feedback_status }}</td>
+                    <td>{{ applicant.applicant_status }}</td>
                     <td>
                         <button class="btn btn-info btn-sm" onclick="window.location.href='{% url 'view_feedback' applicant.applicant_status_id %}';">View Feedback</button>
                     </td>
