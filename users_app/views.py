@@ -35,7 +35,8 @@ from django.http import JsonResponse
 from django.contrib.auth.hashers import make_password
 from django.views.decorators.csrf import csrf_exempt
 from bayanihire_app.models import AccountInformation
-
+from django.core.paginator import Paginator
+from django.http import HttpResponseRedirect
 
 def Index(request):
     return render(request, "index.html")
@@ -801,7 +802,61 @@ def add_accounts(request):
     return render(request, 'AdminView_6_2_AddAccounts.html')
 
 def manage_accounts(request):
-    return render(request, 'AdminView_6_1_manage_accounts.html')
+    # Fetch search, sort, and rows parameters from GET
+    search_query = request.GET.get('search', '').strip()
+    sort_order = request.GET.get('sort', 'asc')
+    rows_param = request.GET.get('rows', '5')
+
+    # Set rows per page with a default of 5
+    rows_per_page = int(rows_param) if rows_param.isdigit() and int(rows_param) > 0 else 5
+    rows_per_page = min(rows_per_page, 15)
+
+    # Filter accounts based on search query
+    if search_query:
+        accounts = AccountStorage.objects.filter(account__username__icontains=search_query)
+    else:
+        accounts = AccountStorage.objects.all()
+
+    # Sort accounts based on sort order
+    if sort_order == 'desc':
+        accounts = accounts.order_by('-account__username')
+    else:
+        accounts = accounts.order_by('account__username')
+
+    # Reactivate or deactivate accounts based on button press
+    if request.method == "POST":
+        action = request.POST.get('action')
+        role_id = int(request.POST.get('role_id'))
+        account_storage = AccountStorage.objects.get(role_id=role_id)
+
+        # Update the account status based on the action
+        if action == 'deactivate' and account_storage.account_status == 'active':
+            account_storage.account_status = 'deactivated'
+            messages.success(request, "Updated status to deactivated.")
+        elif action == 'reactivate' and account_storage.account_status == 'deactivated':
+            account_storage.account_status = 'active'
+            messages.success(request, "Updated status to active.")
+        elif account_storage.account_status == 'active':
+            messages.info(request, "The account is already active.")
+
+        account_storage.save()
+
+        # Redirect to the same page with all parameters preserved
+        query_params = request.GET.copy()  # Copies all current GET parameters
+        return HttpResponseRedirect(f"{reverse('manage_accounts')}?{query_params.urlencode()}")
+
+    # Pagination
+    paginator = Paginator(accounts, rows_per_page)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'sort_order': sort_order,
+        'rows_param': rows_param,
+    }
+    return render(request, 'AdminView_6_1_manage_accounts.html', context)
 
 def Registration(request):
     if request.method == 'POST':
