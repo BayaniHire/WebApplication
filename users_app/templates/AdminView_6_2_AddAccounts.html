@@ -47,11 +47,30 @@
         <br><br>
     
         <label style="font-size: 20px;">Email:</label>
-        <input type="text" name="email" placeholder="Enter Email" required>
+        <input type="email" name="email" placeholder="Enter Email" required>
         <br><br>
 
-        <button type="submit" style="font-size: 20px; font-weight: bold;">Create</button>
+        <button type="submit" class="apply-button">Create</button>
     </form>
 
 </div>
+
+<script>
+    document.querySelector('form').addEventListener('submit', function(event) {
+        const birthdayInput = document.querySelector('input[name="birthday"]');
+        const birthDate = new Date(birthdayInput.value);
+        const today = new Date();
+        const age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+
+        if (age < 18) {
+            event.preventDefault(); // Prevent form submission
+            alert("Users must be at least 18 years old.");
+        }
+    });
+</script>
 {% endblock %}
