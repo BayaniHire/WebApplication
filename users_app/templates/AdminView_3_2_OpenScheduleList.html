@@ -1,42 +1,108 @@
-{% extends "Admin_Inheritance.html" %}  <!-- Replace with your actual base template filename -->
+{% extends "Admin_Inheritance.html" %}
 
 {% block title %}BayaniHire Admin Center{% endblock %}
 
 {% block content %}
-<div class="main-content" style="padding-top: 60px;">  <!-- Main content area with padding to avoid header overlap -->
+<div class="main-content" style="text-align: center;">
+    <h2>Schedule of Interviews</h2>
 
-    <h2>List of Qualified Applicants</h2>
-    <div>
-        <form action="" method="get">
-            <label for="searchInterviewer">Search Interviewer:</label><br>
-            <select id="searchInterviewer" name="interviewer">
-                <option value="">Select</option>
-                <!-- Loop through Interviewers -->
-                {% for interviewer in interviewers %}
-                <option value="{{ interviewer.interviewer_name }}" {% if request.GET.interviewer == interviewer.interviewer_name %}selected{% endif %}>
+    <form method="GET" action="" class="form-inline" id="filterForm">
+        <!-- Interviewer Selection -->
+        <select name="interviewer" class="form-control mr-2" onchange="document.getElementById('filterForm').submit()">
+            <option value="">Select Interviewer</option>
+            {% for interviewer in interviewers %}
+                <option value="{{ interviewer.interviewer_name }}" {% if interviewer.interviewer_name == interviewer_name %}selected{% endif %}>
                     {{ interviewer.interviewer_name }}
                 </option>
-                {% endfor %}
-            </select>
-            <input type="text" name="search" placeholder="Search Applicants" value="{{ request.GET.search }}">
-            <button type="submit">Search</button>  <!-- Search button added here -->
-            <button type="submit" name="view_all" value="1">View All</button> <!-- View All button to reset the search -->
-        </form>
-    </div>
-    
-    <table border="1" width="100%">
-        <tr>
-            <th>List of Qualified Applicants</th>
-            <th>Interview Date</th>
-        </tr>
-        <!-- Loop through Applicants based on selection -->
-        {% for applicant in applicants %}
-        <tr>
-            <td>{{ applicant.account.first_name }} {{ applicant.account.last_name }}</td>
-            <td>{{ applicant.applicant_schedule_date }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+            {% endfor %}
+        </select>
 
+        <!-- Sort by Date (only enabled if an interviewer is selected) -->
+        {% if interviewer_name %}
+            <select name="date_sort" class="form-control mr-2" onchange="document.getElementById('filterForm').submit()">
+                <option value="asc" {% if sort_order == 'asc' %}selected{% endif %}>Date Ascending</option>
+                <option value="desc" {% if sort_order == 'desc' %}selected{% endif %}>Date Descending</option>
+            </select>
+        {% endif %}
+
+        <!-- Search by Name -->
+        <input type="text" name="search" id="search-input" value="{{ search_query }}" class="form-control mr-2" placeholder="Search qualified applicants by name">
+        <button type="submit" class="btn btn-secondary mr-2">Search</button>
+
+        <!-- Rows per Page -->
+        <input type="number" name="rows" min="1" max="10" value="{{ rows_per_page }}" class="form-control mr-2" placeholder="Rows per page">
+        <button type="submit" class="btn btn-primary">Set Rows</button>
+    </form>
+
+    <div class="table-container">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead class="thead-dark">
+                <tr>
+                    <th>No.</th>
+                    <th>List of Qualified Applicants</th>
+                    <th>Interview Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if applicants %}
+                    {% for applicant in applicants %}
+                    <tr>
+                        <!-- Display row number based on pagination -->
+                        <td>{{ page_obj.start_index|add:forloop.counter0 }}</td>
+                        <td>{{ applicant.account.first_name }} {{ applicant.account.last_name }}</td>
+                        <td>{{ applicant.applicant_schedule_date }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="3" style="text-align: center;">No qualified applicants found.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1&date_sort={{ sort_order }}&rows={{ rows_per_page }}&search={{ search_query }}&interviewer={{ interviewer_name }}">First</a>
+            <a href="?page={{ page_obj.previous_page_number }}&date_sort={{ sort_order }}&rows={{ rows_per_page }}&search={{ search_query }}&interviewer={{ interviewer_name }}">Previous</a>
+        {% endif %}
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.</span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}&date_sort={{ sort_order }}&rows={{ rows_per_page }}&search={{ search_query }}&interviewer={{ interviewer_name }}">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}&date_sort={{ sort_order }}&rows={{ rows_per_page }}&search={{ search_query }}&interviewer={{ interviewer_name }}">Last</a>
+        {% endif %}
+    </div>
 </div>
+
+<script>
+// Function to perform live search on the entire dataset
+document.getElementById('search-input').addEventListener('input', function() {
+    const searchValue = this.value.toLowerCase();
+    const rows = document.querySelectorAll('tbody tr');
+    let matchFound = false;
+
+    rows.forEach(row => {
+        const applicantName = row.cells[1].textContent.toLowerCase();  // Adjusted for "List of Qualified Applicants" column
+        if (applicantName.includes(searchValue)) {
+            row.style.display = '';  // Show matching rows
+            matchFound = true;
+        } else {
+            row.style.display = 'none';  // Hide non-matching rows
+        }
+    });
+
+    // If no match is found, display a "No results found" row
+    if (!matchFound) {
+        const noResultsRow = document.createElement('tr');
+        noResultsRow.innerHTML = '<td colspan="3" style="text-align: center;">No results found.</td>';
+        document.querySelector('tbody').appendChild(noResultsRow);
+    } else {
+        // Remove "No results found" message if there are matches
+        const noResultsRow = document.querySelector('tbody tr.no-results');
+        if (noResultsRow) noResultsRow.remove();
+    }
+});
+</script>
 {% endblock %}
