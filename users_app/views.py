@@ -37,6 +37,8 @@ from django.views.decorators.csrf import csrf_exempt
 from bayanihire_app.models import AccountInformation
 from django.core.paginator import Paginator
 from django.http import HttpResponseRedirect
+from django.db import models
+from bayanihire_app.models import JobDetailsAndRequirements
 
 def Index(request):
     return render(request, "index.html")
@@ -1135,4 +1137,15 @@ def update_password(request):
             return JsonResponse({'success': False, 'error': f'An unexpected error occurred: {str(e)}'})
 
     return JsonResponse({'success': False, 'error': 'Invalid request method.'})
+
+def Index(request):  # Capitalize the function name to match the URL pattern
+    companies = JobDetailsAndRequirements.objects.values('job_company').annotate(job_count=models.Count('job_id'))
+    
+    context = {
+        'companies': companies
+    }
+    return render(request, 'index.html', context)
+
+
+
 
