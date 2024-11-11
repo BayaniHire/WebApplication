@@ -3,8 +3,12 @@
 {% block title %}BayaniHire Admin Center{% endblock %}
 
 {% block content %}
-<div class="main-content" style="padding-top: 60px;">  <!-- Main content area with padding to avoid header overlap -->
-    
+<div class="main-content container" style="padding: 0; margin: 0; text-align: center; display: flex; flex-direction: column; align-items: center;"></div>
+    <h2 style="font-size: 36px; font-weight: bold; text-align: center;">Qualification</h2>
+    <p style="font-size: 14px; font-weight: bold; text-align: center;">
+        Welcome to Qualification, where the System Admin can send all the For Interview applicants to the Interviewer.
+    </p>
+
     <form method="POST" action="{% url 'send_schedule' %}" id="interviewer-form">
         {% csrf_token %}
         <table width="100%">
