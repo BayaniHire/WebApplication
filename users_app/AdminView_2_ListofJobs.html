@@ -1,0 +1,97 @@
+{% extends "Admin_Inheritance.html" %}
+
+{% block title %}BayaniHire Admin Center{% endblock %}
+
+{% block content %}
+<div class="main-content" style="padding: 0; margin: 0; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 0;"></div>
+    <h2 style="font-size: 36px; font-weight: bold; text-align: center;">List of All Jobs</h2>
+    <p style="font-size: 14px; font-weight: bold;">
+        Welcome to List of Jobs, where the System Admin can manage all the jobs deployed in the webapp.
+    </p>
+    <div class="d-flex align-items-center mb-3">
+        <p class="mb-0 mr-3">Active Jobs: <span style="color: red;">{{ active_jobs_count }}</span></p>
+        <button class="btn btn-secondary" onclick="window.location.href='{% url 'create_job_details' %}';">Create Job</button>
+    </div>
+
+    <!-- Form for sorting, searching, and setting rows per page -->
+    <form id="searchForm" method="GET" action="" class="d-flex justify-content-between mb-3">
+        <select name="sort" class="form-control w-auto" onchange="this.form.submit()">
+            <option value="title_asc" {% if sort_order == 'title_asc' %}selected{% endif %}>Sort by Title A-Z</option>
+            <option value="title_desc" {% if sort_order == 'title_desc' %}selected{% endif %}>Sort by Title Z-A</option>
+            <option value="company_asc" {% if sort_order == 'company_asc' %}selected{% endif %}>Sort by Company A-Z</option>
+            <option value="company_desc" {% if sort_order == 'company_desc' %}selected{% endif %}>Sort by Company Z-A</option>
+            <option value="date_asc" {% if sort_order == 'date_asc' %}selected{% endif %}>Sort by Date Posted Ascending</option>
+            <option value="date_desc" {% if sort_order == 'date_desc' %}selected{% endif %}>Sort by Date Posted Descending</option>
+        </select>
+        <input type="text" name="search" value="{{ search_query }}" class="form-control w-25" placeholder="Search by position or company">
+        <button type="submit" class="btn btn-secondary">Search</button>
+        <input type="number" name="rows" value="{{ rows_per_page }}" min="1" max="10" class="form-control w-auto" onchange="this.form.submit()">
+        <button type="submit" class="btn btn-secondary">Set Rows</button>
+    </form>
+    
+    <!-- Jobs Table -->
+    <div class="table-container">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>No.</th> 
+                    <th>Job Position Offer</th>
+                    <th>Company</th>
+                    <th>Date Posted</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for job in jobs %}
+                <tr>
+                    <td>{{ forloop.counter0|add:start_index }}</td>
+                    <td>{{ job.job_title }}</td>
+                    <td>{{ job.job_company }}</td>
+                    <td>{{ job.job_date_published }}</td>
+                    <td>{{ job.job_status }}</td>
+                    <td>
+                        <button class="btn btn-info btn-sm" onclick="window.location.href='{% url 'edit_job_details' job.job_id %}';">Edit Job</button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center;">No jobs available.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination Links -->
+    <div>
+        {% if page_obj.has_previous %}
+        <a href="?page=1&sort={{ sort_order }}&rows={{ rows_per_page }}&search={{ search_query }}">First</a>
+        <a href="?page={{ page_obj.previous_page_number }}&sort={{ sort_order }}&rows={{ rows_per_page }}&search={{ search_query }}">Previous</a>
+        {% endif %}
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&sort={{ sort_order }}&rows={{ rows_per_page }}&search={{ search_query }}">Next</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}&sort={{ sort_order }}&rows={{ rows_per_page }}&search={{ search_query }}">Last</a>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function submitForm() {
+    document.getElementById('searchForm').submit();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(event) {
+            if (event.keyCode === 13) { // Enter key is pressed
+                submitForm();
+            }
+        });
+    }
+});
+</script>
+
+{% endblock %}
