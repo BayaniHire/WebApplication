@@ -357,34 +357,45 @@ def applicant_profile(request):
 logger = logging.getLogger(__name__)
 
 def list_of_applicants(request):
-    # Get all applicants
-    applicants = ListOfApplicantsWithStatusAndCredentials.objects.all()
-    print(applicants)
+    search_query = request.GET.get('search', '').strip()
+    sort_order = request.GET.get('sort', 'asc')
+    rows_param = request.GET.get('rows', '5')
+    rows_per_page = max(min(int(rows_param), 10), 1) if rows_param.isdigit() else 5
 
-    # Calculate total number of applicants
-    total_applicants = applicants.count()
-    print(total_applicants)
+    query = Q(account__first_name__icontains=search_query) | Q(account__middle_name__icontains=search_query) | Q(account__last_name__icontains=search_query)
+    if search_query:
+        applicants = ListOfApplicantsWithStatusAndCredentials.objects.filter(query)
+    else:
+        applicants = ListOfApplicantsWithStatusAndCredentials.objects.all()
 
-    # Prepare data for the table
-    applicant_data = []
-    for idx, applicant in enumerate(applicants, start=1):
-        account_info = applicant.account  # Assuming this is the relation to AccountInformation
-        job_details = applicant.job        # Assuming this is the relation to JobDetailsAndRequirements
+    if sort_order == 'desc':
+        applicants = applicants.order_by('-account__first_name', '-account__middle_name', '-account__last_name')
+    else:
+        applicants = applicants.order_by('account__first_name', 'account__middle_name', 'account__last_name')
 
-        # Build the applicant row
-        applicant_data.append({
-            'no': idx,
-            'full_name': f"{account_info.first_name} {account_info.middle_name or ''} {account_info.last_name}",
-            'company': job_details.job_company,
-            'position_applied': job_details.job_title,
-            'date_applied': applicant.submission_date,  # Assuming this is the correct field
-            'status': applicant.applicant_status,
-            'applicant_status_id': applicant.applicant_status_id,  # Make sure this line is added
-        })
+    paginator = Paginator(applicants, rows_per_page)
+    page_number = request.GET.get('page', 1)  # Default to page 1 if not provided
+    page_obj = paginator.get_page(page_number)
+    
+    # Calculate the starting index for the current page
+    start_index = (page_obj.number - 1) * rows_per_page + 1
 
+    # Build context with adjusted numbering
     context = {
-        'applicant_data': applicant_data,
-        'total_applicants': total_applicants,
+        'applicant_data': [{
+            'no': start_index + idx,
+            'full_name': f"{a.account.first_name} {a.account.middle_name or ''} {a.account.last_name}",
+            'company': a.job.job_company,
+            'position_applied': a.job.job_title,
+            'date_applied': a.submission_date,
+            'status': a.applicant_status,
+            'applicant_status_id': a.applicant_status_id,
+        } for idx, a in enumerate(page_obj)],
+        'total_applicants': paginator.count,
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'sort_order': sort_order,
+        'rows_per_page': rows_per_page,
     }
     return render(request, 'AdminView_1_Homepage_ListofApplicants.html', context)
 
