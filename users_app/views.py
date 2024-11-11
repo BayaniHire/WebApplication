@@ -799,6 +799,18 @@ def interviewer_profile(request):
     return render(request, 'Profile.html', context)
 
 def add_accounts(request):
+    if request.method == 'POST':
+        # Birthday validation
+        birthday = request.POST.get('birthday')
+        if birthday:
+            birth_date = date.fromisoformat(birthday)
+            today = date.today()
+            age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
+            if age < 18:
+                messages.error(request, "Users must be at least 18 years old.")
+                return redirect('add_accounts')
+        
+        # Continue processing the form if email and age are valid
     return render(request, 'AdminView_6_2_AddAccounts.html')
 
 def manage_accounts(request):
