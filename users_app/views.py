@@ -359,6 +359,7 @@ logger = logging.getLogger(__name__)
 def list_of_applicants(request):
     search_query = request.GET.get('search', '').strip()
     sort_order = request.GET.get('sort', 'asc')
+    date_sort = request.GET.get('date_sort', 'asc')  # New parameter for date sorting
     rows_param = request.GET.get('rows', '5')
     rows_per_page = max(min(int(rows_param), 10), 1) if rows_param.isdigit() else 5
 
@@ -368,22 +369,25 @@ def list_of_applicants(request):
     else:
         applicants = ListOfApplicantsWithStatusAndCredentials.objects.all()
 
+    # Handling sorting by name
     if sort_order == 'desc':
         applicants = applicants.order_by('-account__first_name', '-account__middle_name', '-account__last_name')
     else:
         applicants = applicants.order_by('account__first_name', 'account__middle_name', 'account__last_name')
+    
+    # Handling sorting by date
+    if date_sort == 'desc':
+        applicants = applicants.order_by('-submission_date')
+    elif date_sort == 'asc':
+        applicants = applicants.order_by('submission_date')
 
     paginator = Paginator(applicants, rows_per_page)
-    page_number = request.GET.get('page', 1)  # Default to page 1 if not provided
+    page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
-    
-    # Calculate the starting index for the current page
-    start_index = (page_obj.number - 1) * rows_per_page + 1
 
-    # Build context with adjusted numbering
     context = {
         'applicant_data': [{
-            'no': start_index + idx,
+            'no': (page_obj.number - 1) * rows_per_page + idx + 1,
             'full_name': f"{a.account.first_name} {a.account.middle_name or ''} {a.account.last_name}",
             'company': a.job.job_company,
             'position_applied': a.job.job_title,
@@ -395,6 +399,7 @@ def list_of_applicants(request):
         'page_obj': page_obj,
         'search_query': search_query,
         'sort_order': sort_order,
+        'date_sort': date_sort,  # Pass this to template for maintaining state
         'rows_per_page': rows_per_page,
     }
     return render(request, 'AdminView_1_Homepage_ListofApplicants.html', context)
