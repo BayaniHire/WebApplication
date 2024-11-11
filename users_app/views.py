@@ -849,11 +849,39 @@ def schedule_view(request):
     return render(request, 'AdminView_4_Schedule.html', context)
 
 def feedback(request):
-    applicants = ListOfApplicantsWithStatusAndCredentials.objects.select_related('account', 'job').all()
-    first_applicant_id = applicants.first().applicant_status_id if applicants.exists() else None
+    search_query = request.GET.get('search', '').strip()
+    sort_order = request.GET.get('name_sort', 'asc')
+    rows_param = request.GET.get('rows', '5')
+    rows_per_page = max(min(int(rows_param), 10), 1) if rows_param.isdigit() else 5
+
+    # Base queryset of applicants excluding those with None or empty interviewer feedback status
+    applicants = ListOfApplicantsWithStatusAndCredentials.objects.select_related('account', 'job') \
+        .exclude(interviewer_feedback_status__isnull=True) \
+        .exclude(interviewer_feedback_status='')
+
+    # Filter by search query if provided
+    if search_query:
+        applicants = applicants.filter(
+            account__first_name__icontains=search_query
+        )
+
+    # Sort applicants by name
+    if sort_order == 'desc':
+        applicants = applicants.order_by('-account__first_name', '-account__last_name')
+    else:
+        applicants = applicants.order_by('account__first_name', 'account__last_name')
+
+    # Pagination
+    paginator = Paginator(applicants, rows_per_page)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+
     return render(request, 'AdminView_5_Feedback.html', {
-        'applicants': applicants,
-        'first_applicant_id': first_applicant_id
+        'applicants': page_obj,
+        'search_query': search_query,
+        'sort_order': sort_order,
+        'rows_per_page': rows_per_page,
+        'page_obj': page_obj,
     })
 
 @require_http_methods(["GET", "POST"])
