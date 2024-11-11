@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
+import json
 from . import views
 from bayanihire_app.forms import AccountInformationForm
 from bayanihire_app.models import (
@@ -29,6 +30,11 @@ from django.db import transaction
 from django.urls import reverse
 from django.db.models import Max
 from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.contrib.auth.hashers import make_password
+from django.views.decorators.csrf import csrf_exempt
+from bayanihire_app.models import AccountInformation
 
 
 def Index(request):
@@ -1019,3 +1025,43 @@ def change_password(request):
         
 
     return redirect('login')
+######################ito yung udpate password sa mga account#######################################################################3
+def update_password(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            account_id = data.get('account_id') or request.session.get('account_id')  # Fallback to session
+            current_password = data.get('current_password')
+            new_password = data.get('new_password')
+
+            print("Account ID received in view:", account_id)  # Debugging: print the account_id
+
+            # Check if account_id is None (missing or not provided)
+            if account_id is None:
+                return JsonResponse({'success': False, 'error': 'Account ID is missing in the request.'})
+
+            # Ensure new_password and current_password are provided
+            if not new_password or not current_password:
+                return JsonResponse({'success': False, 'error': 'New password or current password is missing.'})
+
+            # Retrieve the account
+            try:
+                account = AccountInformation.objects.get(account_id=account_id)
+
+                # Verify that the current password matches
+                if account.password != current_password:
+                    return JsonResponse({'success': False, 'error': 'Current password is incorrect.'})
+
+                # Update the password
+                account.password = new_password  # Store password in plain text
+                account.save()
+                return JsonResponse({'success': True})
+
+            except AccountInformation.DoesNotExist:
+                return JsonResponse({'success': False, 'error': 'Account not found with the provided ID.'})
+
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': f'An unexpected error occurred: {str(e)}'})
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method.'})
+
