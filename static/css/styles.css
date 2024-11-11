@@ -84,6 +84,8 @@ body {
     box-sizing: border-box;
 }
 
+
+
 .header .logo {
     position: absolute; /* Position the logo inside the header */
     top: 50%; /* Vertically center the logo */
@@ -98,6 +100,7 @@ body {
     font-size: 3rem;
     font-family: 'Times New Roman', Times, serif;
     text-align: center;
+    margin-bottom: 20px;
 }
 
 .content-area p {
@@ -106,9 +109,21 @@ body {
     margin: 1rem 0;
 }
 
+.content-area h3 {
+    font-size: 2rem;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 1rem 0;
+    margin-top: 80px;
+    font-weight: bold;
+}
+
 @media (max-width: 768px) {
     .content-area h2 {
         font-size: 2rem; /* Smaller font size for smaller screens */
+    }
+
+    .content-area h3 {
+        font-size: 1rem; /* Smaller font size for smaller screens */
     }
 
     .content-area p {
@@ -116,9 +131,15 @@ body {
     }
 }
 
+
+
 @media (max-width: 480px) {
     .content-area h2 {
         font-size: 1.5rem; /* Even smaller font size for small screens */
+    }
+
+    .content-area h3 {
+        font-size: 0.875rem; /* Even smaller font size for small screens */
     }
 
     .content-area p {
@@ -202,4 +223,49 @@ footer {
     text-align: center;
     padding: 1rem;
     font-size: 1rem;
+}
+
+
+
+
+/* Change the background color of the carousel */
+#companyCarousel .carousel-inner {
+    background-color:  linear-gradient(180deg, #8c592a, rgba(255, 255, 255, 0)), #d2b486; /* Replace with your desired color */
+}
+
+/* If you want the card within the carousel to have a transparent background */
+#companyCarousel .carousel-item .card {
+    background-color: transparent;
+    border: none; /* Remove any borders if they exist */
+    
+}
+
+/* Adjust font size for the company name */
+#companyCarousel .carousel-item .card-title {
+    font-size: 1.5rem; /* Change to your desired size */
+    color: white; 
+    font-weight: bold; /* Optional: make it bold */
+}
+
+/* Adjust font size for the job count text */
+#companyCarousel .carousel-item .card-text {
+    font-size: 0.75rem; /* Change to your desired size */
+    color: #FFFFFF; /* Optional: change the text color */
+}
+
+
+/* Style the carousel controls (previous and next buttons) */
+#companyCarousel .carousel-control-prev-icon,
+#companyCarousel .carousel-control-next-icon {
+    background-color: rgba(0, 0, 0, 0.5); /* Change color and opacity */
+    border-radius: 50%; /* Optional: make it circular */
+}
+
+/* Style the carousel indicators (dots) */
+#companyCarousel .carousel-indicators [data-bs-target] {
+    background-color: #5c332e; /* Replace with your desired color */
+}
+
+#companyCarousel .carousel-indicators .active {
+    background-color:  #5c332e; /* Replace with active indicator color */
 }
