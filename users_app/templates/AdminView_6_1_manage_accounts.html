@@ -47,31 +47,33 @@
             </tr>
         </thead>
         <tbody>
-            {% for account in page_obj %}
-            <tr class="account-row {{ account.role }} {{ account.account_status }}">
-                <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
-                <td class="username">{{ account.account.username }}</td>
-                <td>{{ account.role }}</td>
-                <td>{{ account.account_status }}</td>
-                <td>
-                    <form method="post" action="?{{ request.GET.urlencode }}">
-                        {% csrf_token %}
-                        <input type="hidden" name="role_id" value="{{ account.role_id }}">
-                        <input type="hidden" name="search" value="{{ request.GET.search }}">
-                        <input type="hidden" name="sort" value="{{ request.GET.sort }}">
-                        <input type="hidden" name="rows" value="{{ request.GET.rows }}">
-                        <input type="hidden" name="page" value="{{ request.GET.page }}">
-                        
-                        <button type="submit" name="action" value="reactivate" class="btn btn-success" {% if account.account_status == 'active' or account.account_status == 'new' %}disabled{% endif %}>Reactivate</button>
-                        <button type="submit" name="action" value="deactivate" class="btn btn-danger" {% if account.account_status == 'deactivated' or account.account_status == 'new' %}disabled{% endif %}>Deactivate</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-            <!-- Row for "No Match Found" message -->
-            <tr id="no-match" style="display: none;">
-                <td colspan="5" style="text-align: center;">No match found</td>
-            </tr>
+            {% if no_match %}
+                <tr>
+                    <td colspan="5" style="text-align: center;">No match accounts</td>
+                </tr>
+            {% else %}
+                {% for account in page_obj %}
+                <tr class="account-row {{ account.role }} {{ account.account_status }}">
+                    <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
+                    <td class="username">{{ account.account.username }}</td>
+                    <td>{{ account.role }}</td>
+                    <td>{{ account.account_status }}</td>
+                    <td>
+                        <form method="post" action="?{{ request.GET.urlencode }}">
+                            {% csrf_token %}
+                            <input type="hidden" name="role_id" value="{{ account.role_id }}">
+                            <input type="hidden" name="search" value="{{ request.GET.search }}">
+                            <input type="hidden" name="sort" value="{{ request.GET.sort }}">
+                            <input type="hidden" name="rows" value="{{ request.GET.rows }}">
+                            <input type="hidden" name="page" value="{{ request.GET.page }}">
+                            
+                            <button type="submit" name="action" value="reactivate" class="btn btn-success" {% if account.account_status == 'active' or account.account_status == 'new' %}disabled{% endif %}>Reactivate</button>
+                            <button type="submit" name="action" value="deactivate" class="btn btn-danger" {% if account.account_status == 'deactivated' or account.account_status == 'new' %}disabled{% endif %}>Deactivate</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% endif %}
         </tbody>
     </table>
 
