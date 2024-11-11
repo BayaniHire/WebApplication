@@ -15,6 +15,11 @@
             <option value="asc" {% if sort_order == 'asc' %}selected{% endif %}>Sort Name A-Z</option>
             <option value="desc" {% if sort_order == 'desc' %}selected{% endif %}>Sort Name Z-A</option>
         </select>
+
+        <select name="date_sort" class="form-control mr-2" onchange="this.form.submit()">
+            <option value="asc" {% if date_sort == 'asc' %}selected{% endif %}>Date Applied Ascending</option>
+            <option value="desc" {% if date_sort == 'desc' %}selected{% endif %}>Date Applied Descending</option>
+        </select>
     
         <input type="text" name="search" value="{{ search_query }}" class="form-control mr-2" placeholder="Search by name..." style="width: 25%;">
     
