@@ -775,58 +775,79 @@ def open_schedule_list(request):
     return render(request, 'AdminView_3_2_OpenScheduleList.html', context)
 
 def schedule(request):
-    # Get AccountStorage entries where the role is 'interviewer'
+    today = date.today()
+    search_query_interviewer = request.GET.get('search_interviewer', '').strip()
+    search_query_schedule = request.GET.get('search_schedule', '').strip()  # Ensure this variable is defined
+
     interviewers = AccountStorage.objects.filter(role='interviewer').select_related('account')
-    
-    # Extract full names from related AccountInformation records
-    interviewer_names = [
-        f"{i.account.first_name or ''} {i.account.middle_name or ''} {i.account.last_name or ''}".strip()
-        for i in interviewers
-    ]
+    if search_query_interviewer:
+        interviewers = interviewers.filter(
+            Q(account__first_name__icontains=search_query_interviewer) |
+            Q(account__middle_name__icontains=search_query_interviewer) |
+            Q(account__last_name__icontains=search_query_interviewer)
+        )
 
     if request.method == "POST":
-        # Retrieve the selected interviewer name and interview date from the form
         selected_interviewer_name = request.POST.get('selected_interviewer')
         interview_date = request.POST.get('interview_date')
 
-        # Find the selected interviewer in AccountStorage by matching full name
-        selected_interviewer = next(
-            (i for i in interviewers if f"{i.account.first_name or ''} {i.account.middle_name or ''} {i.account.last_name or ''}".strip() == selected_interviewer_name), 
-            None
-        )
+        if interview_date:
+            interview_date_obj = date.fromisoformat(interview_date)
+            if interview_date_obj < today:
+                messages.error(request, 'The selected date must be today or in the future.')
+                return redirect('schedule')
+
+        selected_interviewer = interviewers.filter(
+            account__first_name__icontains=selected_interviewer_name.split()[0],
+            account__last_name__icontains=selected_interviewer_name.split()[-1]
+        ).first()
 
         if selected_interviewer:
-            # Save the interview schedule date in InterviewStorage with concatenated full name
             InterviewStorage.objects.create(
                 account=selected_interviewer.account,
                 role=selected_interviewer,
-                interview_schedule_date=interview_date,
-                interviewer_name=selected_interviewer_name,  # Save full name as concatenated interviewer_name
+                interview_schedule_date=interview_date_obj,
+                interviewer_name=selected_interviewer_name
             )
+            messages.success(request, 'Interview scheduled successfully.')
+            return redirect('schedule')
+        else:
+            messages.error(request, 'Selected interviewer not found.')
+            return redirect('schedule')
 
-        # Redirect to the same page with a success message
-        return redirect('schedule')
+    # Pagination for interviewers
+    rows_interviewer = int(request.GET.get('rows_interviewer', 5))
+    page_number_interviewer = request.GET.get('page_interviewer', 1)
+    interviewer_paginator = Paginator(interviewers, rows_interviewer)
+    page_obj_interviewer = interviewer_paginator.get_page(page_number_interviewer)
 
-    # Retrieve interview records with interviewer names and scheduled dates for display
-    interview_data = InterviewStorage.objects.select_related('account').values(
-        'account__first_name', 'account__middle_name', 'account__last_name', 'interview_schedule_date'
-    )
-
-    # Format interviewer names and dates for display
+    # Handling interview schedules display setup
+    interview_data = InterviewStorage.objects.select_related('account').order_by('-interview_schedule_date')
     formatted_interview_data = [
         {
-            "name": f"{entry['account__first_name'] or ''} {entry['account__middle_name'] or ''} {entry['account__last_name'] or ''}".strip(),
-            "date": entry['interview_schedule_date']
-        }
-        for entry in interview_data
+            "name": f"{entry.account.first_name} {entry.account.middle_name} {entry.account.last_name}".strip(),
+            "date": entry.interview_schedule_date
+        } for entry in interview_data
     ]
 
-    # Pass interviewer names and interview schedule data to the template
+    # Pagination for interview schedules
+    rows_schedule = int(request.GET.get('rows_schedule', 5))
+    page_number_schedule = request.GET.get('page_schedule', 1)
+    schedule_paginator = Paginator(formatted_interview_data, rows_schedule)
+    page_obj_schedule = schedule_paginator.get_page(page_number_schedule)
+
     context = {
-        'interviewer_names': interviewer_names,
-        'formatted_interview_data': formatted_interview_data,
+        'interviewer_names': page_obj_interviewer,
+        'formatted_interview_data': page_obj_schedule,
+        'search_query_interviewer': search_query_interviewer,
+        'search_query_schedule': search_query_schedule,
+        'rows_interviewer': rows_interviewer,
+        'rows_schedule': rows_schedule,
+        'page_obj_interviewer': page_obj_interviewer,
+        'page_obj_schedule': page_obj_schedule,
     }
     return render(request, 'AdminView_4_Schedule.html', context)
+
 
 def schedule_view(request):
     # Retrieve interview records with interviewer names and scheduled dates
