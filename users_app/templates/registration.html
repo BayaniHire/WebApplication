@@ -96,6 +96,14 @@
                             <label for="birthdate" class="form-label me-2">Birthday:</label> <!-- Add margin-end for spacing -->
                             {{ form.birth_date }}
                         </div>
+                        <!-- Error message for birth_date field -->
+                        {% if form.birth_date.errors %}
+                            <div class="text-danger">
+                                {% for error in form.birth_date.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}     
                     </div>
                 </div>
             </div>
@@ -109,6 +117,8 @@
                 </div>
             </div>
 
+            
+
             <!-- Username with Domain Suffix -->
             <div class="mb-4">
                 <label for="username" class="form-label">Username</label>
@@ -118,9 +128,29 @@
                 </div>
             </div>
             
+            <!-- Password -->
             <div class="mb-4">
                 <label for="password" class="form-label">Password</label>
                 {{ form.password }}
+                {% if form.password.errors %}
+                    <div class="text-danger">
+                        {% for error in form.password.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-4">
+                <label for="confirm_password" class="form-label">Confirm Password</label>
+                {{ form.confirm_password }}
+                {% if form.confirm_password.errors %}
+                    <div class="text-danger">
+                        {% for error in form.confirm_password.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
 
             <!-- Submit Button -->
