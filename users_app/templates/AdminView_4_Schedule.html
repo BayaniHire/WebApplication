@@ -1,54 +1,168 @@
-{% extends "Admin_Inheritance.html" %}  <!-- Replace with your actual base template filename -->
+{% extends "Admin_Inheritance.html" %}
 
 {% block title %}BayaniHire Admin Center{% endblock %}
 
 {% block content %}
-<div class="main-content" style="padding-top: 60px;">  <!-- Main content area with padding to avoid header overlap -->
+<div class="main-content" style="padding: 0; margin: 0; text-align: center; display: flex; flex-direction: column; align-items: center;"></div>
+    <h2 style="font-size: 36px; font-weight: bold; text-align: center;">Schedule</h2>
+    <p style="font-size: 14px; font-weight: bold; text-align: center;">
+        Welcome!, This is where the System Admin schedule interviewer dates to the interviewer.
+    </p>
 
-    <h2>Interviewer Schedule</h2>
-    <p>Kindly choose the interviewer's name and interview date.</p>
+    <div class="table-container">
     
-    <!-- Interviewer Selection Form -->
-    <form action="{% url 'schedule' %}" method="post" class="mb-4">
-        {% csrf_token %}
-        <table class="table table-bordered">
-            <caption>Interviewer Names</caption>
-            {% for name in interviewer_names %}
-                <tr>
-                    <td>
-                        <input type="radio" name="selected_interviewer" value="{{ name }}" required>
-                        <label>{{ name }}</label>
-                    </td>
-                </tr>
-            {% endfor %}
-        </table>
+        <!-- Left Table: Interviewer Selection -->
+        <div class="left-table">
+            <h3>Interviewer Selection</h3>
     
-        <label for="interview_date">Interview Date:</label>
-        <input type="date" name="interview_date" class="form-control w-auto d-inline" required>
+            <!-- Search and Rows per Page for Interviewer Table -->
+            <form method="GET" action="" id="interviewerForm">
+                <input type="text" name="search_interviewer" id="searchInterviewer" value="{{ search_query_interviewer }}" placeholder="Search Interviewer" class="form-control mb-2">
+                <input type="number" name="rows_interviewer" min="1" max="10" value="{{ rows_interviewer }}" class="form-control mb-2" placeholder="Rows per page">
+                <button type="submit" class="btn btn-primary mb-3">Set Rows</button>
+            </form>
     
-        <button type="submit" class="btn btn-primary mt-2">Send</button>
-    </form>
+            <!-- Interviewer Selection Table -->
+            <form action="{% url 'schedule' %}" method="post">
+                {% csrf_token %}
+                <table class="table table-bordered" id="interviewerTable">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Interviewer Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for interviewer in interviewer_names %}
+                        <tr>
+                            <td>{{ page_obj_interviewer.start_index|add:forloop.counter0 }}</td>
+                            <td>
+                                <input type="radio" name="selected_interviewer" value="{{ interviewer.account.first_name }} {{ interviewer.account.last_name }}" required>
+                                {{ interviewer.account.first_name }} {{ interviewer.account.last_name }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <label for="interview_date">Interview Date:</label>
+                <input type="date" name="interview_date" class="form-control w-auto d-inline" required>
+                <button type="submit" class="btn btn-primary mt-2">Schedule Interview</button>
+            </form>
     
-    <!-- Interview Schedule Display Table -->
-    <table class="table table-bordered mt-4">
-        <thead>
-            <tr>
-                <th>Interviewer Name</th>
-                <th>Date Given</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for interview in formatted_interview_data %}
-                <tr>
-                    <td>{{ interview.name }}</td>
-                    <td>{{ interview.date }}</td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="2" class="text-center">No interviews scheduled</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            <!-- Pagination Controls for Interviewer Table -->
+            <div class="pagination mt-3">
+                {% if page_obj_interviewer.has_previous %}
+                    <a href="?page_interviewer=1&search_interviewer={{ search_query_interviewer }}&rows_interviewer={{ rows_interviewer }}">First</a>
+                    <a href="?page_interviewer={{ page_obj_interviewer.previous_page_number }}&search_interviewer={{ search_query_interviewer }}&rows_interviewer={{ rows_interviewer }}">Previous</a>
+                {% endif %}
+                <span>Page {{ page_obj_interviewer.number }} of {{ page_obj_interviewer.paginator.num_pages }}</span>
+                {% if page_obj_interviewer.has_next %}
+                    <a href="?page_interviewer={{ page_obj_interviewer.next_page_number }}&search_interviewer={{ search_query_interviewer }}&rows_interviewer={{ rows_interviewer }}">Next</a>
+                    <a href="?page_interviewer={{ page_obj_interviewer.paginator.num_pages }}&search_interviewer={{ search_query_interviewer }}&rows_interviewer={{ rows_interviewer }}">Last</a>
+                {% endif %}
+            </div>
+        </div>
+    
+        <!-- Right Table: Interview Schedule -->
+        <div class="right-table">
+            <h3>Interview Schedule</h3>
+    
+            <!-- Search and Rows per Page for Schedule Table -->
+            <form method="GET" action="" id="scheduleForm">
+                <input type="text" name="search_schedule" id="searchSchedule" value="{{ search_query_schedule }}" placeholder="Search Interview Schedule" class="form-control mb-2">
+                <input type="number" name="rows_schedule" min="1" max="10" value="{{ rows_schedule }}" class="form-control mb-2" placeholder="Rows per page">
+                <button type="submit" class="btn btn-primary mb-3">Set Rows</button>
+            </form>
+    
+            <!-- Interview Schedule Table -->
+            <table class="table table-bordered" id="scheduleTable">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Interviewer Name</th>
+                        <th>Date Given</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for interview in formatted_interview_data %}
+                    <tr>
+                        <td>{{ page_obj_schedule.start_index|add:forloop.counter0 }}</td>
+                        <td>{{ interview.name }}</td>
+                        <td>{{ interview.date }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-center">No interviews scheduled</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+    
+            <!-- Pagination Controls for Schedule Table -->
+            <div class="pagination mt-3">
+                {% if page_obj_schedule.has_previous %}
+                    <a href="?page_schedule=1&search_schedule={{ search_query_schedule }}&rows_schedule={{ rows_schedule }}">First</a>
+                    <a href="?page_schedule={{ page_obj_schedule.previous_page_number }}&search_schedule={{ search_query_schedule }}&rows_schedule={{ rows_schedule }}">Previous</a>
+                {% endif %}
+                <span>Page {{ page_obj_schedule.number }} of {{ page_obj_schedule.paginator.num_pages }}</span>
+                {% if page_obj_schedule.has_next %}
+                    <a href="?page_schedule={{ page_obj_schedule.next_page_number }}&search_schedule={{ search_query_schedule }}&rows_schedule={{ rows_schedule }}">Next</a>
+                    <a href="?page_schedule={{ page_obj_schedule.paginator.num_pages }}&search_schedule={{ search_query_schedule }}&rows_schedule={{ rows_schedule }}">Last</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>    
 </div>
+
+<script>
+// Live search function for Interviewer Table
+document.getElementById('searchInterviewer').addEventListener('input', function() {
+    const searchValue = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#interviewerTable tbody tr');
+    let matchFound = false;
+
+    rows.forEach((row, index) => {
+        const interviewerName = row.cells[1].textContent.toLowerCase();
+        if (interviewerName.includes(searchValue)) {
+            row.style.display = '';
+            row.cells[0].textContent = index + 1;  // Update No. column dynamically
+            matchFound = true;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    // Show "No results found" if no matches
+    if (!matchFound) {
+        const noResultsRow = document.createElement('tr');
+        noResultsRow.innerHTML = '<td colspan="2" class="text-center">No results found</td>';
+        document.querySelector('#interviewerTable tbody').appendChild(noResultsRow);
+    }
+});
+
+// Live search function for Schedule Table
+document.getElementById('searchSchedule').addEventListener('input', function() {
+    const searchValue = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#scheduleTable tbody tr');
+    let matchFound = false;
+
+    rows.forEach((row, index) => {
+        const interviewerName = row.cells[1].textContent.toLowerCase();
+        if (interviewerName.includes(searchValue)) {
+            row.style.display = '';
+            row.cells[0].textContent = index + 1;  // Update No. column dynamically
+            matchFound = true;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    // Show "No results found" if no matches
+    if (!matchFound) {
+        const noResultsRow = document.createElement('tr');
+        noResultsRow.innerHTML = '<td colspan="3" class="text-center">No results found</td>';
+        document.querySelector('#scheduleTable tbody').appendChild(noResultsRow);
+    }
+});
+</script>
 {% endblock %}
