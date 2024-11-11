@@ -22,28 +22,25 @@
 
     <button class="bodybutton" style="font-family: Georgia; font-size: 20px; font-weight: bold;" onclick="togglePasswordSection()">Change Password</button>
 
-    <div id="password-section" class="hidden-content" style="display: none;">
-        <form method="post" action="{% url 'INTprofile' %}">
-            {% csrf_token %}
-            <div class="input-group">
-                <label>Current Password:</label>
-                <input class="inputarea" type="password" name="current_password" placeholder="Enter Current Password">
-            </div>
+    <div id="password-section" class="change-password-section" style="display: none;">
+        <div class="input-group">
+            <label>Current Password:</label>
+            <input class="inputarea" type="password" placeholder="Current Password">
+        </div>
 
-            <div class="input-group">
-                <label>New Password:</label>
-                <input class="inputarea" type="password" name="new_password" placeholder="Enter New Password Here">
-            </div>
+        <div class="input-group">
+            <label>New Password:</label>
+            <input class="inputarea" type="password" placeholder="New Password">
+        </div>
 
-            <div class="input-group">
-                <label>Confirm Password:</label>
-                <input class="inputarea" type="password" name="confirm_password" placeholder="Confirm New Password">
-            </div>
+        <div class="input-group">
+            <label>Confirm Password:</label>
+            <input class="inputarea" type="password" placeholder="Confirm Password">
+        </div>
 
-            <div class="input-group">
-                <button type="submit" class="bodybutton">Save</button>
-            </div>
-        </form>
+        <div class="input-group">
+            <button type="button" class="save-button bodybutton">Save</button>
+        </div>
     </div>
 
     <script>
@@ -51,6 +48,72 @@
             const passwordSection = document.getElementById("password-section");
             passwordSection.style.display = passwordSection.style.display === "none" ? "block" : "none";
         }
+
+        // JavaScript code for updating the password
+        document.addEventListener("DOMContentLoaded", function () {
+            const saveButton = document.querySelector('.save-button');
+            const currentPasswordInput = document.querySelector('input[placeholder="Current Password"]');
+            const newPasswordInput = document.querySelector('input[placeholder="New Password"]');
+            const confirmPasswordInput = document.querySelector('input[placeholder="Confirm Password"]');
+            const errorMessage = document.createElement("div"); // Error message container
+
+            errorMessage.style.color = "red";
+            errorMessage.style.marginTop = "5px";
+            document.querySelector('.change-password-section').appendChild(errorMessage);
+
+            saveButton.addEventListener("click", function () {
+                const currentPassword = currentPasswordInput.value;  // Capture current password
+                const newPassword = newPasswordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+
+                // Check if password is at least 6 characters long
+                if (newPassword.length < 6) {
+                    errorMessage.textContent = "Your password is too short! You need 6+ characters.";
+                    return;
+                }
+
+                // Check if passwords match
+                if (newPassword !== confirmPassword) {
+                    errorMessage.textContent = "Passwords don’t match.";
+                    return;
+                }
+
+                // Clear error message if validation passes
+                errorMessage.textContent = "";
+
+                // AJAX request to Django backend to update the password
+                const accountId = "{{ request.session.account_id }}";  // Fetch account ID from session
+                fetch("{% url 'update_password' %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": "{{ csrf_token }}",
+                    },
+                    body: JSON.stringify({
+                        account_id: accountId,  // Use the accountId from session
+                        current_password: currentPassword, // Include current password
+                        new_password: newPassword,
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Server response:", data);  // Log the server response for debugging
+                    if (data.success) {
+                        alert("Password updated successfully!");
+                        currentPasswordInput.value = "";
+                        newPasswordInput.value = "";
+                        confirmPasswordInput.value = "";
+                        document.getElementById("password-section").style.display = 'none';
+                    } else {
+                        errorMessage.textContent = data.error || "Failed to update password."; // Show specific error
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    errorMessage.textContent = "An error occurred. Please try again.";
+                });
+            });
+        });
     </script>
 
     <button class="bodybutton" style="font-family: Georgia; font-size: 20px; font-weight: bold;" onclick="window.location.href='{% url 'Index' %}'">Sign Out</button>
