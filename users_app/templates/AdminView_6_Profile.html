@@ -3,18 +3,24 @@
 {% block title %}BayaniHire: Admin Center{% endblock %}
 
 {% block content %}
-<div class="main-content" style="padding-top: 60px;">  <!-- Main content area with padding to avoid header overlap -->
-    <!-- User Profile Section -->
-    <h2 style="font-family: Georgia; font-size: 36px; font-weight: bold;">User Profile:</h2>
-    <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">Username:</label> 
-    <span style="font-family: Georgia; font-size: 24px;">{{ username }}</span><br>
+<div class="main-content" style="padding: 0; margin: 0; text-align: center; display: flex; flex-direction: column; align-items: center;"></div>
+    <h2 style="font-size: 36px; font-weight: bold; text-align: center;">User Profile:</h2>
 
-    <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">Name:</label> 
-    <span style="font-family: Georgia; font-size: 24px;">{{ full_name }}</span><br>
 
-    <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">Email:</label> 
-    <span style="font-family: Georgia; font-size: 24px;">{{ email }}</span><br>
+    <div style="display: flex; align-items: center; font-family: Georgia;">
+        <label style="font-size: 30px; font-weight: bold;">Username:</label>
+        <span style="font-size: 24px; margin-left: 10px;">{{ username }}</span>
+    </div>
 
+    <div style="display: flex; align-items: center; font-family: Georgia;">
+        <label style="font-size: 30px; font-weight: bold;">Name:</label>
+        <span style="font-size: 24px; margin-left: 10px;">{{ full_name }}</span>
+
+    </div>
+    <div style="display: flex; align-items: center; font-family: Georgia; margin-top: 10px;">
+        <label style="font-size: 30px; font-weight: bold;">Email:</label>
+        <span style="font-size: 24px; margin-left: 10px;">{{ email }}</span>
+    </div>
     <!-- Password Change Form, FOR TESTINGGGG  -->
     <h2 style="font-family: Georgia; font-size: 36px; font-weight: bold;">Change Password:</h2>
     <form method="post" action="{% url 'adminprofile' %}">
@@ -37,12 +43,12 @@
 
     <h2 style="font-family: Georgia; font-size: 36px; font-weight: bold;">Create Account for Admin and Interviewer</h2>
     
-    <button style="font-family: Georgia; font-size: 20px; font-weight: bold;" onclick="window.location.href='{% url 'manage_accounts' %}';">Manage Accounts</button>
-    <button style="font-family: Georgia; font-size: 20px; font-weight: bold;" onclick="window.location.href='{% url 'add_accounts' %}';">Create Account</button>
+    <button class="save-button" style="font-family: Georgia; font-size: 20px; font-weight: bold;" onclick="window.location.href='{% url 'manage_accounts' %}';">Manage Accounts</button>
+    <button class="save-button" style="font-family: Georgia; font-size: 20px; font-weight: bold;" onclick="window.location.href='{% url 'add_accounts' %}';">Create Account</button>
     
     <br><br>
 
-    <button style="font-family: Georgia; font-size: 14px; font-weight: bold;"onclick="window.location.href='{% url 'Index' %}'">Sign Out</button>
+    <button class="sign-out-button" style="font-family: Georgia; font-size: 14px; font-weight: bold;"onclick="window.location.href='{% url 'Index' %}'">Sign Out</button>
 
 
 </div>
