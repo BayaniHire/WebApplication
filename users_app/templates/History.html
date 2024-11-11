@@ -2,24 +2,41 @@
 
 {% block body %}
 <div class="main-content">
-    <table border="0" style="font-size: 18px;">
-        <tr>
-            <th>Interviewed Applicant List</th>
-        </tr>
-        {% for applicant in applicants %}
-        <tr>
-            <td>{{ applicant.account.first_name }} {{ applicant.account.last_name }}</td>
-            <td>
-                <button onclick="window.location.href='{% url 'view_feedback' applicant.applicant_status_id %}'">
-                    View Feedback
-                </button>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-
     <div class="qualified-applicants">
-      <h2>Feedback History</h2>
+        <h2>Feedback History</h2>
     </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Applicant Name</th>
+                <th>Job Applied</th>
+                <th>Job Company</th>
+                <th>Applicant Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for applicant in applicants %}
+                <tr>
+                    <td>{{ applicant.full_name }}</td>
+                    <td>{{ applicant.job_title }}</td>
+                    <td>{{ applicant.job_company }}</td>
+                    <td>{{ applicant.status }}</td>
+                    <td>
+                        <button class="bodybutton" onclick="window.location.href='{% url 'INTeditfeedback' applicant.applicant_status_id %}'">
+                            View Feedback
+                        </button>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center;">
+                        No feedback history available.
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}
