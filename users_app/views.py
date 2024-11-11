@@ -141,17 +141,33 @@ def interviewer_feedback(request):
     return render(request, 'Feedback.html', {'applicants': applicants})
 
 
-def interviewer_history(request):
-    # Assuming the user's ID is stored in session
-    user_id = request.session.get('user_id')
-    
-    # Retrieve feedback entries linked to the current user
-    applicants = ListOfApplicantsWithStatusAndCredentials.objects.filter(
+# WEIN BAGO#
+def interviewerhistory(request):
+    user_id = request.session.get('user_id')  # Using 'user_id' for consistency
+    if not user_id:
+        return redirect('login')
+
+    # Retrieve feedback entries for the interviewer with non-null feedback and 'PASSED'/'FAILED' statuses
+    applicants_with_feedback = ListOfApplicantsWithStatusAndCredentials.objects.filter(
         interview_applicant_id__account_id=user_id,
-        interviewer_feedback__isnull=False
-    ).order_by('-submission_date')
+        interviewer_feedback__isnull=False,
+        interviewer_feedback_status__in=['PASSED', 'FAILED']
+    ).select_related('account', 'job', 'interview_applicant_id').order_by('-submission_date')
     
-    return render(request, 'History.html', {'applicants': applicants})
+    # Prepare the applicants' data for the template
+    applicants_data = [
+        {
+            "full_name": f"{applicant.account.first_name} {applicant.account.middle_name or ''} {applicant.account.last_name}",
+            "job_title": applicant.job.job_title,
+            "job_company": applicant.job.job_company,
+            "status": applicant.interviewer_feedback_status,
+            "applicant_status_id": applicant.applicant_status_id
+        }
+        for applicant in applicants_with_feedback
+    ]
+
+    return render(request, 'History.html', {'applicants': applicants_data})
+#WEIN BAGO#
 
 def interviewer_profile(request):
     return render(request, 'Profile.html')
@@ -875,6 +891,141 @@ def adminprofile(request):
         'email': user.email
     }
     return render(request, 'AdminView_6_Profile.html', context)
+    
+#WEIN BAGO DAGDAG 11-11-2024
+from django.contrib import messages
+
+def interviewer_feedback(request):
+    account_id = request.session.get('account_id')
+    if not account_id:
+        return redirect('login')
+
+    if request.method == 'POST':
+        applicant_id = request.POST.get('applicant_id')
+        status = request.POST.get('status')
+        feedback = request.POST.get('feedback')
+
+        if not applicant_id:
+            messages.error(request, "Please select an applicant.")
+            return redirect('interviewer_feedback')
+
+        # Find and update the applicant's status and feedback
+        applicant = ListOfApplicantsWithStatusAndCredentials.objects.get(applicant_status_id=applicant_id)
+        applicant.interviewer_feedback_status = status
+        applicant.interviewer_feedback = feedback
+        applicant.save()
+
+        return redirect('INTappointments')
+
+    interviews = InterviewStorage.objects.filter(account_id=account_id)
+    applicants = ListOfApplicantsWithStatusAndCredentials.objects.filter(
+        interview_applicant_id__in=interviews,
+        applicant_status='QUALIFIED'
+    ).exclude(
+        interviewer_feedback_status__in=['PASSED', 'FAILED']
+    ).select_related('account', 'job', 'interview_applicant_id')
+
+    return render(request, 'Feedback.html', {'applicants': applicants})
+
+def interviewer_editfeedback(request, applicant_status_id):
+    # Retrieve the applicant using the applicant_status_id
+    applicant = ListOfApplicantsWithStatusAndCredentials.objects.get(applicant_status_id=applicant_status_id)
+
+    # If the request is a POST, we are saving the updated feedback
+    if request.method == 'POST':
+        status = request.POST.get('status')
+        feedback = request.POST.get('feedback')
+
+        # Update the applicant's feedback status and remarks
+        applicant.interviewer_feedback_status = status
+        applicant.interviewer_feedback = feedback
+        applicant.save()
+
+        # Redirect to feedback history page after updating
+        return redirect('INThistory')  # Adjust this URL to your feedback history page URL
+
+    # Pass the applicant data to the template for pre-filling
+    return render(request, 'EditFeedback.html', {'applicant': applicant})
+    # Retrieve the applicant using the applicant_status_id
+    applicant = ListOfApplicantsWithStatusAndCredentials.objects.get(applicant_status_id=applicant_status_id)
+
+    # If the request is a POST, we are saving the feedback
+    if request.method == 'POST':
+        status = request.POST.get('status')
+        feedback = request.POST.get('feedback')
+
+        # Update the applicant's feedback status and remarks
+        applicant.interviewer_feedback_status = status
+        applicant.interviewer_feedback = feedback
+        applicant.save()
+
+        # Redirect to feedback history page after updating
+        return redirect('INThistory')  # Adjust this URL to your feedback history page URL
+
+    # Pass the applicant data to the template for pre-filling
+    return render(request, 'EditFeedback.html', {'applicant': applicant})
+
+def interviewer_applicants(request):
+    # Get the interviewer's account ID from the session (assuming session is properly set after login)
+    account_id = request.session.get('account_id')
+    if not account_id:
+        # Redirect to login if the account_id is not found in the session
+        return redirect('login')
+
+    # Retrieve the interviewer's own InterviewStorage entries
+    interviews = InterviewStorage.objects.filter(account_id=account_id)
+
+    # Fetch applicants linked to these interviews and qualified for interview
+    qualified_applicants = ListOfApplicantsWithStatusAndCredentials.objects.filter(
+        applicant_status='QUALIFIED',
+        interview_applicant_id__in=interviews
+    ).select_related('account', 'job', 'interview_applicant_id')
+
+    # Prepare data for the template
+    applicants_data = [
+        {
+            "full_name": f"{applicant.account.first_name} {applicant.account.middle_name or ''} {applicant.account.last_name}",
+            "job_title": applicant.job.job_title,
+            "job_company": applicant.job.job_company,
+            "date_applied": applicant.submission_date,
+            "interview_date": applicant.interview_applicant_id.interview_schedule_date if applicant.interview_applicant_id else None,
+            "status": applicant.applicant_status,
+            "applicant_status_id": applicant.applicant_status_id if applicant.applicant_status_id else None  # Ensure this line is added
+        }
+        for applicant in qualified_applicants
+    ]
+
+    return render(request, 'Applicants.html', {'applicants': applicants_data})
+
+def interviewer_history(request):
+    account_id = request.session.get('account_id')
+    if not account_id:
+        return redirect('login')
+
+    # Retrieve interview sessions associated with the interviewer
+    interviews = InterviewStorage.objects.filter(account_id=account_id)
+    
+    # Include only applicants with feedback status 'PASSED' or 'FAILED'
+    applicants_with_feedback = ListOfApplicantsWithStatusAndCredentials.objects.filter(
+        interview_applicant_id__in=interviews,
+        interviewer_feedback_status__in=['PASSED', 'FAILED']
+    ).select_related('account', 'job', 'interview_applicant_id')
+    
+    # Prepare the applicants' data for the template
+    applicants_data = [
+        {
+            "full_name": f"{applicant.account.first_name} {applicant.account.middle_name or ''} {applicant.account.last_name}",
+            "job_title": applicant.job.job_title if applicant.job else "No job title",
+            "job_company": applicant.job.job_company if applicant.job else "No job company",
+            "status": applicant.interviewer_feedback_status or "No status",
+            "applicant_status_id": applicant.applicant_status_id
+        }
+        for applicant in applicants_with_feedback
+    ]
+
+    return render(request, 'History.html', {'applicants': applicants_data})
+
+
 def interviewer_profile(request):
     # Get the interviewer's account ID from the session
     account_id = request.session.get('account_id')
@@ -907,6 +1058,8 @@ def interviewer_profile(request):
         'email': user.email
     }
     return render(request, 'Profile.html', context)
+
+# 11-11-2024
 
 def add_accounts(request):
     if request.method == 'POST':
