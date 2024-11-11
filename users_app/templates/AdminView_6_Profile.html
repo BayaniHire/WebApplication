@@ -28,7 +28,9 @@
         <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">Confirm New Password:</label>
         <input type="password" name="confirm_password" placeholder="Confirm New Password" style="font-family: Georgia; font-size: 24px;"><br>
 
-        <button type="submit" style="font-family: Georgia; font-size: 20px; font-weight: bold;">Save</button>
+        <div id="errorMessage" style="color: red; font-family: Georgia; font-size: 18px; margin-top: 5px;"></div>
+
+        <button type="button" class="save-button" style="font-family: Georgia; font-size: 20px; font-weight: bold;">Save</button>
     </form>
 
     <br><br>
@@ -44,4 +46,70 @@
 
 
 </div>
+{% endblock %}
+
+{% block script %}
+<script>
+    // Toggle the display of the change password section
+    document.addEventListener("DOMContentLoaded", function () {
+        const saveButton = document.querySelector('.save-button');
+        const currentPasswordInput = document.querySelector('input[placeholder="Enter Current Password"]');
+        const newPasswordInput = document.querySelector('input[placeholder="Enter New Password"]');
+        const confirmPasswordInput = document.querySelector('input[placeholder="Confirm New Password"]');
+        const errorMessage = document.getElementById("errorMessage");
+    
+        saveButton.addEventListener("click", function (event) {
+            event.preventDefault(); // Prevents form from submitting
+            
+            const currentPassword = currentPasswordInput.value;
+            const newPassword = newPasswordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+    
+            // Check if new password is at least 6 characters long
+            if (newPassword.length < 6) {
+                errorMessage.textContent = "Your password is too short! You need 6+ characters.";
+                return;
+            }
+    
+            // Check if new passwords match
+            if (newPassword !== confirmPassword) {
+                errorMessage.textContent = "Passwords don’t match.";
+                return;
+            }
+    
+            // Clear error message if validation passes
+            errorMessage.textContent = "";
+    
+            // AJAX request to update the password
+            fetch("{% url 'update_password' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}",
+                },
+                body: JSON.stringify({
+                    account_id: "{{ request.session.account_id }}",  // Use account_id from session
+                    current_password: currentPassword,
+                    new_password: newPassword,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Password updated successfully!");
+                    currentPasswordInput.value = "";
+                    newPasswordInput.value = "";
+                    confirmPasswordInput.value = "";
+                    errorMessage.textContent = ""; // Clear any previous error messages
+                } else {
+                    errorMessage.textContent = data.error || "Failed to update password."; // Show specific error
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                errorMessage.textContent = "An error occurred. Please try again.";
+            });
+        });
+    });    
+</script>
 {% endblock %}
