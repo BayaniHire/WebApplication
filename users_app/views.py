@@ -526,12 +526,44 @@ def viewing_files(request, file_name):
     return render(request, 'AdminView_1_2_ViewingFiles.html', context)
 
 def list_of_jobs(request):
-    jobs = JobDetailsAndRequirements.objects.all()  # Fetch all job details
-    active_jobs_count = JobDetailsAndRequirements.objects.filter(job_status="ACTIVE").count()  # Count active jobs
-    return render(request, 'AdminView_2_ListofJobs.html', {
-        'jobs': jobs,
-        'active_jobs_count': active_jobs_count  # Pass count to the template
-    })
+    search_query = request.GET.get('search', '').strip()
+    sort_order = request.GET.get('sort', 'title_asc')  # Default sort by job title ascending
+    rows_param = request.GET.get('rows', '5')  # Set default rows to 5
+    rows_per_page = max(min(int(rows_param), 10), 1) if rows_param.isdigit() else 5
+
+    query = Q(job_title__icontains=search_query) | Q(job_company__icontains=search_query)
+    jobs = JobDetailsAndRequirements.objects.filter(query)
+
+    # Apply sorting based on the sort_order
+    if sort_order == 'title_desc':
+        jobs = jobs.order_by('-job_title')
+    elif sort_order == 'company_asc':
+        jobs = jobs.order_by('job_company')
+    elif sort_order == 'company_desc':
+        jobs = jobs.order_by('-job_company')
+    elif sort_order == 'date_asc':
+        jobs = jobs.order_by('job_date_published')
+    elif sort_order == 'date_desc':
+        jobs = jobs.order_by('-job_date_published')
+    else:
+        jobs = jobs.order_by('job_title')
+
+    paginator = Paginator(jobs, rows_per_page)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+
+    start_index = (page_obj.number - 1) * rows_per_page + 1
+
+    context = {
+        'jobs': page_obj,
+        'active_jobs_count': JobDetailsAndRequirements.objects.filter(job_status="ACTIVE").count(),
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'sort_order': sort_order,
+        'rows_per_page': rows_per_page,  # Make sure to pass this back to the template
+        'start_index': start_index 
+    }
+    return render(request, 'AdminView_2_ListofJobs.html', context)
 
 def edit_job_details(request, job_id):
     job = get_object_or_404(JobDetailsAndRequirements, pk=job_id)
