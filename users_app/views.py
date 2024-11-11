@@ -39,6 +39,8 @@ from django.core.paginator import Paginator
 from django.http import HttpResponseRedirect
 from django.db import models
 from bayanihire_app.models import JobDetailsAndRequirements
+from django.contrib import messages
+from django.db.models import Subquery, OuterRef
 
 def Index(request):
     return render(request, "index.html")
@@ -179,6 +181,7 @@ def interviewer_viewinfo(request, applicant_status_id):
 
 ##################INTERVIEWER######################
 
+
 ###################APPLICANT############################
 def applicant_homepage(request):
     jobs = JobDetailsAndRequirements.objects.filter(job_status='ACTIVE')  # Fetch only active jobs
@@ -277,29 +280,32 @@ def applicant_applicationstatus(request):
     applications = (
         ListOfApplicantsWithStatusAndCredentials.objects
         .filter(account=account)
-        .select_related('job') 
+        .select_related('job', 'interview_applicant_id') 
         .order_by('-submission_date') # Ensure you can access job-related fields
         .annotate(
-            interview_schedule_date=InterviewStorage.objects.filter(account=account).values('interview_schedule_date')[:1]
-        )  # Annotate to include interview date
+            # Use Subquery to get the interview date for each application
+            interview_schedule_date=Subquery(
+                InterviewStorage.objects.filter(interview_applicant_id=Subquery(
+                    ListOfApplicantsWithStatusAndCredentials.objects.filter(account=account)
+                    .values('interview_applicant_id')[:1]
+                )).values('interview_schedule_date')[:1]
+            )
+        )
         .values(
             'job__job_title',
-            'job__job_date_published',  # Ensure this field exists in the job model
+            'job__job_date_published',
             'applicant_status',
             'submission_date',
             'interview_schedule_date',
             'applicant_status_id',
+            'job__job_id'
         )
-        .distinct()  
     )
-    
 
     context = {
         'applications': applications,  # Pass the applications to the template
         'has_applications': applications.exists()  # Flag to check if applications exist
     }
-
-    
 
     return render(request, 'Applicant_Applicationstatus.html', context)
 
@@ -342,13 +348,38 @@ def applicant_viewfileupload(request, applicant_status_id):
 
     return render(request, 'Applicant_Viewfileupload.html', context)
 
-def applicant_interviewdetails(request):
-    return render(request, 'Applicant_InterviewDetails.html')
+
+
+def applicant_interviewdetails(request, applicant_status_id):
+    # Fetch interview details for the given applicant
+    applicant = get_object_or_404(ListOfApplicantsWithStatusAndCredentials, applicant_status_id=applicant_status_id)
+
+    # Check if the applicant is qualified
+    if applicant.applicant_status == "QUALIFIED":
+        # Check if interview details exist for the qualified applicant
+        if applicant.interview_applicant_id:
+            # If interview details exist, fetch them
+            interview_details = {
+                'interviewer_name': applicant.interview_applicant_id.interviewer_name,
+                'schedule_date': applicant.interview_applicant_id.interview_schedule_date,
+                'interview_message': applicant.admin_message,  # Use admin_message from ListOfApplicantsWithStatusAndCredentials
+            }
+            return render(request, 'Applicant_InterviewDetails.html', {
+                'interview_details': interview_details
+            })
+        else:
+            # If no interview schedule exists, show the message
+            return render(request, 'Applicant_InterviewDetails.html', {
+                'show_no_schedule_message': True
+            })
+    else:
+        # If not qualified, show the message
+        return render(request, 'Applicant_InterviewDetails.html', {
+            'show_not_qualified_message': True
+        })
 
 def applicant_profile(request):
     return render(request, 'Applicant_profile.html')
-
-
 ###################APPLICANT############################
 
 
@@ -404,6 +435,7 @@ def list_of_applicants(request):
     }
     return render(request, 'AdminView_1_Homepage_ListofApplicants.html', context)
 
+
 def open_applicants(request, applicant_status_id):
     # Fetch the applicant using the provided applicant_status_id
     applicant = get_object_or_404(ListOfApplicantsWithStatusAndCredentials, applicant_status_id=applicant_status_id)
@@ -412,19 +444,47 @@ def open_applicants(request, applicant_status_id):
     account_info = applicant.account
     job_details = applicant.job
 
-    # Prepare the uploaded files
-    uploaded_files = applicant.file_metadata.split(",") if applicant.file_metadata else []
-    uploaded_files = [file.strip() for file in uploaded_files]
+    # Prepare the list of uploaded files (from comma-separated metadata)
+    uploaded_files = []
+    filenames = applicant.file_metadata.split(", ") if applicant.file_metadata else []
 
-    # Prepare context for rendering
+    # Process credentials data to prepare each file as base64 encoded
+    if applicant.credentials:
+        total_files_size = len(applicant.credentials)
+        individual_file_size = total_files_size // len(filenames) if filenames else 0
+
+        for i, filename in enumerate(filenames):
+            start_index = i * individual_file_size
+            end_index = start_index + individual_file_size if i < len(filenames) - 1 else total_files_size
+            file_data = applicant.credentials[start_index:end_index]
+            encoded_file = base64.b64encode(file_data).decode('utf-8')
+            
+            uploaded_files.append({
+                'data': encoded_file,
+                'metadata': filename,
+                'type': filename.split('.')[-1].lower(),
+            })
+
+    # Handle a file preview request for a specific file
+    file_name_to_view = request.GET.get('view_file')
+    if file_name_to_view:
+        matching_file = next((file for file in uploaded_files if file['metadata'] == file_name_to_view), None)
+        if not matching_file:
+            raise Http404("File not found")
+
+        # Return JSON response with file data and type for preview
+        return JsonResponse({'file_data': matching_file['data'], 'file_type': matching_file['type']})
+
+    # Render page with applicant and job details, status, and uploaded files
     context = {
         'applicant': account_info,
         'job_details': job_details,
         'uploaded_files': uploaded_files,
         'submission_date': applicant.submission_date,
         'applicant_status': applicant.applicant_status,
-        'applicant_status_id': applicant_status_id  # Ensure this is included
+        'applicant_status_id': applicant_status_id
     }
+
     return render(request, 'AdminView_1_1_OpenApplicants.html', context)
 
 def update_applicant_status(request, applicant_status_id):
