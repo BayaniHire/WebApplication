@@ -823,6 +823,9 @@ def manage_accounts(request):
     else:
         accounts = accounts.order_by('account__username')
 
+    # Check if there are no matching accounts
+    no_match = not accounts.exists()
+
     # Reactivate or deactivate accounts based on button press
     if request.method == "POST":
         action = request.POST.get('action')
@@ -855,6 +858,7 @@ def manage_accounts(request):
         'search_query': search_query,
         'sort_order': sort_order,
         'rows_param': rows_param,
+        'no_match': no_match,  # Pass the no_match flag to the template
     }
     return render(request, 'AdminView_6_1_manage_accounts.html', context)
 
