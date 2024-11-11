@@ -1,50 +1,44 @@
-{% extends "Admin_Inheritance.html" %}  <!-- Replace with your actual base template filename -->
+{% extends "Admin_Inheritance.html" %}
 
 {% block title %}BayaniHire Admin Center{% endblock %}
 
 {% block content %}
-<div class="main-content" style="padding-top: 60px;">  <!-- Main content area with padding to avoid header overlap -->
-    <!-- Title and Profile -->
-    <div class="d-flex justify-content-between align-items-center">
-        <h1>BayaniHire Admin Center</h1>
-        <button class="btn btn-primary" onclick="window.location.href='{% url 'adminprofile' %}';">Profile</button>
-    </div>
-
-    <h2>Create/Edit Job Details & Requirements</h2>
-    
-    <form action="{% url 'edit_job_details' job.job_id %}" method="post">
+<div class="main-content container" style="padding: 0; margin: 0; text-align: center; display: flex; flex-direction: column; align-items: center;">
+    <h2 class="font-weight-bold my-4" style="font-size: 36px;">Edit Job Details & Requirements</h2>
+    <form action="{% url 'edit_job_details' job.job_id %}" method="post" class="w-100">
         {% csrf_token %}
-        <table class="table">
-            <tr>
-                <td><strong>Status:</strong></td>
-                <td>
-                    <select name="status" class="form-control" required>
-                        <option value="ACTIVE" {% if job.job_status == 'ACTIVE' %}selected{% endif %}>ACTIVE</option>
-                        <option value="CLOSE" {% if job.job_status == 'CLOSE' %}selected{% endif %}>CLOSE</option>
-                    </select>
-                </td>
-                <td><strong>Date:</strong></td>
-                <td><input type="date" name="date" value="{{ job_date }}" class="form-control" readonly></td>
-            </tr>
-            <tr>
-                <td><strong>Job Title</strong></td>
-                <td><input type="text" name="job_title" placeholder="Job Title" value="{{ job.job_title }}" class="form-control" required></td>
-                <td><strong>Job Benefits</strong></td>
-                <td><textarea name="job_benefits" placeholder="Job Benefits" class="form-control" required>{{ job.job_benefits }}</textarea></td>
-            </tr>
-            <tr>
-                <td><strong>Company</strong></td>
-                <td><input type="text" name="company" placeholder="Company" value="{{ job.job_company }}" class="form-control" required></td>
-            </tr>
-            <tr>
-                <td><strong>Job Description</strong></td>
-                <td><textarea name="job_description" placeholder="Job Description" class="form-control" required>{{ job.job_description }}</textarea></td>
-                <td><strong>Job Requirements</strong></td>
-                <td><textarea name="job_requirements" placeholder="Job Requirements" class="form-control" required>{{ job.job_requirements }}</textarea></td>
-            </tr>
-        </table>
-        <button type="submit" class="btn btn-success">Save</button>
+        <div class="table-responsive">
+            <table class="table table-borderless mx-auto w-75">
+                <tr>
+                    <td><strong>Status:</strong></td>
+                    <td>
+                        <select name="status" class="form-control" required>
+                            <option value="ACTIVE" {% if job.job_status == 'ACTIVE' %}selected{% endif %}>ACTIVE</option>
+                            <option value="CLOSE" {% if job.job_status == 'CLOSE' %}selected{% endif %}>CLOSE</option>
+                        </select>
+                    </td>
+                    <td><strong>Date:</strong></td>
+                    <td><input type="date" name="date" value="{{ job_date }}" class="form-control" readonly></td>
+                </tr>
+                <tr>
+                    <td><strong>Job Title</strong></td>
+                    <td><input type="text" name="job_title" placeholder="Job Title" value="{{ job.job_title }}" class="form-control" required></td>
+                    <td><strong>Job Benefits</strong></td>
+                    <td><textarea name="job_benefits" placeholder="Job Benefits" class="form-control" required>{{ job.job_benefits }}</textarea></td>
+                </tr>
+                <tr>
+                    <td><strong>Company</strong></td>
+                    <td><input type="text" name="company" placeholder="Company" value="{{ job.job_company }}" class="form-control" required></td>
+                </tr>
+                <tr>
+                    <td><strong>Job Description</strong></td>
+                    <td><textarea name="job_description" placeholder="Job Description" class="form-control" required>{{ job.job_description }}</textarea></td>
+                    <td><strong>Job Requirements</strong></td>
+                    <td><textarea name="job_requirements" placeholder="Job Requirements" class="form-control" required>{{ job.job_requirements }}</textarea></td>
+                </tr>
+            </table>
+        </div>
+        <button type="submit" class="btn btn-success mt-3">Save</button>
     </form>
-
 </div>
 {% endblock %}
