@@ -33,25 +33,22 @@
             {% csrf_token %}
             
             <!-- Username input container -->
-            <div class="mb-4 row justify-content-center">
-                <label for="username" class="col-sm-3 col-form-label text-end">Username:</label>
-                <div class="col-sm-6">
-                    <input type="text" id="username" name="username" required class="form-control"style="max-width: 400px;">
-                </div>
+            <div class="mb-3 text-center">
+                <label for="username" class="form-label">Username:</label>
+                <input type="text" id="username" name="username" required class="form-control w-50 mx-auto" style="max-width: 400px;">
             </div>
 
             <!-- Password input container -->
-            <div class="mb-4 row justify-content-center">
-                <label for="password" class="col-sm-3 col-form-label text-end">Password:</label>
-                <div class="col-sm-6">
-                    <input type="password" id="password" name="password" required class="form-control"style="max-width: 400px;">
-                </div>
+            <div class="mb-3 text-center">
+                <label for="password" class="form-label">Password:</label>
+                <input type="password" id="password" name="password" required class="form-control w-50 mx-auto" style="max-width: 400px;">
             </div>
 
             <!-- Forgot Password Link -->
             <div class="mb-3 text-center">
-                <a href="{% url 'ForgotPassword' %}">Forgot Password?</a>
+                <a href="{% url 'ForgotPassword' %}" class="forgot-password-link">Forgot Password?</a>
             </div>
+            
 
             <!-- Submit Button -->
             <div class="button-container text-center mb-3">
