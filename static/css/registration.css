@@ -308,6 +308,28 @@ body {
 }
 
 
+/* Style for "Forgot Password?" link */
+a.forgot-password-link {
+    color: #FF5722; /* Change this to your desired color */
+    text-decoration: none; /* Remove underline if desired */
+}
+
+a.forgot-password-link:hover {
+    color: #E64A19; /* Change this to a darker shade or a different color for hover */
+}
+
+/* Style for "Register" link */
+a.register-btn {
+    color: #FF5722; /* Change this to your desired color */
+    text-decoration: none;
+}
+
+a.register-btn:hover {
+    color: #E64A19; /* Change this to a darker shade or a different color for hover */
+}
+
+
+
 
 
 
