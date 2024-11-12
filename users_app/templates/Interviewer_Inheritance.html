@@ -261,6 +261,59 @@
             font-size: 30px;
             font-weight: bold;
         }
+
+        @media (max-width: 768px) {
+    /* For tablets and smaller devices */
+    .sidebar {
+        width: 18%; /* Increase width for better touch targets on smaller screens */
+    }
+    .button {
+    width: 100%;
+    height: 60px;
+    margin-bottom: 10px;
+    background: #FFD8AD;
+    color: #5C472E;
+    border: 1px solid #5C472E;
+    border-radius: 15px;
+    font-family: "Georgia";
+    font-weight: bold;
+    text-align: center;
+    line-height: 60px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: calc(0.8vw + 10px); /* Base font size with a bit of viewport responsiveness */
+    overflow: hidden; /* Hide overflow text */
+    text-overflow: ellipsis; /* Show ellipsis when text overflows */
+    white-space: nowrap; /* Prevent text from wrapping to the next line */
+}
+
+@media (max-width: 768px) {
+    .button {
+        font-size: calc(1vw + 6px); /* Slightly increase viewport responsiveness for smaller screens */
+        height: 50px; /* Adjust height */
+    }
+}
+
+@media (max-width: 480px) {
+    .button {
+        font-size: calc(1.5vw + 4px); /* Further increase for very small screens */
+        height: 40px; /* Smaller buttons */
+        margin-bottom: 5px; /* Reduce space between buttons */
+        padding: 0 10px; /* Adjust padding to maintain text inside the button */
+    }
+}
+
+/* Ensure minimum font size */
+@media (max-width: 320px) {
+    .button {
+        font-size: 12px; /* Minimum font size to ensure readability */
+    }
+}
+
+}
+
+
+
     </style>
 </head>
 <body>
@@ -277,7 +330,7 @@
             </div>
             <button class="button" onclick="window.location.href='{% url 'INTappointments' %}'">Appointments</button>
             <button class="button" onclick="window.location.href='{% url 'INTapplicants' %}'">Applicants</button>
-            <button class="button" onclick="window.location.href='{% url 'INTfeedback' %}'">Interview Feedback</button>
+            <button class="button" onclick="window.location.href='{% url 'INTfeedback' %}'">Feedback</button>
             <button class="button" onclick="window.location.href='{% url 'INThistory' %}'">Feedback History</button>
         </div>
 
