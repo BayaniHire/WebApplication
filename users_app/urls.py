@@ -57,6 +57,12 @@ urlpatterns = [
     #### wag galawing sa update to###
     path('update_password/', views.update_password, name='update_password'),
     
+    # Email Function
+    path('forgot-password/', views.forgot_password, name='forgot_password'),
+    path('verify-otp/', views.verify_otp, name='verify_otp'),
+    path('resend-otp/', views.resend_otp, name='resend_otp'),
+    path('reset-password/', views.reset_password_view, name='reset_password_view'),
+    path('force-change-password/', views.force_change_password, name='force_change_password'),
 ##########################ADMIN##########################################
 
     ###wag po galawin pang log in to
