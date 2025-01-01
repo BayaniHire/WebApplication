@@ -42,6 +42,17 @@ from django.db import models
 from bayanihire_app.models import JobDetailsAndRequirements
 from django.contrib import messages
 from django.db.models import Subquery, OuterRef
+import random
+import string
+from django.core.mail import send_mail
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.conf import settings
+from django.utils.crypto import get_random_string
+from bayanihire_app.models import AccountInformation, OTPVerification
+from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
+from django.core.mail import EmailMultiAlternatives
 
 def Index(request):
     return render(request, "index.html")
@@ -1481,6 +1492,191 @@ def Index(request):  # Capitalize the function name to match the URL pattern
         'companies': companies
     }
     return render(request, 'index.html', context)
+
+
+# Email Function
+def verify_otp(request):
+    if request.method == 'POST':
+        otp_code = request.POST.get('otp_code')
+        email = request.session.get('email')
+
+        if not email:
+            return render(request, 'email_confirmation.html', {
+                'error': 'Session expired. Please restart the process.'
+            })
+
+        try:
+            otp_record = OTPVerification.objects.get(email=email, otp=otp_code, is_used=False)
+
+            # Check if account is linked
+            if not otp_record.account:
+                try:
+                    account = AccountInformation.objects.get(email=email)
+                    otp_record.account = account
+                    otp_record.save()
+                except AccountInformation.DoesNotExist:
+                    return render(request, 'email_confirmation.html', {
+                        'error': 'Account not found. Please contact support.'
+                    })
+
+            # Check if OTP is expired
+            if otp_record.is_expired():
+                return render(request, 'email_confirmation.html', {
+                    'error': 'OTP has expired. Please request a new one.'
+                })
+
+            # Mark OTP as used
+            otp_record.is_used = True
+            otp_record.save()
+
+            # Store account_id in the session for password reset
+            request.session['account_id'] = otp_record.account.account_id
+
+            return redirect('force_change_password')
+
+        except OTPVerification.DoesNotExist:
+            return render(request, 'email_confirmation.html', {
+                'error': 'Invalid OTP. Please try again or request a new code.'
+            })
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method.'})
+
+
+def generate_otp(email):
+    try:
+        account = AccountInformation.objects.get(email=email)
+    except AccountInformation.DoesNotExist:
+        return {"success": False, "error": "Account not found for the provided email."}
+
+    otp = OTPVerification.objects.create(
+        email=email,
+        otp=''.join(random.choices(string.digits, k=2)) + ''.join(random.choices(string.ascii_letters, k=4)),
+        account=account
+    )
+    return {"success": True, "otp": otp.otp}
+
+    
+
+def force_change_password(request):
+    return render(request, 'force_change_password.html')
+
+def send_otp_to_email(email, otp):
+    # Delete previous OTPs for the same email
+    OTPVerification.objects.filter(email=email, is_used=False).delete()
+
+    # Create a new OTP record
+    OTPVerification.objects.create(email=email, otp=otp, created_at=timezone.now())
+
+    # Construct the email subject and HTML content
+    subject = 'Your OTP Code for BayaniHire'
+    html_content = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif; text-align: center; margin: 20px; padding: 20px;background-color:#FFFFFF; border: 1px solid #ddd; border-radius: 10px;">
+            <div>
+                <h1 style="color:#5c332e;">BayaniHire</h1>
+                <p style="color: #000000;">Dear User,</p>
+                <p style="color:  #000000;">Your One-Time Password (OTP) is:</p>
+                <h2 style="color: red;">{otp}</h2>
+                <p style="color:  #000000;">Please use this OTP to complete your login process. Do not share this code with anyone.</p>
+                <p style="color:  #000000;">Thank you for using BayaniHire!</p>
+            </div>
+        </body>
+        </html>
+    """
+
+    # Create the email
+    email_message = EmailMultiAlternatives(
+        subject=subject,
+        body=f"Your OTP code is: {otp}",  # Fallback plain text
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[email],
+    )
+    email_message.attach_alternative(html_content, "text/html")  # Attach HTML content
+    email_message.send()
+
+
+
+def forgot_password(request):
+    if request.method == "POST":
+        email = request.POST.get('email')
+
+        # Ensure the email exists in AccountInformation
+        try:
+            account = AccountInformation.objects.get(email=email)
+        except AccountInformation.DoesNotExist:
+            messages.error(request, "Email is not associated with any account.")
+            return render(request, 'forgot_password.html')
+
+        # Generate and save OTP
+        result = generate_otp(email)  # Pass the email to generate_otp
+        if not result['success']:
+            messages.error(request, result['error'])
+            return render(request, 'forgot_password.html')
+
+        otp = result['otp']  # Retrieve the generated OTP
+
+        # Mark old OTPs as used
+        OTPVerification.objects.filter(email=email, is_used=False).update(is_used=True)
+
+        # Send the OTP via email
+        send_otp_to_email(email, otp)
+
+        messages.success(request, "OTP has been sent to your email.")
+        return render(request, 'email_confirmation.html')
+
+    return render(request, 'forgot_password.html')
+
+
+def resend_otp(request):
+    email = request.session.get('email')  # Retrieve email from session
+    if email:
+        otp_data = generate_otp(email)  # Call the generate_otp function
+        if otp_data.get("success"):  # Check if the operation was successful
+            otp = otp_data.get("otp")  # Extract the OTP string
+            send_otp_to_email(email, otp)  # Send OTP to the email address
+            request.session['otp'] = otp  # Update the OTP in session
+
+            messages.success(request, "OTP has been resent to your email.")
+            return render(request, 'email_confirmation.html')  # Re-render OTP confirmation page
+        else:
+            messages.error(request, otp_data.get("error", "An error occurred while generating OTP."))
+            return redirect('forgot_password')  # Redirect if OTP generation fails
+    else:
+        messages.error(request, "No email found for OTP resend.")
+        return redirect('forgot_password')  # Redirect if no email exists
+
+
+
+
+    
+@csrf_exempt
+def reset_password_view(request):
+    if request.method == 'POST':
+        import json
+        data = json.loads(request.body)
+        new_password = data.get('new_password')
+        confirm_password = data.get('confirm_password')
+        account_id = request.session.get('account_id')
+
+        if not account_id:
+            return JsonResponse({"success": False, "error": "Session expired. Please try again."})
+
+        if len(new_password) < 6:
+            return JsonResponse({"success": False, "error": "Password must be at least 6 characters long."})
+
+        if new_password != confirm_password:
+            return JsonResponse({"success": False, "error": "Passwords do not match."})
+
+        try:
+            account = AccountInformation.objects.get(account_id=account_id)
+            account.password = new_password  # Save plain text as per your requirement
+            account.save()
+            return JsonResponse({"success": True, "message": "Password updated successfully!"})
+        except AccountInformation.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Account not found."})
+
+    return JsonResponse({"success": False, "error": "Invalid request."})
+
 
 
 
