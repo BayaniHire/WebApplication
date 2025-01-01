@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'bayanihire_app',  # Your app
     'users_app',      # Your app
 ]
@@ -112,3 +113,13 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]  # Your static files direc
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Email Function
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  
+EMAIL_PORT = 587  
+EMAIL_USE_TLS = True  
+EMAIL_HOST_USER = 'automatedbayanihire@gmail.com'  
+EMAIL_HOST_PASSWORD = 'ddgp irir jfxq tkdq'  
+DEFAULT_FROM_EMAIL = 'automatedbayanihire@gmail.com'  
+SITE_ID = 1
