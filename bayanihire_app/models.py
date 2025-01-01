@@ -76,3 +76,24 @@ class ListOfApplicantsWithStatusAndCredentials(models.Model):
 
     class Meta:
         db_table = 'list_of_applicants_with_status_and_credentials'
+        
+class OTPVerification(models.Model):
+    email = models.EmailField()
+    otp = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
+    account = models.ForeignKey(
+        AccountInformation,
+        on_delete=models.CASCADE,
+        null=True,  # Allow null for existing rows
+        blank=True  # Allow blank in forms or admin if needed
+    )
+
+    def is_expired(self):
+        from django.utils.timezone import now, timedelta
+        return now() > self.created_at + timedelta(minutes=30)
+
+    
+    def __str__(self):
+        return f"OTP for {self.email} - {self.otp}"
+
