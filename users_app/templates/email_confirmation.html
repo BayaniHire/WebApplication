@@ -5,10 +5,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>BayaniHire - Email Confirmation</title>
-    <link rel="stylesheet" href="{% static 'css/popup.css' %}"> <!-- Link to the popup CSS file -->
+    <link rel="stylesheet" href="{% static 'css/popup.css' %}">
 </head>
 <body>
-
     <div class="content-area">
         <!-- Title -->
         <h2>Email Confirmation</h2>
@@ -23,27 +22,39 @@
 
         <!-- Additional Instructions with Resend Link -->
         <p class="additional-instructions">
-            Didn't receive the OTP code? <a href="#">Resend OTP Code</a> <!-- Use a placeholder link for now -->
+            Didn't receive the OTP code? <a href="{% url 'resend_otp' %}">Resend OTP Code</a>
         </p>
 
         <!-- OTP Confirmation Form -->
-        <form class="confirmation-form" action="process_email_confirmation.php" method="POST">
+        <form class="confirmation-form" action="{% url 'verify_otp' %}" method="POST">
+            {% csrf_token %}
             <label for="otp-code">
                 <span>OTP Code:</span>
                 <input type="text" id="otp-code" name="otp_code" required placeholder="Enter OTP Code">
             </label>
 
+            <!-- Display errors -->
+            {% if error %}
+                <p style="color: red;">{{ error }}</p>
+            {% endif %}
+
             <!-- Buttons: Cancel and Verify -->
             <div class="button-container">
                 <button type="button" class="cancel-btn" onclick="window.location.href='{% url 'login' %}'">Cancel</button>
-                <button type="verify" class="submit-btn">Verify</button>
+                <button type="submit" class="submit-btn">Verify</button>
             </div>
         </form>
+    </div>
+
+    <!-- Debugging Section (Optional) -->
+    <div style="display: none;">
+        <p>Debug Info:</p>
+        <p>Email: {{ request.session.email }}</p>
+        <p>OTP (from session): {{ request.session.otp }}</p>
     </div>
 
     <footer>
         &copy; 2024 BayaniHire. All Rights Reserved.
     </footer>
-
 </body>
 </html>
