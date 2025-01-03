@@ -13,23 +13,29 @@
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background-color: #4CAF50;
-            color: white;
             padding: 10px 20px;
             border-radius: 5px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
             z-index: 1000;
-            display: none;
+        }
+        .alert-success {
+            background-color: #4CAF50; /* Green for success messages */
+            color: white;
+        }
+        .alert-error {
+            background-color: #f44336; /* Red for error messages */
+            color: white;
         }
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Event listener for query string success message
             const params = new URLSearchParams(window.location.search);
             const message = params.get('message');
 
             if (message) {
                 const alertBox = document.createElement('div');
-                alertBox.className = 'alert-box';
+                alertBox.className = 'alert-box alert-success'; // Green alert for success
                 alertBox.textContent = message;
                 document.body.appendChild(alertBox);
 
@@ -41,6 +47,14 @@
                     alertBox.remove();
                 }, 3000);
             }
+
+            // Automatically hide red alerts after 2 seconds
+            const errorAlerts = document.querySelectorAll('.alert-error');
+            errorAlerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.remove();
+                }, 3000); // 3 seconds
+            });
         });
     </script>
 </head>
@@ -60,6 +74,17 @@
 		<!-- Logo image -->
 		<img src="{% static 'Logo.png' %}" alt="Logo Image" width="150" height="128" class="logo">
 	</header>
+
+    <!-- Alert Box for Django Messages -->
+    {% if messages %}
+        <div>
+            {% for message in messages %}
+                <div class="alert-box {% if message.tags == 'error' %}alert-error{% elif message.tags == 'success' %}alert-success{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 
     <!-- Content Area -->
     <div class="container content-area my-5 p-4">
@@ -84,6 +109,11 @@
             <div class="mb-3 text-center">
                 <a href="{% url 'ForgotPassword' %}" class="forgot-password-link">Forgot Password?</a>
             </div>
+
+             <!-- Display error message near the submit button -->
+            {% if message %}
+                <p style="color: red; text-align: center;">{{ message }}</p>
+            {% endif %}
             
 
             <!-- Submit Button -->
