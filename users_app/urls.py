@@ -33,6 +33,7 @@ urlpatterns = [
 ##########################APPLICANT###############################################
     
  ##########################ADMIN##########################################
+    path('logout/', views.logout_view, name='logout'),
     path('dashboard_admin/', views.list_of_applicants, name='list_of_applicants'),
     path('open_applicants/<int:applicant_status_id>/', views.open_applicants, name='open_applicants'),
     path('view-file/<str:file_name>/', views.viewing_files, name='viewing_files'),  # Update this line
