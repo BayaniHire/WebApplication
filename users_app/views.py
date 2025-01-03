@@ -448,6 +448,10 @@ def applicant_interviewdetails(request, applicant_status_id):
         })
 
 def applicant_profile(request):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
     return render(request, 'Applicant_profile.html')
 ###################APPLICANT############################
 
