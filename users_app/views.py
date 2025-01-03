@@ -1167,30 +1167,6 @@ def manage_accounts(request):
     }
     return render(request, 'AdminView_6_1_manage_accounts.html', context)
 
-def Registration(request):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-        
-    if request.method == 'POST':
-        form = AccountInformationForm(request.POST)
-        if form.is_valid():
-            account_info = form.save()  # Save the AccountInformation instance
-            
-            # Create the corresponding AccountStorage entry
-            AccountStorage.objects.create(
-                account=account_info,  # Link to the account
-                role='applicant',  # Set role as 'applicant'
-                account_status='active'  # Set account status as 'active'
-            )
-            
-            # Redirect to a success page or login
-            return redirect('login')  # Change 'success_page' to the actual success page you have
-    else:
-        form = AccountInformationForm()
-    
-    return render(request, 'registration.html', {'form': form})
-
 def admin_interviewer_account_setup(request):
     auth_response = ensure_authenticated(request)
     if auth_response:
@@ -1541,7 +1517,26 @@ def login(request):
 
     return render(request, 'login.html')
 
-
+def Registration(request):    
+    if request.method == 'POST':
+        form = AccountInformationForm(request.POST)
+        if form.is_valid():
+            account_info = form.save()  # Save the AccountInformation instance
+            
+            # Create the corresponding AccountStorage entry
+            AccountStorage.objects.create(
+                account=account_info,  # Link to the account
+                role='applicant',  # Set role as 'applicant'
+                account_status='active'  # Set account status as 'active'
+            )
+            
+            # Redirect to a success page or login
+            return redirect('login')  # Change 'success_page' to the actual success page you have
+    else:
+        form = AccountInformationForm()
+    
+    return render(request, 'registration.html', {'form': form})
+    
 def change_password(request):
     # Only allow POST requests and check if account_id exists in the session
     if request.method == 'POST' and 'account_id' in request.session:
