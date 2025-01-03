@@ -53,6 +53,11 @@ from bayanihire_app.models import AccountInformation, OTPVerification
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
+from django.contrib.auth import logout
+
+def logout_view(request):
+    logout(request)
+    return redirect('Index')
 
 def Index(request):
     return render(request, "index.html")
