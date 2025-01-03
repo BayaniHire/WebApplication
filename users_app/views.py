@@ -135,9 +135,17 @@ def interviewer_appointments(request):
     return render(request, 'Appointments.html', context)
 
 def interviewer_editfeedback(request):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+    
     return render(request, 'EditFeedback.html')
 
 def interviewer_feedback(request):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
     if request.method == 'POST':
         # Assuming you have fields in your form named 'applicant_id', 'status', and 'feedback'
         applicant_id = request.POST.get('applicant_id')
@@ -187,9 +195,17 @@ def interviewerhistory(request):
 #WEIN BAGO#
 
 def interviewer_profile(request):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
     return render(request, 'Profile.html')
 
 def interviewer_viewinfo(request, applicant_status_id):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
     # Fetch the applicant using the provided applicant_status_id
     applicant = get_object_or_404(ListOfApplicantsWithStatusAndCredentials, applicant_status_id=applicant_status_id)
 
@@ -217,6 +233,10 @@ def interviewer_viewinfo(request, applicant_status_id):
 
 ###################APPLICANT############################
 def applicant_homepage(request):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
     jobs = JobDetailsAndRequirements.objects.filter(job_status='ACTIVE')  # Fetch only active jobs
     context = {
         'jobs': jobs  # Pass the jobs to the template context
@@ -225,11 +245,19 @@ def applicant_homepage(request):
 
 
 def applicant_jobreq(request, job_id):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
     job_details = get_object_or_404(JobDetailsAndRequirements, job_id=job_id)
 
     return render(request, 'Applicant_JobReq.html', {'job_details': job_details})
 
 def applicant_fileupload(request, job_id):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
     uploaded_files_display = []
 
     if request.method == 'GET':
@@ -343,6 +371,10 @@ def applicant_applicationstatus(request):
     return render(request, 'Applicant_Applicationstatus.html', context)
 
 def applicant_viewfileupload(request, applicant_status_id):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
     # Retrieve the application details using the applicant_status_id
     application = get_object_or_404(ListOfApplicantsWithStatusAndCredentials, applicant_status_id=applicant_status_id)
 
@@ -384,6 +416,10 @@ def applicant_viewfileupload(request, applicant_status_id):
 
 
 def applicant_interviewdetails(request, applicant_status_id):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
     # Fetch interview details for the given applicant
     applicant = get_object_or_404(ListOfApplicantsWithStatusAndCredentials, applicant_status_id=applicant_status_id)
 
@@ -421,6 +457,10 @@ def applicant_profile(request):
 logger = logging.getLogger(__name__)
 
 def list_of_applicants(request):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
     search_query = request.GET.get('search', '').strip()
     sort_order = request.GET.get('sort', 'asc')
     date_sort = request.GET.get('date_sort', 'asc')  # New parameter for date sorting
@@ -470,6 +510,10 @@ def list_of_applicants(request):
 
 
 def open_applicants(request, applicant_status_id):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
     # Fetch the applicant using the provided applicant_status_id
     applicant = get_object_or_404(ListOfApplicantsWithStatusAndCredentials, applicant_status_id=applicant_status_id)
 
@@ -521,6 +565,10 @@ def open_applicants(request, applicant_status_id):
     return render(request, 'AdminView_1_1_OpenApplicants.html', context)
 
 def update_applicant_status(request, applicant_status_id):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
     # Ensure the request method is POST
     if request.method == 'POST':
         # Fetch the applicant using the provided applicant_status_id
@@ -541,6 +589,10 @@ def update_applicant_status(request, applicant_status_id):
     return redirect('list_of_applicants')  # Redirect if not a POST request
 
 def viewing_files(request, file_name):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
     # Construct the full file path
     file_path = os.path.join(settings.MEDIA_ROOT, file_name)
 
@@ -559,6 +611,10 @@ def viewing_files(request, file_name):
     return render(request, 'AdminView_1_2_ViewingFiles.html', context)
 
 def list_of_jobs(request):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
     search_query = request.GET.get('search', '').strip()
     sort_order = request.GET.get('sort', 'title_asc')  # Default sort by job title ascending
     rows_param = request.GET.get('rows', '5')  # Set default rows to 5
@@ -599,6 +655,10 @@ def list_of_jobs(request):
     return render(request, 'AdminView_2_ListofJobs.html', context)
 
 def edit_job_details(request, job_id):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
     job = get_object_or_404(JobDetailsAndRequirements, pk=job_id)
 
     if request.method == 'POST':
@@ -633,11 +693,19 @@ def edit_job_details(request, job_id):
     
 
 def create_job_details(request):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
     today_date = date.today().strftime("%Y-%m-%d")  # Format today's date as YYYY-MM-DD
     return render(request, 'AdminView_2_2_CreateJobDetails.html', {'today_date': today_date})
 
 
 def qualification(request):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
     interviewers = InterviewStorage.objects.select_related('account')
     grouped_interviewers = {}
 
@@ -686,6 +754,10 @@ def qualification(request):
     })
     
 def send_schedule(request):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
       # Fetch all applicants who are set for interview
     applicants = ListOfApplicantsWithStatusAndCredentials.objects.filter(
         applicant_status='FOR INTERVIEW'
@@ -720,6 +792,10 @@ def send_schedule(request):
     })
 
 def confirm_send_schedule(request):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
     if request.method == "POST":
         interviewer_name = request.POST.get('interviewer_name')
         schedule_date = request.POST.get('schedule_date')
@@ -745,6 +821,10 @@ def confirm_send_schedule(request):
 
 
 def open_schedule_list(request):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
     interviewer_name = request.GET.get('interviewer', None)
     search_query = request.GET.get('search', '').strip()
     sort_order = request.GET.get('date_sort', 'asc')
@@ -791,6 +871,10 @@ def open_schedule_list(request):
     return render(request, 'AdminView_3_2_OpenScheduleList.html', context)
 
 def schedule(request):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
     today = date.today()
     search_query_interviewer = request.GET.get('search_interviewer', '').strip()
     search_query_schedule = request.GET.get('search_schedule', '').strip()  # Ensure this variable is defined
@@ -866,6 +950,10 @@ def schedule(request):
 
 
 def schedule_view(request):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
     # Retrieve interview records with interviewer names and scheduled dates
     interview_data = InterviewStorage.objects.select_related('account').values(
         'account__first_name', 'account__middle_name', 'account__last_name', 'interview_schedule_date'
@@ -887,6 +975,10 @@ def schedule_view(request):
     return render(request, 'AdminView_4_Schedule.html', context)
 
 def feedback(request):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
     search_query = request.GET.get('search', '').strip()
     sort_order = request.GET.get('name_sort', 'asc')
     rows_param = request.GET.get('rows', '5')
@@ -924,6 +1016,10 @@ def feedback(request):
 
 @require_http_methods(["GET", "POST"])
 def view_feedback(request, applicant_status_id):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
     # Fetch the specific applicant using the provided ID
     applicant = get_object_or_404(ListOfApplicantsWithStatusAndCredentials, pk=applicant_status_id)
     
@@ -951,6 +1047,10 @@ def view_feedback(request, applicant_status_id):
 
 
 def adminprofile(request):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
     # Assuming the user's ID is stored in session
     account_id = request.session.get('account_id')
     user = get_object_or_404(AccountInformation, account_id=account_id)
@@ -982,7 +1082,235 @@ def adminprofile(request):
         'email': user.email
     }
     return render(request, 'AdminView_6_Profile.html', context)
+
+def add_accounts(request):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
+    if request.method == 'POST':
+        # Birthday validation
+        birthday = request.POST.get('birthday')
+        if birthday:
+            birth_date = date.fromisoformat(birthday)
+            today = date.today()
+            age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
+            if age < 18:
+                messages.error(request, "Users must be at least 18 years old.")
+                return redirect('add_accounts')
+        
+        # Continue processing the form if email and age are valid
+    return render(request, 'AdminView_6_2_AddAccounts.html')
+
+def manage_accounts(request):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
+    # Fetch search, sort, and rows parameters from GET
+    search_query = request.GET.get('search', '').strip()
+    sort_order = request.GET.get('sort', 'asc')
+    rows_param = request.GET.get('rows', '5')
+
+    # Set rows per page with a default of 5
+    rows_per_page = int(rows_param) if rows_param.isdigit() and int(rows_param) > 0 else 5
+    rows_per_page = min(rows_per_page, 15)
+
+    # Filter accounts based on search query
+    if search_query:
+        accounts = AccountStorage.objects.filter(account__username__icontains=search_query)
+    else:
+        accounts = AccountStorage.objects.all()
+
+    # Sort accounts based on sort order
+    if sort_order == 'desc':
+        accounts = accounts.order_by('-account__username')
+    else:
+        accounts = accounts.order_by('account__username')
+
+    # Check if there are no matching accounts
+    no_match = not accounts.exists()
+
+    # Reactivate or deactivate accounts based on button press
+    if request.method == "POST":
+        action = request.POST.get('action')
+        role_id = int(request.POST.get('role_id'))
+        account_storage = AccountStorage.objects.get(role_id=role_id)
+
+        # Update the account status based on the action
+        if action == 'deactivate' and account_storage.account_status == 'active':
+            account_storage.account_status = 'deactivated'
+            messages.success(request, "Updated status to deactivated.")
+        elif action == 'reactivate' and account_storage.account_status == 'deactivated':
+            account_storage.account_status = 'active'
+            messages.success(request, "Updated status to active.")
+        elif account_storage.account_status == 'active':
+            messages.info(request, "The account is already active.")
+
+        account_storage.save()
+
+        # Redirect to the same page with all parameters preserved
+        query_params = request.GET.copy()  # Copies all current GET parameters
+        return HttpResponseRedirect(f"{reverse('manage_accounts')}?{query_params.urlencode()}")
+
+    # Pagination
+    paginator = Paginator(accounts, rows_per_page)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'sort_order': sort_order,
+        'rows_param': rows_param,
+        'no_match': no_match,  # Pass the no_match flag to the template
+    }
+    return render(request, 'AdminView_6_1_manage_accounts.html', context)
+
+def Registration(request):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
+    if request.method == 'POST':
+        form = AccountInformationForm(request.POST)
+        if form.is_valid():
+            account_info = form.save()  # Save the AccountInformation instance
+            
+            # Create the corresponding AccountStorage entry
+            AccountStorage.objects.create(
+                account=account_info,  # Link to the account
+                role='applicant',  # Set role as 'applicant'
+                account_status='active'  # Set account status as 'active'
+            )
+            
+            # Redirect to a success page or login
+            return redirect('login')  # Change 'success_page' to the actual success page you have
+    else:
+        form = AccountInformationForm()
     
+    return render(request, 'registration.html', {'form': form})
+
+def admin_interviewer_account_setup(request):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
+    if request.method == 'POST':
+        try:
+            # Get the form data
+            role = request.POST.get('role').lower()
+            birthday = request.POST.get('birthday')
+            gender = request.POST.get('gender')
+            first_name = request.POST.get('first_name')
+            middle_name = request.POST.get('middle_name')
+            last_name = request.POST.get('last_name')
+            email = request.POST.get('email')
+
+            # Ensure all required fields are provided
+            if not (role and birthday and gender and first_name and last_name and email):
+                return render(request, 'users_app/AdminView_6_2_AddAccounts.html', {"message": "Missing required fields. Please fill out the form completely."})
+
+            # Check if the birthday is not empty and compute age
+            birth_date = datetime.strptime(birthday, "%Y-%m-%d")
+            today = datetime.today()
+            age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
+
+            # Generate default username and password
+            base_username = f"{first_name.lower().replace(' ', '')}@bynhr.com"
+            password = last_name.lower().replace(' ', '')  # Use the last name as the default password and remove spaces
+
+            # Check if the username already exists and make it unique if needed
+            username = base_username
+            count = 1
+            while AccountInformation.objects.filter(username=username).exists():
+                username = f"{base_username}_{count}"
+                count += 1
+
+            # Step 1: Save data to AccountInformation, including the email field
+            account_info = AccountInformation(
+                first_name=first_name,
+                middle_name=middle_name,
+                last_name=last_name,
+                birth_date=birth_date,
+                gender=gender,
+                username=username,
+                password=password,
+                email=email,
+                age=age
+            )
+            account_info.save()  # Save to the database
+
+            # Step 2: Save data to AccountStorage with the role
+            account_storage = AccountStorage(
+                account=account_info,  # Link to the saved AccountInformation instance
+                role=role,
+                account_status='new'  # Default status or customize as needed
+            )
+            account_storage.save()  # Save to the database
+
+            # Redirect to the profile admin page
+            messages.success(request, f"Account created successfully with username: {username}")
+            return redirect('adminprofile')
+
+        except Exception as e:
+            # Handle any errors
+            return render(request, 'users_app/AdminView_6_2_AddAccounts.html', {"message": f"An error occurred: {str(e)}"})
+
+    # Render the form if it's not a POST request
+    return render(request, 'users_app/AdminView_6_2_AddAccounts.html')
+
+def admin_creatingjob(request):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
+    if request.method == 'POST':
+        # Get the form data
+        status = request.POST.get('status')
+        job_title = request.POST.get('job_title')
+        job_benefits = request.POST.get('job_benefits')
+        company = request.POST.get('company')
+        job_description = request.POST.get('job_description')
+        job_requirements = request.POST.get('job_requirements')
+
+        # Set the job_date_published to today's date
+        job_date_published = datetime.now().date()
+
+        # Fetch the account ID from the session
+        account_id = request.session.get('account_id')
+
+        # Ensure the account ID is present and valid
+        if account_id:
+            account = get_object_or_404(AccountInformation, account_id=account_id)
+        else:
+            return redirect('login')  # Redirect to login if no user is logged in
+        
+         # Validate required fields
+        if not (status and job_title and company and job_description and job_requirements):
+            return render(request, 'users_app/create_job.html', {'error': 'All fields are required'})
+        
+        # Create and save the job entry
+        new_job = JobDetailsAndRequirements(
+            account=account,
+            job_title=job_title,
+            job_company=company,
+            job_description=job_description,
+            job_benefits=job_benefits,
+            job_requirements=job_requirements,
+            job_status=status,
+            job_date_published=job_date_published
+        )
+        new_job.save()
+
+        # Redirect to a relevant page (e.g., list of jobs) after saving
+        return redirect('list_of_jobs')  # Adjust to your desired URL
+
+    # Render the form if it's a GET request
+    return render(request, 'users_app/create_job.html')
+
+###########################ADMIN RETRIEVAL####################################
+
 #WEIN BAGO DAGDAG 11-11-2024
 from django.contrib import messages
 
@@ -1019,6 +1347,10 @@ def interviewer_feedback(request):
     return render(request, 'Feedback.html', {'applicants': applicants})
 
 def interviewer_editfeedback(request, applicant_status_id):
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
     # Retrieve the applicant using the applicant_status_id
     applicant = ListOfApplicantsWithStatusAndCredentials.objects.get(applicant_status_id=applicant_status_id)
 
@@ -1119,6 +1451,10 @@ def interviewer_history(request):
 
 def interviewer_profile(request):
     # Get the interviewer's account ID from the session
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+        
     account_id = request.session.get('account_id')
     user = get_object_or_404(AccountInformation, account_id=account_id)
 
@@ -1152,216 +1488,13 @@ def interviewer_profile(request):
 
 # 11-11-2024
 
-def add_accounts(request):
-    if request.method == 'POST':
-        # Birthday validation
-        birthday = request.POST.get('birthday')
-        if birthday:
-            birth_date = date.fromisoformat(birthday)
-            today = date.today()
-            age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
-            if age < 18:
-                messages.error(request, "Users must be at least 18 years old.")
-                return redirect('add_accounts')
-        
-        # Continue processing the form if email and age are valid
-    return render(request, 'AdminView_6_2_AddAccounts.html')
-
-def manage_accounts(request):
-    # Fetch search, sort, and rows parameters from GET
-    search_query = request.GET.get('search', '').strip()
-    sort_order = request.GET.get('sort', 'asc')
-    rows_param = request.GET.get('rows', '5')
-
-    # Set rows per page with a default of 5
-    rows_per_page = int(rows_param) if rows_param.isdigit() and int(rows_param) > 0 else 5
-    rows_per_page = min(rows_per_page, 15)
-
-    # Filter accounts based on search query
-    if search_query:
-        accounts = AccountStorage.objects.filter(account__username__icontains=search_query)
-    else:
-        accounts = AccountStorage.objects.all()
-
-    # Sort accounts based on sort order
-    if sort_order == 'desc':
-        accounts = accounts.order_by('-account__username')
-    else:
-        accounts = accounts.order_by('account__username')
-
-    # Check if there are no matching accounts
-    no_match = not accounts.exists()
-
-    # Reactivate or deactivate accounts based on button press
-    if request.method == "POST":
-        action = request.POST.get('action')
-        role_id = int(request.POST.get('role_id'))
-        account_storage = AccountStorage.objects.get(role_id=role_id)
-
-        # Update the account status based on the action
-        if action == 'deactivate' and account_storage.account_status == 'active':
-            account_storage.account_status = 'deactivated'
-            messages.success(request, "Updated status to deactivated.")
-        elif action == 'reactivate' and account_storage.account_status == 'deactivated':
-            account_storage.account_status = 'active'
-            messages.success(request, "Updated status to active.")
-        elif account_storage.account_status == 'active':
-            messages.info(request, "The account is already active.")
-
-        account_storage.save()
-
-        # Redirect to the same page with all parameters preserved
-        query_params = request.GET.copy()  # Copies all current GET parameters
-        return HttpResponseRedirect(f"{reverse('manage_accounts')}?{query_params.urlencode()}")
-
-    # Pagination
-    paginator = Paginator(accounts, rows_per_page)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-
-    context = {
-        'page_obj': page_obj,
-        'search_query': search_query,
-        'sort_order': sort_order,
-        'rows_param': rows_param,
-        'no_match': no_match,  # Pass the no_match flag to the template
-    }
-    return render(request, 'AdminView_6_1_manage_accounts.html', context)
-
-def Registration(request):
-    if request.method == 'POST':
-        form = AccountInformationForm(request.POST)
-        if form.is_valid():
-            account_info = form.save()  # Save the AccountInformation instance
-            
-            # Create the corresponding AccountStorage entry
-            AccountStorage.objects.create(
-                account=account_info,  # Link to the account
-                role='applicant',  # Set role as 'applicant'
-                account_status='active'  # Set account status as 'active'
-            )
-            
-            # Redirect to a success page or login
-            return redirect('login')  # Change 'success_page' to the actual success page you have
-    else:
-        form = AccountInformationForm()
-    
-    return render(request, 'registration.html', {'form': form})
-
-def admin_interviewer_account_setup(request):
-    if request.method == 'POST':
-        try:
-            # Get the form data
-            role = request.POST.get('role').lower()
-            birthday = request.POST.get('birthday')
-            gender = request.POST.get('gender')
-            first_name = request.POST.get('first_name')
-            middle_name = request.POST.get('middle_name')
-            last_name = request.POST.get('last_name')
-            email = request.POST.get('email')
-
-            # Ensure all required fields are provided
-            if not (role and birthday and gender and first_name and last_name and email):
-                return render(request, 'users_app/AdminView_6_2_AddAccounts.html', {"message": "Missing required fields. Please fill out the form completely."})
-
-            # Check if the birthday is not empty and compute age
-            birth_date = datetime.strptime(birthday, "%Y-%m-%d")
-            today = datetime.today()
-            age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
-
-            # Generate default username and password
-            base_username = f"{first_name.lower().replace(' ', '')}@bynhr.com"
-            password = last_name.lower().replace(' ', '')  # Use the last name as the default password and remove spaces
-
-            # Check if the username already exists and make it unique if needed
-            username = base_username
-            count = 1
-            while AccountInformation.objects.filter(username=username).exists():
-                username = f"{base_username}_{count}"
-                count += 1
-
-            # Step 1: Save data to AccountInformation, including the email field
-            account_info = AccountInformation(
-                first_name=first_name,
-                middle_name=middle_name,
-                last_name=last_name,
-                birth_date=birth_date,
-                gender=gender,
-                username=username,
-                password=password,
-                email=email,
-                age=age
-            )
-            account_info.save()  # Save to the database
-
-            # Step 2: Save data to AccountStorage with the role
-            account_storage = AccountStorage(
-                account=account_info,  # Link to the saved AccountInformation instance
-                role=role,
-                account_status='new'  # Default status or customize as needed
-            )
-            account_storage.save()  # Save to the database
-
-            # Redirect to the profile admin page
-            messages.success(request, f"Account created successfully with username: {username}")
-            return redirect('adminprofile')
-
-        except Exception as e:
-            # Handle any errors
-            return render(request, 'users_app/AdminView_6_2_AddAccounts.html', {"message": f"An error occurred: {str(e)}"})
-
-    # Render the form if it's not a POST request
-    return render(request, 'users_app/AdminView_6_2_AddAccounts.html')
-
-def admin_creatingjob(request):
-    if request.method == 'POST':
-        # Get the form data
-        status = request.POST.get('status')
-        job_title = request.POST.get('job_title')
-        job_benefits = request.POST.get('job_benefits')
-        company = request.POST.get('company')
-        job_description = request.POST.get('job_description')
-        job_requirements = request.POST.get('job_requirements')
-
-        # Set the job_date_published to today's date
-        job_date_published = datetime.now().date()
-
-        # Fetch the account ID from the session
-        account_id = request.session.get('account_id')
-
-        # Ensure the account ID is present and valid
-        if account_id:
-            account = get_object_or_404(AccountInformation, account_id=account_id)
-        else:
-            return redirect('login')  # Redirect to login if no user is logged in
-        
-         # Validate required fields
-        if not (status and job_title and company and job_description and job_requirements):
-            return render(request, 'users_app/create_job.html', {'error': 'All fields are required'})
-        
-        # Create and save the job entry
-        new_job = JobDetailsAndRequirements(
-            account=account,
-            job_title=job_title,
-            job_company=company,
-            job_description=job_description,
-            job_benefits=job_benefits,
-            job_requirements=job_requirements,
-            job_status=status,
-            job_date_published=job_date_published
-        )
-        new_job.save()
-
-        # Redirect to a relevant page (e.g., list of jobs) after saving
-        return redirect('list_of_jobs')  # Adjust to your desired URL
-
-    # Render the form if it's a GET request
-    return render(request, 'users_app/create_job.html')
-
-###########################ADMIN RETRIEVAL####################################
-
-
 ############################index##########################################
+def ensure_authenticated(request):
+    if 'account_id' not in request.session:
+        messages.error(request, "You must log in first.")
+        return redirect('login')
+    return None
+
 def login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
