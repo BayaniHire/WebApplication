@@ -1,4 +1,9 @@
+from datetime import timedelta
+from django.utils.timezone import now
 from django.db import models
+import logging
+
+logger = logging.getLogger(__name__)
 
 class AccountInformation(models.Model):
     account_id = models.AutoField(primary_key=True)
@@ -85,14 +90,14 @@ class OTPVerification(models.Model):
     account = models.ForeignKey(
         AccountInformation,
         on_delete=models.CASCADE,
-        null=True,  # Allow null for existing rows
-        blank=True  # Allow blank in forms or admin if needed
+        null=True,  
+        blank=True  
     )
 
     def is_expired(self):
-        from django.utils.timezone import now, timedelta
-        return now() > self.created_at + timedelta(minutes=30)
-
+        expiration_time = self.created_at + timedelta(minutes=30)
+        return now() > expiration_time
+    
     
     def __str__(self):
         return f"OTP for {self.email} - {self.otp}"
