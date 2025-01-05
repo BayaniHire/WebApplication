@@ -123,3 +123,9 @@ EMAIL_HOST_USER = 'automatedbayanihire@gmail.com'
 EMAIL_HOST_PASSWORD = 'ddgp irir jfxq tkdq'  
 DEFAULT_FROM_EMAIL = 'automatedbayanihire@gmail.com'  
 SITE_ID = 1
+
+# Session Configuration
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Store sessions in the database
+SESSION_COOKIE_AGE = 1800  # Session valid for 30 minutes (in seconds)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Keep session alive even after closing the browser
+SESSION_SAVE_EVERY_REQUEST = True  # Reset session expiry on each request
