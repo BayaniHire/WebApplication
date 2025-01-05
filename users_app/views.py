@@ -1729,7 +1729,8 @@ def send_otp_to_email(email, otp):
                 <p style="color: #000000;">Dear User,</p>
                 <p style="color:  #000000;">Your One-Time Password (OTP) is:</p>
                 <h2 style="color: red;">{otp}</h2>
-                <p style="color:  #000000;">Please use this OTP to complete your login process. Do not share this code with anyone.</p>
+                <p style="color:  #000000;">Please use this OTP to complete your login process. Do not share this code with anyone. If you need a new OTP, you can click the 
+                "Resend OTP Code" link in the system. Please note that if you do not click the link, the OTP code will remain the same.</p>
                 <p style="color:  #000000;">Thank you for using BayaniHire!</p>
             </div>
         </body>
