@@ -54,6 +54,7 @@ from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth import logout
+from django.utils.timezone import now, timedelta
 
 def logout_view(request):
     logout(request)
@@ -1631,8 +1632,10 @@ def Index(request):  # Capitalize the function name to match the URL pattern
 
 
 # Email Function
+@csrf_exempt
 def verify_otp(request):
     if request.method == 'POST':
+        print(f"Session Email: {request.session.get('email')}")
         otp_code = request.POST.get('otp_code')
         email = request.session.get('email')
 
@@ -1642,40 +1645,39 @@ def verify_otp(request):
             })
 
         try:
-            otp_record = OTPVerification.objects.get(email=email, otp=otp_code, is_used=False)
+            # Fetch the latest unused OTP for the email
+            otp_record = OTPVerification.objects.filter(email=email, is_used=False).latest('created_at')
 
-            # Check if account is linked
-            if not otp_record.account:
-                try:
-                    account = AccountInformation.objects.get(email=email)
-                    otp_record.account = account
-                    otp_record.save()
-                except AccountInformation.DoesNotExist:
-                    return render(request, 'email_confirmation.html', {
-                        'error': 'Account not found. Please contact support.'
-                    })
+            # Validate OTP and expiration
+            if otp_record.otp != otp_code:
+                return render(request, 'email_confirmation.html', {
+                    'error': 'Invalid OTP. Please try again.'
+                })
 
-            # Check if OTP is expired
             if otp_record.is_expired():
                 return render(request, 'email_confirmation.html', {
                     'error': 'OTP has expired. Please request a new one.'
                 })
 
-            # Mark OTP as used
+            # Mark OTP as used only after successful verification
             otp_record.is_used = True
             otp_record.save()
 
-            # Store account_id in the session for password reset
+            # Store account_id in the session for further actions
             request.session['account_id'] = otp_record.account.account_id
 
+            # Redirect to the password reset page
             return redirect('force_change_password')
 
         except OTPVerification.DoesNotExist:
             return render(request, 'email_confirmation.html', {
-                'error': 'Invalid OTP. Please try again or request a new code.'
+                'error': 'No valid OTP found. Please request a new code.'
             })
 
     return JsonResponse({'success': False, 'error': 'Invalid request method.'})
+
+
+
 
 
 def generate_otp(email):
@@ -1684,12 +1686,24 @@ def generate_otp(email):
     except AccountInformation.DoesNotExist:
         return {"success": False, "error": "Account not found for the provided email."}
 
-    otp = OTPVerification.objects.create(
+    # Check for an existing unused OTP
+    existing_otp = OTPVerification.objects.filter(email=email, is_used=False).first()
+    if existing_otp:
+        # Reuse the existing OTP
+        return {"success": True, "otp": existing_otp.otp}
+
+    # Generate a new OTP
+    otp = ''.join(random.choices(string.digits, k=2)) + ''.join(random.choices(string.ascii_letters, k=4))
+    
+    # Create a new OTP record
+    otp_record = OTPVerification.objects.create(
         email=email,
-        otp=''.join(random.choices(string.digits, k=2)) + ''.join(random.choices(string.ascii_letters, k=4)),
-        account=account
+        otp=otp,
+        created_at=now(),
+        account=account  # Ensure the account is linked
     )
-    return {"success": True, "otp": otp.otp}
+    return {"success": True, "otp": otp_record.otp}
+
 
     
 
@@ -1697,12 +1711,14 @@ def force_change_password(request):
     return render(request, 'force_change_password.html')
 
 def send_otp_to_email(email, otp):
-    # Delete previous OTPs for the same email
-    OTPVerification.objects.filter(email=email, is_used=False).delete()
+    # Fetch or generate a new OTP
+    otp_data = generate_otp(email)
+    if not otp_data["success"]:
+        raise ValueError(otp_data["error"])
 
-    # Create a new OTP record
-    OTPVerification.objects.create(email=email, otp=otp, created_at=timezone.now())
+    otp = otp_data["otp"]
 
+    
     # Construct the email subject and HTML content
     subject = 'Your OTP Code for BayaniHire'
     html_content = f"""
@@ -1736,29 +1752,31 @@ def forgot_password(request):
     if request.method == "POST":
         email = request.POST.get('email')
 
-        # Ensure the email exists in AccountInformation
+        # Check if the email exists in AccountInformation
         try:
             account = AccountInformation.objects.get(email=email)
         except AccountInformation.DoesNotExist:
-            messages.error(request, "Email is not associated with any account.")
-            return render(request, 'forgot_password.html')
+            return render(request, 'forgot_password.html', {
+                'error': 'Email is not associated with any account.'
+            })
 
-        # Generate and save OTP
-        result = generate_otp(email)  # Pass the email to generate_otp
-        if not result['success']:
-            messages.error(request, result['error'])
-            return render(request, 'forgot_password.html')
+        # Save email in session and reset the expiration
+        request.session['email'] = email
+        request.session.set_expiry(1800)  # Extend session expiry by 30 minutes
 
-        otp = result['otp']  # Retrieve the generated OTP
+        # Generate a new OTP
+        otp_data = generate_otp(email)
+        if not otp_data["success"]:
+            return render(request, 'forgot_password.html', {
+                'error': otp_data["error"]
+            })
 
-        # Mark old OTPs as used
-        OTPVerification.objects.filter(email=email, is_used=False).update(is_used=True)
+        # Send the OTP to the user's email
+        send_otp_to_email(email, otp_data["otp"])
 
-        # Send the OTP via email
-        send_otp_to_email(email, otp)
-
-        messages.success(request, "OTP has been sent to your email.")
-        return render(request, 'email_confirmation.html')
+        return render(request, 'email_confirmation.html', {
+            'success_message': 'OTP has been sent to your email.'
+        })
 
     return render(request, 'forgot_password.html')
 
@@ -1766,20 +1784,22 @@ def forgot_password(request):
 def resend_otp(request):
     email = request.session.get('email')  # Retrieve email from session
     if email:
-        otp_data = generate_otp(email)  # Call the generate_otp function
-        if otp_data.get("success"):  # Check if the operation was successful
-            otp = otp_data.get("otp")  # Extract the OTP string
-            send_otp_to_email(email, otp)  # Send OTP to the email address
-            request.session['otp'] = otp  # Update the OTP in session
+        otp_data = generate_otp(email)
+        if otp_data.get("success"):
+            otp = otp_data.get("otp")
+            send_otp_to_email(email, otp)
 
-            messages.success(request, "OTP has been resent to your email.")
-            return render(request, 'email_confirmation.html')  # Re-render OTP confirmation page
+            # Refresh the session expiration
+            request.session.set_expiry(1800)  # Extend session expiry by 30 minutes
+
+            return render(request, 'email_confirmation.html', {
+                'success_message': 'OTP has been resent to your email.'
+            })
         else:
-            messages.error(request, otp_data.get("error", "An error occurred while generating OTP."))
-            return redirect('forgot_password')  # Redirect if OTP generation fails
+            return redirect('forgot_password')
     else:
-        messages.error(request, "No email found for OTP resend.")
-        return redirect('forgot_password')  # Redirect if no email exists
+        return redirect('forgot_password')
+
 
 
 
@@ -1812,8 +1832,3 @@ def reset_password_view(request):
             return JsonResponse({"success": False, "error": "Account not found."})
 
     return JsonResponse({"success": False, "error": "Invalid request."})
-
-
-
-
-
