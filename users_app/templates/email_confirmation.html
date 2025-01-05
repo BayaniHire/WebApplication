@@ -81,7 +81,7 @@
             if (timeLeft > 0) {
                 const minutes = Math.floor(timeLeft / 60);
                 const seconds = timeLeft % 60;
-                countdownTimer.textContent = `You can resend the OTP in ${minutes}m ${seconds}s`;
+                countdownTimer.textContent = `You can request a new OTP in ${minutes}m ${seconds}s`;
                 timeLeft--;
             } else {
                 countdownTimer.textContent = '';
