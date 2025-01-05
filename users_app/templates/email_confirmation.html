@@ -20,9 +20,12 @@
         <!-- Icon Image -->
         <img src="{% static 'mobile.png' %}" alt="Confirmation Icon" width="128" height="128" class="content-image">
 
+        <p id="countdown-timer" style="color: red; font-weight: bold;"></p>
+
         <!-- Additional Instructions with Resend Link -->
         <p class="additional-instructions">
-            Didn't receive the OTP code? <a href="{% url 'resend_otp' %}">Resend OTP Code</a>
+            Didn't receive the OTP code? 
+            <a href="{% url 'resend_otp' %}" id="resend-otp-link" class="disabled-link">Resend OTP Code</a>
         </p>
 
         <!-- OTP Confirmation Form -->
@@ -35,13 +38,14 @@
 
             <!-- Display success messages -->
             {% if success_message %}    
-                <p style="color: green; font-weight: bold;">{{ success_message }}</p>
+                <p id="success-message" style="color: green; font-weight: bold;">{{ success_message }}</p>
             {% endif %}
 
             <!-- Display errors -->
             {% if error %}
-                <p style="color: red;">{{ error }}</p>
+                <p id="error-message" style="color: red;">{{ error }}</p>
             {% endif %}
+
 
             <!-- Buttons: Cancel and Verify -->
             <div class="button-container">
@@ -61,5 +65,64 @@
     <footer>
         &copy; 2024 BayaniHire. All Rights Reserved.
     </footer>
+
+    <script>
+        // Timer Logic
+        const countdownTimer = document.getElementById('countdown-timer');
+        const resendOtpLink = document.getElementById('resend-otp-link');
+        const initialTimeLeft = {{ remaining_time|default:1500 }}; // Time in seconds from backend
+        let timeLeft = initialTimeLeft;
+
+        // Disable the link initially
+        resendOtpLink.classList.add('disabled-link');
+        resendOtpLink.href = "javascript:void(0);"; // Disable link functionality
+
+        function updateTimer() {
+            if (timeLeft > 0) {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                countdownTimer.textContent = `You can resend the OTP in ${minutes}m ${seconds}s`;
+                timeLeft--;
+            } else {
+                countdownTimer.textContent = '';
+                resendOtpLink.classList.remove('disabled-link');
+                resendOtpLink.href = "{% url 'resend_otp' %}"; // Enable link functionality
+            }
+        }
+
+        // Start the countdown
+        setInterval(updateTimer, 1000);
+   
+
+        // Function to hide messages after 3 seconds
+        function hideMessages() {
+            const successMessage = document.getElementById('success-message');
+            const errorMessage = document.getElementById('error-message');
+            if (successMessage) {
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                }, 3000); // Hide after 3 seconds
+            }
+            if (errorMessage) {
+                setTimeout(() => {
+                    errorMessage.style.display = 'none';
+                }, 3000); // Hide after 3 seconds
+            }
+        }
+
+        // Call the function to hide messages
+        hideMessages();
+    </script>
+
+    <style>
+        .disabled-link {
+            pointer-events: none;
+            color: gray;
+            text-decoration: none;
+        }
+    </style>
 </body>
 </html>
+
+
+
