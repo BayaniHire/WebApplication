@@ -1747,7 +1747,6 @@ def send_otp_to_email(email, otp):
     email_message.send()
 
 
-
 def forgot_password(request):
     if request.method == "POST":
         email = request.POST.get('email')
@@ -1773,6 +1772,9 @@ def forgot_password(request):
 
         # Send the OTP to the user's email
         send_otp_to_email(email, otp_data["otp"])
+        
+        # Calculate remaining time for the countdown
+        remaining_time = 1800  # 30 minutes in seconds
 
         return render(request, 'email_confirmation.html', {
             'success_message': 'OTP has been sent to your email.'
@@ -1784,21 +1786,30 @@ def forgot_password(request):
 def resend_otp(request):
     email = request.session.get('email')  # Retrieve email from session
     if email:
+        # Mark all unused OTPs as used
+        OTPVerification.objects.filter(email=email, is_used=False).update(is_used=True)
+
+        # Generate a new OTP
         otp_data = generate_otp(email)
         if otp_data.get("success"):
             otp = otp_data.get("otp")
             send_otp_to_email(email, otp)
 
-            # Refresh the session expiration
-            request.session.set_expiry(1800)  # Extend session expiry by 30 minutes
+            # Extend session expiration
+            request.session.set_expiry(3600)  # Extend session expiry by 30 minutes
 
+            # Render the email_confirmation.html with a success message
             return render(request, 'email_confirmation.html', {
                 'success_message': 'OTP has been resent to your email.'
             })
         else:
-            return redirect('forgot_password')
+            return render(request, 'email_confirmation.html', {
+                'error': 'Failed to generate OTP. Please try again.'
+            })
     else:
-        return redirect('forgot_password')
+        return render(request, 'login.html', {
+            'error': 'Session expired. Please log in again.'
+        })
 
 
 
