@@ -33,6 +33,11 @@
                 <input type="text" id="otp-code" name="otp_code" required placeholder="Enter OTP Code">
             </label>
 
+            <!-- Display success messages -->
+            {% if success_message %}    
+                <p style="color: green; font-weight: bold;">{{ success_message }}</p>
+            {% endif %}
+
             <!-- Display errors -->
             {% if error %}
                 <p style="color: red;">{{ error }}</p>
