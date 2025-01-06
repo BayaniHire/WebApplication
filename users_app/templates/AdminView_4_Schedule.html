@@ -19,7 +19,7 @@
             <form method="GET" action="" id="interviewerForm">
                 <input type="text" name="search_interviewer" id="searchInterviewer" value="{{ search_query_interviewer }}" placeholder="Search Interviewer" class="form-control mb-2">
                 <input type="number" name="rows_interviewer" min="1" max="10" value="{{ rows_interviewer }}" class="form-control mb-2" placeholder="Rows per page">
-                <button type="submit" class="btn btn-primary mb-3">Set Rows</button>
+                <button type="submit" class="sfbutton">Set Rows</button>
             </form>
     
             <!-- Interviewer Selection Table -->
@@ -46,7 +46,7 @@
                 </table>
                 <label for="interview_date">Interview Date:</label>
                 <input type="date" name="interview_date" class="form-control w-auto d-inline" required>
-                <button type="submit" class="btn btn-primary mt-2">Schedule Interview</button>
+                <button type="submit" class="sfbutton">Schedule Interview</button>
             </form>
     
             <!-- Pagination Controls for Interviewer Table -->
@@ -71,7 +71,7 @@
             <form method="GET" action="" id="scheduleForm">
                 <input type="text" name="search_schedule" id="searchSchedule" value="{{ search_query_schedule }}" placeholder="Search Interview Schedule" class="form-control mb-2">
                 <input type="number" name="rows_schedule" min="1" max="10" value="{{ rows_schedule }}" class="form-control mb-2" placeholder="Rows per page">
-                <button type="submit" class="btn btn-primary mb-3">Set Rows</button>
+                <button type="submit" class="sfbutton">Set Rows</button>
             </form>
     
             <!-- Interview Schedule Table -->
