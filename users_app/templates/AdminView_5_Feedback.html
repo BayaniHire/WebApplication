@@ -9,7 +9,7 @@
     <!-- Search, Sorting, and Rows per Page Form -->
     <form method="GET" action="" class="form-inline" id="filterForm">
         <input type="text" name="search" id="search-input" value="{{ search_query }}" placeholder="Search by Applicant's Name" class="form-control mr-2">
-        <button type="submit" class="btn btn-secondary mr-2">Search</button>
+        <button type="submit" class="sfbutton">Search</button>
 
         <!-- Sort by Name -->
         <select name="name_sort" class="form-control mr-2" onchange="document.getElementById('filterForm').submit()">
@@ -19,10 +19,10 @@
 
         <!-- Rows per Page -->
         <input type="number" name="rows" min="1" max="10" value="{{ rows_per_page }}" class="form-control mr-2" placeholder="Rows per page">
-        <button type="submit" class="btn btn-primary">Set Rows</button>
+        <button type="submit" class="sfbutton">Set Rows</button>
     </form>
 
-    <table id="applicantsTable" border="1" width="100%">
+    <table class="interviewer-table">
         <thead>
             <tr>
                 <th>No.</th>
@@ -45,7 +45,7 @@
                     <td>{{ applicant.interviewer_feedback_status }}</td>
                     <td>{{ applicant.applicant_status }}</td>
                     <td>
-                        <button class="btn btn-info btn-sm" onclick="window.location.href='{% url 'view_feedback' applicant.applicant_status_id %}';">View Feedback</button>
+                        <button class="bodybutton" onclick="window.location.href='{% url 'view_feedback' applicant.applicant_status_id %}';">View Feedback</button>
                     </td>
                 </tr>
                 {% endfor %}
