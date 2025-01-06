@@ -21,7 +21,7 @@
         <form method="GET" id="sort-form" class="d-flex align-items-center" style="gap: 10px;">
             <input type="number" id="row-count" name="rows" placeholder="Enter number of rows..." min="1" max="10" 
                    class="form-control w-auto" style="padding: 10px;" value="{{ request.GET.rows|default:'5' }}">
-            <button type="submit" class="btn btn-secondary">Set Rows</button>
+            <button type="submit" class="sfbutton">Set Rows</button>
             <select id="sort-select" class="form-control w-auto" name="sort" onchange="document.getElementById('sort-form').submit()">
                 <option value="asc" {% if request.GET.sort == 'asc' %}selected{% endif %}>Sort Username A-Z</option>
                 <option value="desc" {% if request.GET.sort == 'desc' %}selected{% endif %}>Sort Username Z-A</option>
@@ -32,7 +32,7 @@
         <form method="GET" action="{% url 'manage_accounts' %}" class="d-flex align-items-center" style="gap: 10px;">
             <input type="text" id="search-input" name="search" placeholder="Search by username..." value="{{ search_query }}" 
                    class="form-control w-auto" style="padding: 10px;">
-            <button type="submit" class="btn btn-primary">Search</button>
+            <button type="submit" class="sfbutton">Search</button>
         </form>
     </div>
 
