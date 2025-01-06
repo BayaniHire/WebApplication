@@ -11,29 +11,29 @@
     <p>Number of New Applicants: <span style="color: red; ">{{ total_applicants }}</span></p>
 
     <form method="GET" action="" class="d-flex align-items-center mb-3">
-        <select name="sort" class="form-control mr-2" onchange="this.form.submit()">
+        <select name="sort" class="AD-admin-sort-dropdown" onchange="this.form.submit()">
             <option value="asc" {% if sort_order == 'asc' %}selected{% endif %}>Sort Name A-Z</option>
             <option value="desc" {% if sort_order == 'desc' %}selected{% endif %}>Sort Name Z-A</option>
         </select>
     
-        <select name="date_sort" class="form-control mr-2" onchange="this.form.submit()">
+        <select name="date_sort" class="AD-admin-sort-dropdown" onchange="this.form.submit()">
             <option value="asc" {% if date_sort == 'asc' %}selected{% endif %}>Date Applied Ascending</option>
             <option value="desc" {% if date_sort == 'desc' %}selected{% endif %}>Date Applied Descending</option>
         </select>
     
-        <input type="text" name="search" value="{{ search_query }}" class="form-control mr-2" placeholder="Search by name..." style="width: 25%;">
+        <input type="text" name="search" value="{{ search_query }}" class="applicant-search-input" placeholder="Search by name..." style="width: 25%;">
     
-        <button type="submit" class="btn btn-secondary mr-2">Search</button>
+        <button type="submit" class="applicant-search-button">Search</button>
     
         <input type="number" name="rows" min="1" max="10" value="{{ rows_per_page }}" class="form-control mr-2" placeholder="Rows per page">
     
-        <button type="submit" class="btn btn-primary">Set Rows</button>
+        <button type="submit" class="applicant-search-button">Set Rows</button>
     </form>
     
     <!-- Table displaying applicant data -->
-    <div class="table-container">
-        <table style="width: 100%; border-collapse: collapse;">
-            <thead class="thead-dark">
+    <div class="interviewer-table-container">
+        <table class="interviewer-table">
+            <thead>
                 <tr>
                     <th>No.</th>
                     <th>Applicant Name</th>
@@ -55,7 +55,7 @@
                         <td>{{ applicant.date_applied }}</td>
                         <td>{{ applicant.status }}</td>
                         <td>
-                            <button class="btn btn-info btn-sm" onclick="window.location.href='{% url 'open_applicants' applicant.applicant_status_id %}';">Open</button>
+                            <button class="bodybutton" onclick="window.location.href='{% url 'open_applicants' applicant.applicant_status_id %}';">Open</button>
                         </td>
                     </tr>
                     {% endfor %}
