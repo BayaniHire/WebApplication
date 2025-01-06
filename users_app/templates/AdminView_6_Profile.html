@@ -1,91 +1,81 @@
-{% extends "Admin_Inheritance.html" %}  <!-- Replace with your actual base template filename -->
+{% extends "Admin_Inheritance.html" %}
 
 {% block title %}BayaniHire: Admin Center{% endblock %}
 
 {% block content %}
-<div class="main-content" style="padding: 0; margin: 0; text-align: center; display: flex; flex-direction: column; align-items: center;"></div>
-    <h2 style="font-size: 36px; font-weight: bold; text-align: center;">User Profile:</h2>
+<h2 class="features-title user-profile-title">User Profile</h2>
 
-
-    <div style="display: flex; align-items: center; font-family: Georgia;">
-        <label style="font-size: 30px; font-weight: bold;">Username:</label>
-        <span style="font-size: 24px; margin-left: 10px;">{{ username }}</span>
-    </div>
-
-    <div style="display: flex; align-items: center; font-family: Georgia;">
-        <label style="font-size: 30px; font-weight: bold;">Name:</label>
-        <span style="font-size: 24px; margin-left: 10px;">{{ full_name }}</span>
-
-    </div>
-    <div style="display: flex; align-items: center; font-family: Georgia; margin-top: 10px;">
-        <label style="font-size: 30px; font-weight: bold;">Email:</label>
-        <span style="font-size: 24px; margin-left: 10px;">{{ email }}</span>
-    </div>
-    <!-- Password Change Form, FOR TESTINGGGG  -->
-    <h2 style="font-family: Georgia; font-size: 36px; font-weight: bold;">Change Password:</h2>
-    <form method="post" action="{% url 'adminprofile' %}">
-        {% csrf_token %}
-        <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">Current Password:</label>
-        <input type="password" name="current_password" placeholder="Enter Current Password" style="font-family: Georgia; font-size: 24px;"><br>
-
-        <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">New Password:</label>
-        <input type="password" name="new_password" placeholder="Enter New Password" style="font-family: Georgia; font-size: 24px;"><br>
-
-        <label style="font-family: Georgia; font-size: 30px; font-weight: bold;">Confirm New Password:</label>
-        <input type="password" name="confirm_password" placeholder="Confirm New Password" style="font-family: Georgia; font-size: 24px;"><br>
-
-        <div id="errorMessage" style="color: red; font-family: Georgia; font-size: 18px; margin-top: 5px;"></div>
-
-        <button type="button" class="save-button" style="font-family: Georgia; font-size: 20px; font-weight: bold;">Save</button>
-    </form>
-
-    <br><br>
-
-    <h2 style="font-family: Georgia; font-size: 36px; font-weight: bold;">Create Account for Admin and Interviewer</h2>
-    
-    <button class="save-button" style="font-family: Georgia; font-size: 20px; font-weight: bold;" onclick="window.location.href='{% url 'manage_accounts' %}';">Manage Accounts</button>
-    <button class="save-button" style="font-family: Georgia; font-size: 20px; font-weight: bold;" onclick="window.location.href='{% url 'add_accounts' %}';">Create Account</button>
-    
-    <br><br>
-
-    <button class="sign-out-button" style="font-family: Georgia; font-size: 14px; font-weight: bold;" onclick="location.href='{% url 'logout' %}'">Sign Out</button>
-
+<div class="text-placeholder user-profile-item">
+    <label>Username:</label>
+    <div class="user-profile-value">{{ username }}</div>
 </div>
+<div class="text-placeholder user-profile-item">
+    <label>Name:</label>
+    <div class="user-profile-value">{{ full_name }}</div>
+</div>
+<div class="text-placeholder user-profile-item">
+    <label>Email:</label>
+    <div class="user-profile-value">{{ email }}</div>
+</div>
+
+<h3 class="features-title password-title">Change Password</h3>
+<form method="post" action="{% url 'adminprofile' %}">
+    {% csrf_token %}
+    <div class="text-placeholder">
+        <label>Current Password:</label>
+        <input type="password" class="input-profile" name="current_password" placeholder="Current Password">
+    </div>
+    <div class="text-placeholder">
+        <label>New Password:</label>
+        <input type="password" class="input-profile" name="new_password" placeholder="New Password">
+    </div>
+    <div class="text-placeholder">
+        <label>Confirm New Password:</label>
+        <input type="password" class="input-profile" name="confirm_password" placeholder="Confirm Password">
+    </div>
+    <div class="change-password-buttons">
+        <button type="button" class="save-button">Save</button>
+    </div>
+    <div id="errorMessage" class="error-message"></div>
+</form>
+
+<h3 class="features-title manage-title">Manage Admin and Interviewer Accounts</h3>
+<div class="account-management-buttons">
+    <button class="account-button" onclick="window.location.href='{% url 'manage_accounts' %}'">Manage Accounts</button>
+    <button class="account-button" onclick="window.location.href='{% url 'add_accounts' %}'">Create Account</button>
+</div>
+
+<button class="sign-out-button" onclick="window.location.href='{% url 'Index' %}'">Sign Out</button>
 {% endblock %}
 
 {% block script %}
 <script>
-    // Toggle the display of the change password section
     document.addEventListener("DOMContentLoaded", function () {
         const saveButton = document.querySelector('.save-button');
         const currentPasswordInput = document.querySelector('input[placeholder="Enter Current Password"]');
         const newPasswordInput = document.querySelector('input[placeholder="Enter New Password"]');
         const confirmPasswordInput = document.querySelector('input[placeholder="Confirm New Password"]');
         const errorMessage = document.getElementById("errorMessage");
-    
+
         saveButton.addEventListener("click", function (event) {
-            event.preventDefault(); // Prevents form from submitting
-            
+            event.preventDefault();
+
             const currentPassword = currentPasswordInput.value;
             const newPassword = newPasswordInput.value;
             const confirmPassword = confirmPasswordInput.value;
-    
-            // Check if new password is at least 6 characters long
+
             if (newPassword.length < 6) {
                 errorMessage.textContent = "Your password is too short! You need 6+ characters.";
                 return;
             }
-    
-            // Check if new passwords match
+
             if (newPassword !== confirmPassword) {
                 errorMessage.textContent = "Passwords don’t match.";
                 return;
             }
-    
-            // Clear error message if validation passes
+
             errorMessage.textContent = "";
-    
-            // AJAX request to update the password
+
             fetch("{% url 'update_password' %}", {
                 method: "POST",
                 headers: {
@@ -93,7 +83,7 @@
                     "X-CSRFToken": "{{ csrf_token }}",
                 },
                 body: JSON.stringify({
-                    account_id: "{{ request.session.account_id }}",  // Use account_id from session
+                    account_id: "{{ request.session.account_id }}",
                     current_password: currentPassword,
                     new_password: newPassword,
                 }),
@@ -105,9 +95,8 @@
                     currentPasswordInput.value = "";
                     newPasswordInput.value = "";
                     confirmPasswordInput.value = "";
-                    errorMessage.textContent = ""; // Clear any previous error messages
                 } else {
-                    errorMessage.textContent = data.error || "Failed to update password."; // Show specific error
+                    errorMessage.textContent = data.error || "Failed to update password.";
                 }
             })
             .catch(error => {
@@ -115,6 +104,6 @@
                 errorMessage.textContent = "An error occurred. Please try again.";
             });
         });
-    });    
+    });
 </script>
 {% endblock %}
