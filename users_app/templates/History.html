@@ -1,42 +1,46 @@
 {% extends "Interviewer_Inheritance.html" %}
 
-{% block body %}
-<div class="main-content">
+{% block title %}History{% endblock %}
+
+{% block content %}
+<div class="interviewer-main-content">
     <div class="qualified-applicants">
         <h2 style="color: rgb(71, 48, 17);">Feedback History</h2>
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Applicant Name</th>
-                <th>Job Applied</th>
-                <th>Job Company</th>
-                <th>Applicant Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for applicant in applicants %}
+    <div class="interviewer-table-container">
+        <table class="interviewer-table">
+            <thead>
                 <tr>
-                    <td>{{ applicant.full_name }}</td>
-                    <td>{{ applicant.job_title }}</td>
-                    <td>{{ applicant.job_company }}</td>
-                    <td>{{ applicant.status }}</td>
-                    <td>
-                        <button class="bodybutton" onclick="window.location.href='{% url 'INTeditfeedback' applicant.applicant_status_id %}'">
-                            View Feedback
-                        </button>
-                    </td>
+                    <th>Applicant Name</th>
+                    <th>Job Applied</th>
+                    <th>Job Company</th>
+                    <th>Applicant Status</th>
+                    <th>Actions</th>
                 </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="5" style="text-align: center;">
-                        No feedback history available.
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for applicant in applicants %}
+                    <tr>
+                        <td>{{ applicant.full_name }}</td>
+                        <td>{{ applicant.job_title }}</td>
+                        <td>{{ applicant.job_company }}</td>
+                        <td>{{ applicant.status }}</td>
+                        <td>
+                            <button class="bodybutton" onclick="window.location.href='{% url 'INTeditfeedback' applicant.applicant_status_id %}'">
+                                View Feedback
+                            </button>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align: center;">
+                            No feedback history available.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}
