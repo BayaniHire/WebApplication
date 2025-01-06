@@ -1,41 +1,43 @@
 {% extends "Interviewer_Inheritance.html" %}
 
-{% block body %}
-    <div class="main-content">
+{% block title %}Applicant{% endblock %}
+
+{% block content %}
+    <div class="interviewer-main-content">
         <div class="qualified-applicants">
             <h2 style="color: rgb(71, 48, 17);">Qualified Applicants</h2>
         </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Applicant's Name</th>
-                    <th>Job Applied</th>
-                    <th>Date Applied</th>
-                    <th>Interview Date</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for applicant in applicants %}
-                <tr>
-                    <td>{{ applicant.full_name }}</td>
-                    <td>{{ applicant.job_title }}</td>
-                    <td>{{ applicant.date_applied }}</td>
-                    <td>{{ applicant.interview_date }}</td>
-                    <td>{{ applicant.status }}</td>
-                    <td>
-                        {% if applicant.applicant_status_id %}
-                            <button class="bodybutton" onclick="location.href='{% url 'INTviewinfo' applicant.applicant_status_id %}'">View Details</button>
-                        {% else %}
-                            <span>No Action Available</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        
+        <div class="interviewer-table-container">
+            <table class="interviewer-table">
+                <thead>
+                    <tr>
+                        <th>Applicant's Name</th>
+                        <th>Job Applied</th>
+                        <th>Date Applied</th>
+                        <th>Interview Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for applicant in applicants %}
+                    <tr>
+                        <td>{{ applicant.full_name }}</td>
+                        <td>{{ applicant.job_title }}</td>
+                        <td>{{ applicant.date_applied }}</td>
+                        <td>{{ applicant.interview_date }}</td>
+                        <td>{{ applicant.status }}</td>
+                        <td>
+                            {% if applicant.applicant_status_id %}
+                                <button class="bodybutton" onclick="location.href='{% url 'INTviewinfo' applicant.applicant_status_id %}'">View Details</button>
+                            {% else %}
+                                <span>No Action Available</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 {% endblock %}
