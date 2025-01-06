@@ -1,62 +1,185 @@
-{% extends "Admin_Inheritance.html" %}  <!-- Replace with your actual base template filename -->
+{% extends "Admin_Inheritance.html" %}
 
 {% block title %}BayaniHire Admin Center{% endblock %}
 
 {% block content %}
-<div class="main-content" style="padding: 0; margin: 0; text-align: center; display: flex; flex-direction: column; align-items: center;"></div> <!-- Main content area with padding to avoid header overlap -->
-    <h2 style="font-size: 36px; font-weight: bold; text-align: center;">Applicant Interview Schedule</h2>
+<div class="main-content" style="padding: 0; margin: 0; text-align: center; display: flex; flex-direction: column; align-items: center;"></div>
+<h2 style="font-size: 36px; font-weight: bold; text-align: center;">Applicant Interview Schedule</h2>
 
-    <!-- Form for Scheduling -->
-    <form method="POST" action="{% url 'confirm_send_schedule' %}">
-        {% csrf_token %}
-        
-        <!-- Hidden Fields for Data Submission -->
-        <input type="hidden" name="interviewer_name" value="{{ interviewer_name }}">
-        <input type="hidden" name="schedule_date" value="{{ schedule_date }}">
-        <input type="hidden" name="interview_message" value="{{ interview_message }}">
-        
-        {% for applicant in applicants %}
-            <input type="hidden" name="applicant_ids[]" value="{{ applicant.applicant_status_id }}">
-        {% endfor %}
+<!-- Form for Scheduling -->
+<form method="POST" action="{% url 'confirm_send_schedule' %}" id="schedule-form">
+    {% csrf_token %}
+    
+    <!-- Hidden Fields for Data Submission -->
+    <input type="hidden" name="interviewer_name" value="{{ interviewer_name }}">
+    <input type="hidden" name="schedule_date" value="{{ schedule_date }}">
+    <input type="hidden" id="interview_location" name="interview_location">
 
-        <table width="100%" >
-            <tr>
-                <!-- Qualified Applicants List -->
-                <td valign="top" width="50%">
-                    <p>Shown on the list are the Qualified Applicants.</p>
-                    <table>
-                        <tr>
-                            <th>FOR INTERVIEW</th>
-                            <th>Job Applied</th>
-                        </tr>
-                        {% for applicant in applicants %}
-                        <tr>
-                            <td>{{ applicant.full_name }}</td>
-                            <td>{{ applicant.job_title }} at {{ applicant.job_company }}</td>
-                        </tr>
-                        {% endfor %}
-                    </table>
-                    <p>Interview message</p>
-                    <textarea name="interview_message">{{ interview_message }}</textarea>
-                </td>
+    {% for applicant in applicants %}
+        <input type="hidden" name="applicant_ids[]" value="{{ applicant.applicant_status_id }}">
+    {% endfor %}
 
-                <!-- Interviewer Details -->
-                <td valign="top" width="50%">
-                    <p>Name of Interviewer</p>
-                    <input type="text" name="interviewer_name_display" value="{{ interviewer_name }}" readonly>
-                    <p>Schedule Date</p>
-                    <input type="text" name="schedule_date_display" value="{{ schedule_date }}" readonly>
-                    <p><button type="submit" class = 'apply-button' >Send</button></p>
-                </td>
-            </tr>
-        </table>
-    </form>
+    <table class="AD-table">
+        <tr>
+            <!-- Qualified Applicants List -->
+            <td valign="top" width="50%">
+                <p>Shown on the list are the Qualified Applicants.</p>
+                <table class="AD-sub-table">
+                    <tr>
+                        <th class="AD-table-header-left">FOR INTERVIEW</th>
+                        <th class="AD-table-header-left">Job Applied</th>
+                    </tr>
+                    {% for applicant in applicants %}
+                    <tr>
+                        <td>{{ applicant.full_name }}</td>
+                        <td>{{ applicant.job_title }} at {{ applicant.job_company }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                <p>Interview message</p>
+                <textarea name="interview_message">{{ interview_message }}</textarea>
+            </td>
+
+            <!-- Interviewer Details -->
+            <td valign="top" width="50%">
+                <p>Name of Interviewer</p>
+                <input type="text" name="interviewer_name_display" value="{{ interviewer_name }}" readonly>
+                <p>Schedule Date</p>
+                <input type="text" name="schedule_date_display" value="{{ schedule_date }}" readonly>
+                
+                <!-- Map Section -->
+                <p>Interview Location</p>
+                <div id="map-container">
+                    <input type="text" id="search-location" placeholder="Search for a location" class="AD-input-full-width">
+                    <div id="admin-map" class="AD-map-container"></div>
+                </div>
+                
+                <!-- Buttons inside valign under the map -->
+                <div class="AD-button-group">
+                    <button type="button" id="edit-location" class="AD-apply-button">Edit Location</button>
+                    <button type="button" id="confirm-location" class="AD-apply-button">Confirm Location</button>
+                </div>
+
+                <p>Confirmed Location:</p>
+                <textarea id="confirmed-location" name="confirmed_location" class="AD-textarea-full-width" readonly>
+                    {{ location }}
+                </textarea>
+            </td>
+        </tr>
+    </table>
+    <p><button type="submit" class="AD-apply-button">Send</button></p>
+</form>
 </div>
 
-<style>
-    /* Remove borders from all tables and table cells */
-    table, th, td {
-        border: none;
-    }
-</style>
+<!-- Include Leaflet.js -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const map = L.map('admin-map').setView([14.3291, 120.9367], 15); // Cavite, Bayan Dasmarinas
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+        const marker = L.marker([14.3291, 120.9367], { draggable: true }).addTo(map);
+
+        const searchInput = document.getElementById('search-location');
+        const confirmedLocation = document.getElementById('confirmed-location');
+        const confirmButton = document.getElementById('confirm-location');
+        const editButton = document.getElementById('edit-location');
+        let isLocationConfirmed = false;
+
+        // Reverse geocode to get place name
+        async function getPlaceName(lat, lng) {
+            try {
+                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`);
+                const data = await response.json();
+                return data.display_name || `Lat: ${lat}, Lng: ${lng}`;
+            } catch (error) {
+                console.error("Error fetching place name:", error);
+                return `Lat: ${lat}, Lng: ${lng}`;
+            }
+        }
+
+        // Update location fields and marker position
+        async function updateLocation(lat, lng) {
+            const placeName = await getPlaceName(lat, lng);
+            console.log("Updated Location Data:");
+            console.log("Location Name:", placeName);
+
+            document.getElementById('interview_location').value = placeName;
+
+            if (!isLocationConfirmed) {
+                document.getElementById("confirmed-location").value = placeName; // Update the textarea if not confirmed
+            }
+        }
+
+        // When marker is dragged
+        marker.on('dragend', function () {
+            if (!isLocationConfirmed) { // Allow dragging only if not confirmed
+                const { lat, lng } = marker.getLatLng();
+                updateLocation(lat, lng);
+            }
+        });
+
+        // When map is clicked
+        map.on('click', function (event) {
+            if (!isLocationConfirmed) { // Allow clicking only if not confirmed
+                const { lat, lng } = event.latlng;
+                marker.setLatLng([lat, lng]);
+                updateLocation(lat, lng);
+            }
+        });
+
+        // Search for a location
+        searchInput.addEventListener('keypress', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                if (!isLocationConfirmed) { // Allow searching only if not confirmed
+                    const query = searchInput.value;
+                    fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json&addressdetails=1`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.length > 0) {
+                                const { lat, lon } = data[0];
+                                map.setView([lat, lon], 15);
+                                marker.setLatLng([lat, lon]);
+                                updateLocation(lat, lon);
+                            } else {
+                                alert('Location not found!');
+                            }
+                        })
+                        .catch(error => console.error('Error fetching location:', error));
+                }
+            }
+        });
+
+        // Confirm location button functionality
+        confirmButton.addEventListener('click', function () {
+            isLocationConfirmed = true;
+            confirmedLocation.readOnly = true;
+            alert("Location confirmed! The map is now locked.");
+        });
+
+        // Edit location button functionality
+        editButton.addEventListener('click', function () {
+            isLocationConfirmed = false;
+            confirmedLocation.readOnly = false;
+            alert("You can now edit the location.");
+        });
+
+        // Log values before submitting the form
+        document.getElementById("schedule-form").addEventListener("submit", function (event) {
+            // Get values from hidden input
+            const location = document.getElementById("interview_location").value;
+
+            // Log values for debugging
+            console.log("Location before submission:", location);
+
+            // Validate values
+            if (!location) {
+                event.preventDefault(); // Prevent form submission if values are missing
+                alert("Please confirm the location on the map before submitting.");
+            }
+        });
+
+    });
+</script>
 {% endblock %}
