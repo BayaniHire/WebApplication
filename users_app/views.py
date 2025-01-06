@@ -202,31 +202,60 @@ def interviewer_profile(request):
         
     return render(request, 'Profile.html')
 
+
 def interviewer_viewinfo(request, applicant_status_id):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-        
     # Fetch the applicant using the provided applicant_status_id
     applicant = get_object_or_404(ListOfApplicantsWithStatusAndCredentials, applicant_status_id=applicant_status_id)
+
+    # Ensure only qualified applicants can be accessed by the interviewer
+    if applicant.applicant_status != "QUALIFIED":
+        raise Http404("You do not have access to this applicant's files.")
 
     # Fetch related account and job details
     account_info = applicant.account
     job_details = applicant.job
 
-    # Prepare the uploaded files
-    uploaded_files = applicant.file_metadata.split(",") if applicant.file_metadata else []
-    uploaded_files = [file.strip() for file in uploaded_files]
+    # Prepare the list of uploaded files (from comma-separated metadata)
+    uploaded_files = []
+    filenames = applicant.file_metadata.split(", ") if applicant.file_metadata else []
 
-    # Prepare context for rendering
+    # Process credentials data to prepare each file as base64 encoded
+    if applicant.credentials:
+        total_files_size = len(applicant.credentials)
+        individual_file_size = total_files_size // len(filenames) if filenames else 0
+
+        for i, filename in enumerate(filenames):
+            start_index = i * individual_file_size
+            end_index = start_index + individual_file_size if i < len(filenames) - 1 else total_files_size
+            file_data = applicant.credentials[start_index:end_index]
+            encoded_file = base64.b64encode(file_data).decode('utf-8')
+            
+            uploaded_files.append({
+                'data': encoded_file,
+                'metadata': filename,
+                'type': filename.split('.')[-1].lower(),
+            })
+
+    # Handle a file preview request for a specific file
+    file_name_to_view = request.GET.get('view_file')
+    if file_name_to_view:
+        matching_file = next((file for file in uploaded_files if file['metadata'] == file_name_to_view), None)
+        if not matching_file:
+            raise Http404("File not found")
+
+        # Return JSON response with file data and type for preview
+        return JsonResponse({'file_data': matching_file['data'], 'file_type': matching_file['type']})
+
+    # Render the interviewer's template with context
     context = {
         'applicant': account_info,
         'job_details': job_details,
         'uploaded_files': uploaded_files,
         'submission_date': applicant.submission_date,
         'applicant_status': applicant.applicant_status,
-        'applicant_status_id': applicant_status_id  # Ensure this is included
+        'applicant_status_id': applicant_status_id
     }
+
     return render(request, 'ViewInfo.html', context)
 
 ##################INTERVIEWER######################
@@ -329,6 +358,7 @@ def applicant_fileupload(request, job_id):
 
 
 
+
 def applicant_applicationstatus(request):
     # Ensure the user is logged in using session data
     account_id = request.session.get('account_id')
@@ -360,7 +390,8 @@ def applicant_applicationstatus(request):
             'submission_date',
             'interview_schedule_date',
             'applicant_status_id',
-            'job__job_id'
+            'job__job_id',
+            'job__job_company'
         )
     )
 
@@ -417,22 +448,19 @@ def applicant_viewfileupload(request, applicant_status_id):
 
 
 def applicant_interviewdetails(request, applicant_status_id):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-        
     # Fetch interview details for the given applicant
     applicant = get_object_or_404(ListOfApplicantsWithStatusAndCredentials, applicant_status_id=applicant_status_id)
 
     # Check if the applicant is qualified
     if applicant.applicant_status == "QUALIFIED":
         # Check if interview details exist for the qualified applicant
-        if applicant.interview_applicant_id:
-            # If interview details exist, fetch them
+        if applicant.admin_message and applicant.applicant_schedule_date and applicant.location:
+            # Include location data
             interview_details = {
-                'interviewer_name': applicant.interview_applicant_id.interviewer_name,
-                'schedule_date': applicant.interview_applicant_id.interview_schedule_date,
-                'interview_message': applicant.admin_message,  # Use admin_message from ListOfApplicantsWithStatusAndCredentials
+                'interviewer_name': applicant.interview_applicant_id.interviewer_name if applicant.interview_applicant_id else "N/A",
+                'schedule_date': applicant.applicant_schedule_date,
+                'interview_message': applicant.admin_message,
+                'location': applicant.location,
             }
             return render(request, 'Applicant_InterviewDetails.html', {
                 'interview_details': interview_details
@@ -447,6 +475,7 @@ def applicant_interviewdetails(request, applicant_status_id):
         return render(request, 'Applicant_InterviewDetails.html', {
             'show_not_qualified_message': True
         })
+
 
 def applicant_profile(request):
     auth_response = ensure_authenticated(request)
@@ -758,15 +787,12 @@ def qualification(request):
         'applicants': applicant_data
     })
     
+
 def send_schedule(request):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-        
-      # Fetch all applicants who are set for interview
+    # Fetch all applicants who are set for interview
     applicants = ListOfApplicantsWithStatusAndCredentials.objects.filter(
         applicant_status='FOR INTERVIEW'
-    ).select_related('account', 'job', 'interview_applicant_id')  # assuming foreign key is loaded properly
+    ).select_related('account', 'job', 'interview_applicant_id')
 
     # Prepare data for display in template
     applicant_data = [
@@ -779,50 +805,102 @@ def send_schedule(request):
         }
         for applicant in applicants
     ]
-    
+
     if request.method == "POST":
+        # Fetch form data
         interviewer_name = request.POST.get('interviewer_name')
-        schedule_date = request.POST.get('selected_schedule_date')
-        
-    
-       
+        selected_schedule_date = request.POST.get('selected_schedule_date')
+        interview_message = request.POST.get('interview_message')
+        location = request.POST.get('interview_location')
+
+        # Debugging logs
+        print("Form Data Received:")
+        print(f"Interviewer Name: {interviewer_name}")
+        print(f"Schedule Date: {selected_schedule_date}")
+        print(f"Interview Message: {interview_message}")
+        print(f"Location: {location}")
+
+        # Validate form inputs
+        if not (interviewer_name and selected_schedule_date and location):
+            print("Validation Failed: Missing required fields.")
+            return render(request, 'AdminView_3_1_Send.html', {
+                'applicants': applicant_data,
+                'interviewer_name': interviewer_name,
+                'schedule_date': selected_schedule_date,
+                'interview_message': interview_message,
+                'location': location,
+                'error': "All fields, including the location, are required.",
+            })
+
+        # Process each applicant and save details
+        for applicant in applicants:
+            try:
+                print(f"Processing Applicant ID: {applicant.applicant_status_id}")
+
+                # Update location and interview details in the applicant's record
+                applicant.admin_message = interview_message
+                applicant.applicant_schedule_date = selected_schedule_date
+                applicant.location = location  # Save textual location only
+                applicant.save()
+                print(f"Updated Applicant Details for Applicant ID: {applicant.applicant_status_id}")
+
+            except Exception as e:
+                print(f"Error processing Applicant ID {applicant.applicant_status_id}: {e}")
+
+        print("All data processed successfully.")
         return render(request, 'AdminView_3_1_Send.html', {
+            'applicants': applicant_data,
             'interviewer_name': interviewer_name,
-            'schedule_date': schedule_date,
-            'applicants': applicant_data  # Include updated applicants in the response
+            'schedule_date': selected_schedule_date,
+            'interview_message': interview_message,
+            'location': location,
+            'success': "Interview details have been successfully saved.",
         })
-# GET request: Render page with initial applicant data
+
+    # Render the page with initial applicant data for GET requests
     return render(request, 'AdminView_3_1_Send.html', {
         'applicants': applicant_data
     })
 
+
+
 def confirm_send_schedule(request):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-        
     if request.method == "POST":
+        # Retrieve data from POST request
         interviewer_name = request.POST.get('interviewer_name')
         schedule_date = request.POST.get('schedule_date')
         interview_message = request.POST.get('interview_message')
-        applicant_ids = request.POST.getlist('applicant_ids[]')  # Note the brackets to fetch a list
+        location = request.POST.get('interview_location')  # Include location now
+        applicant_ids = request.POST.getlist('applicant_ids[]')
 
-        # Find interview instance or handle error
-        interview_instance = InterviewStorage.objects.filter(interviewer_name=interviewer_name, interview_schedule_date=schedule_date).first()
+        # Debugging: Log received data
+        print(f"Confirm Schedule -> Interviewer: {interviewer_name}, Date: {schedule_date}, Location: {location}, Applicants: {applicant_ids}")
+
+        # Ensure interview instance exists
+        interview_instance = InterviewStorage.objects.filter(
+            interviewer_name=interviewer_name,
+            interview_schedule_date=schedule_date
+        ).first()
         if not interview_instance:
-            return redirect('send_schedule')  # Consider adding error messaging here
+            print("Error: No matching interview instance found.")
+            return redirect('send_schedule')  # Handle error gracefully
 
         with transaction.atomic():
             for applicant_id in applicant_ids:
+                # Retrieve and update applicant
                 applicant = get_object_or_404(ListOfApplicantsWithStatusAndCredentials, applicant_status_id=applicant_id)
                 applicant.interview_applicant_id = interview_instance
                 applicant.applicant_schedule_date = schedule_date
                 applicant.admin_message = interview_message
+                applicant.location = location  # Save the textual location
                 applicant.applicant_status = 'QUALIFIED'
                 applicant.save()
+                print(f"Updated Applicant ID {applicant_id} with Location: {location}")
 
-        return redirect('list_of_applicants')  # Redirect to a confirmation or success page
-    return redirect('send_schedule')
+        return redirect('list_of_applicants')  # Redirect to confirmation or success page
+
+    return redirect('send_schedule')  # Redirect if method is not POST
+
 
 
 def open_schedule_list(request):
