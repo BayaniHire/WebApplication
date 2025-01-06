@@ -3,96 +3,100 @@
 {% block title %}Applicant Profile{% endblock %}
 
 {% block content %}
-<div class="features-title" id="ApplicantProfile">User Profile</div>
-<div class="text-placeholder" id="Appliprofileusername">
-    <b>Username:</b> <span>Insert Username Here</span>
+<div class="features-title user-profile-title" style="font-family: Georgia; font-size: 28px; color: rgb(53, 36, 13); font-weight: bold;">User Profile</div>
+<div class="text-placeholder user-profile-item">
+    <label>Username:</label>
+    <div class="user-profile-value">{{ username }}</div>
 </div>
-<div class="text-placeholder" id="Appliprofilename">
-    <b>Name:</b> <span>Insert Name Here</span>
+<div class="text-placeholder user-profile-item">
+    <label>Name:</label>
+    <div class="user-profile-value">{{ full_name }}</div>
 </div>
-<div class="text-placeholder" id="Appliprofileemail">
-    <b>Email:</b> <span>Insert Email Here</span>
+<div class="text-placeholder user-profile-item">
+    <label>Email:</label>
+    <div class="user-profile-value">{{ email }}</div>
 </div>
 <br />
-<div class="features-title" id="AppliPassword">Password</div>
+<div class="features-title password-title" style="font-family: Georgia; font-size: 28px; color: rgb(53, 36, 13); font-weight: bold;">Password</div>
 <div class="password-section">
     <div class="text-placeholder">
-        <b>Password:</b> <i>*HIDDEN*</i>
+        <label>Password:</label>
+        <div><i>*HIDDEN*</i></div>
     </div>
-    <button class="edit-password-button" id="AppliEditButton">Edit Password</button>
+    <button class="edit-password-button">Edit Password</button>
 </div>
-<div class="features-title" id="AppliChangePassword">Change Password</div>
 <div class="change-password-section" style="display: none;"> <!-- Initially hidden -->
+    <div class="features-title change-password-title" style="font-family: Georgia; font-size: 28px; color: rgb(53, 36, 13); font-weight: bold;">Change Password</div>
     <div class="text-placeholder">
-        <b>Password:</b> <input type="password" class="input-field" placeholder="Current Password">
+        <label>Password:</label>
+        <input type="password" class="input-profile" placeholder="Current Password">
     </div>
     <div class="text-placeholder">
-        <b>New Password:</b> <input type="password" class="input-field" placeholder="New Password">
+        <label>New Password:</label>
+        <input type="password" class="input-profile" placeholder="New Password">
     </div>
     <div class="text-placeholder">
-        <b>Confirm Password:</b> <input type="password" class="input-field" placeholder="Confirm Password">
+        <label>Confirm Password:</label>
+        <input type="password" class="input-profile" placeholder="Confirm Password">
     </div>
     <div class="change-password-buttons">
         <button class="save-button">Save</button>
     </div>
 </div>
-<div class="profile-button" onclick="signOut()">Sign Out</div>
+<div class="sign-out-button" onclick="signOut()">Sign Out</div>
 {% endblock %}
 
 {% block script %}
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         // Toggle display of the change password section
-        document.getElementById('AppliEditButton').addEventListener('click', function() {
-            var changePasswordSection = document.querySelector('.change-password-section');
+        const editPasswordButton = document.querySelector('.edit-password-button');
+        const passwordSection = document.querySelector('.password-section');
+        const changePasswordSection = document.querySelector('.change-password-section');
+
+        editPasswordButton.addEventListener('click', function () {
             if (changePasswordSection.style.display === 'none' || changePasswordSection.style.display === '') {
-                changePasswordSection.style.display = 'flex'; // Show the section
+                passwordSection.style.display = 'none'; // Hide the password section
+                changePasswordSection.style.display = 'block'; // Show the change-password section
             } else {
-                changePasswordSection.style.display = 'none'; // Hide the section
+                passwordSection.style.display = 'block'; // Show the password section
+                changePasswordSection.style.display = 'none'; // Hide the change-password section
             }
         });
-    });
 
-    // Function to sign out, moved outside DOMContentLoaded for global access
-    function signOut() {
-        sessionStorage.clear();
-        localStorage.clear();
-        window.location.href = "{% url 'login' %}";
-    }
-
-    document.addEventListener("DOMContentLoaded", function () {
+        // JavaScript code for updating the password
         const saveButton = document.querySelector('.save-button');
-        const currentPasswordInput = document.querySelector('input[placeholder="Current Password"]'); // Add current password input
+        const currentPasswordInput = document.querySelector('input[placeholder="Current Password"]');
         const newPasswordInput = document.querySelector('input[placeholder="New Password"]');
         const confirmPasswordInput = document.querySelector('input[placeholder="Confirm Password"]');
         const errorMessage = document.createElement("div"); // Error message container
-    
+
         errorMessage.style.color = "red";
         errorMessage.style.marginTop = "5px";
-        document.querySelector('.change-password-section').appendChild(errorMessage);
-    
+        changePasswordSection.appendChild(errorMessage);
+
         saveButton.addEventListener("click", function () {
-            const currentPassword = currentPasswordInput.value;  // Capture current password
+            const currentPassword = currentPasswordInput.value;
             const newPassword = newPasswordInput.value;
             const confirmPassword = confirmPasswordInput.value;
-    
+
             // Check if password is at least 6 characters long
             if (newPassword.length < 6) {
                 errorMessage.textContent = "Your password is too short! You need 6+ characters.";
                 return;
             }
-    
+
             // Check if passwords match
             if (newPassword !== confirmPassword) {
                 errorMessage.textContent = "Passwords don’t match.";
                 return;
             }
-    
+
             // Clear error message if validation passes
             errorMessage.textContent = "";
-    
+
             // AJAX request to Django backend to update the password
-            const accountId = "{{ request.session.account_id }}";  // Fetch account ID from session
+            const accountId = "{{ request.session.account_id }}";
             fetch("{% url 'update_password' %}", {
                 method: "POST",
                 headers: {
@@ -100,31 +104,37 @@
                     "X-CSRFToken": "{{ csrf_token }}",
                 },
                 body: JSON.stringify({
-                    account_id: accountId,  // Use the accountId from session
-                    current_password: currentPassword, // Include current password
+                    account_id: accountId,
+                    current_password: currentPassword,
                     new_password: newPassword,
                 }),
             })
-            .then(response => response.json())
-            .then(data => {
-                console.log("Server response:", data);  // Log the server response for debugging
-                if (data.success) {
-                    alert("Password updated successfully!");
-                    currentPasswordInput.value = "";
-                    newPasswordInput.value = "";
-                    confirmPasswordInput.value = "";
-                    document.querySelector('.change-password-section').style.display = 'none';
-                } else {
-                    errorMessage.textContent = data.error || "Failed to update password."; // Show specific error
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                errorMessage.textContent = "An error occurred. Please try again.";
-            });
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Server response:", data);
+                    if (data.success) {
+                        alert("Password updated successfully!");
+                        currentPasswordInput.value = "";
+                        newPasswordInput.value = "";
+                        confirmPasswordInput.value = "";
+                        passwordSection.style.display = 'block'; // Show password section
+                        changePasswordSection.style.display = 'none'; // Hide change-password section
+                    } else {
+                        errorMessage.textContent = data.error || "Failed to update password.";
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    errorMessage.textContent = "An error occurred. Please try again.";
+                });
         });
     });
-    
-    
+
+    // Function to sign out
+    function signOut() {
+        sessionStorage.clear();
+        localStorage.clear();
+        window.location.href = "{% url 'login' %}";
+    }
 </script>
 {% endblock %}
