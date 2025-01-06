@@ -1,6 +1,8 @@
 {% extends "Interviewer_Inheritance.html" %}
 
-{% block body %}
+{% block title %}Edit Feedback{% endblock %}
+
+{% block content %}
 <div class="main-content">
     <form method="POST">
         {% csrf_token %}
@@ -12,7 +14,7 @@
 
         <!-- Applicant Status -->
         <label style="color: rgb(53, 36, 13)" class="header-label">Applicant Status:</label>
-        <select name="status" id="status_dropdown" class="dropdown" required disabled>
+        <select name="status" id="status_dropdown" class="AD-admin-sort-dropdown" required disabled>
             <option value="PASSED" {% if applicant.interviewer_feedback_status == 'PASSED' %}selected{% endif %}>PASSED</option>
             <option value="FAILED" {% if applicant.interviewer_feedback_status == 'FAILED' %}selected{% endif %}>FAILED</option>
         </select>
@@ -24,16 +26,16 @@
         <br><br>
 
         <!-- Update Feedback Button -->
-        <button type="submit" class="bodybutton" id="update_button" disabled>Update Feedback</button>
+        <button type="submit" class="sfbutton" id="update_button" disabled>Update Feedback</button>
         <br><br>
 
         <!-- Edit Feedback Button -->
-        <button type="button" id="edit_feedback_button" class="bodybutton" onclick="enableEdit()">Edit Feedback</button>
+        <button type="button" id="edit_feedback_button" class="sfbutton" onclick="enableEdit()">Edit Feedback</button>
     </form>
 
     <br>
     <!-- Back Button -->
-    <button class="bodybutton" onclick="window.location.href='{% url 'INThistory' %}'">Back</button>
+    <button class="sfbutton" onclick="window.location.href='{% url 'INThistory' %}'">Back</button>
 </div>
 
 <script>
