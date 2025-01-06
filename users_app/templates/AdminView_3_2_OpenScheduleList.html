@@ -8,7 +8,7 @@
 
     <form method="GET" action="" class="form-inline" id="filterForm">
         <!-- Interviewer Selection -->
-        <select name="interviewer" class="form-control mr-2" onchange="document.getElementById('filterForm').submit()">
+        <select name="interviewer" class="AD-admin-sort-dropdown" onchange="document.getElementById('filterForm').submit()">
             <option value="">Select Interviewer</option>
             {% for interviewer in interviewers %}
                 <option value="{{ interviewer.interviewer_name }}" {% if interviewer.interviewer_name == interviewer_name %}selected{% endif %}>
@@ -26,12 +26,12 @@
         {% endif %}
 
         <!-- Search by Name -->
-        <input type="text" name="search" id="search-input" value="{{ search_query }}" class="form-control mr-2" placeholder="Search qualified applicants by name">
-        <button type="submit" class="btn btn-secondary mr-2">Search</button>
+        <input type="text" name="search" id="search-input" value="{{ search_query }}" class="search-input" placeholder="Search qualified applicants by name">
+        <button type="submit" class="sfbutton">Search</button>
 
         <!-- Rows per Page -->
         <input type="number" name="rows" min="1" max="10" value="{{ rows_per_page }}" class="form-control mr-2" placeholder="Rows per page">
-        <button type="submit" class="btn btn-primary">Set Rows</button>
+        <button type="submit" class="sfbutton">Set Rows</button>
     </form>
 
     <div class="table-container">
