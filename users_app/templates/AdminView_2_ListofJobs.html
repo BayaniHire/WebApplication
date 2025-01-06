@@ -10,7 +10,7 @@
     </p>
     <div class="d-flex align-items-center mb-3">
         <p class="mb-0 mr-3">Active Jobs: <span style="color: red;">{{ active_jobs_count }}</span></p>
-        <button class="btn btn-secondary" onclick="window.location.href='{% url 'create_job_details' %}';">Create Job</button>
+        <button class="sfbutton" onclick="window.location.href='{% url 'create_job_details' %}';">Create Job</button>
     </div>
 
     <!-- Form for sorting, searching, and setting rows per page -->
@@ -24,14 +24,14 @@
             <option value="date_desc" {% if sort_order == 'date_desc' %}selected{% endif %}>Sort by Date Posted Descending</option>
         </select>
         <input type="text" name="search" value="{{ search_query }}" class="form-control w-25" placeholder="Search by position or company">
-        <button type="submit" class="btn btn-secondary">Search</button>
+        <button type="submit" class="sfbutton">Search</button>
         <input type="number" name="rows" value="{{ rows_per_page }}" min="1" max="10" class="form-control w-auto" onchange="this.form.submit()">
-        <button type="submit" class="btn btn-secondary">Set Rows</button>
+        <button type="submit" class="sfbutton">Set Rows</button>
     </form>
     
     <!-- Jobs Table -->
-    <div class="table-container">
-        <table class="table table-bordered">
+    <div class="interviewer-table-container">
+        <table class="interviewer-table">
             <thead>
                 <tr>
                     <th>No.</th> 
@@ -51,7 +51,7 @@
                     <td>{{ job.job_date_published }}</td>
                     <td>{{ job.job_status }}</td>
                     <td>
-                        <button class="btn btn-info btn-sm" onclick="window.location.href='{% url 'edit_job_details' job.job_id %}';">Edit Job</button>
+                        <button class="bodybutton" onclick="window.location.href='{% url 'edit_job_details' job.job_id %}';">Edit Job</button>
                     </td>
                 </tr>
                 {% empty %}
