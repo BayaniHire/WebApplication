@@ -5,12 +5,10 @@
 {% block content %}
 <div class="main-content">
     <!-- Search and Sort Controls -->
-    <div class="sort-container">
-        <input type="text" id="searchBar" placeholder="Search Job Applied..." onkeyup="searchFunction()" 
-               style="padding: 5px; border-radius: 5px; border: 1px solid #5C472E;">
-        <button onclick="searchFunction()" style="padding: 5px; border-radius: 5px; border: 1px solid #5C472E;">Search</button>
-        <select id="sortOptions" onchange="sortFunction()" 
-                style="padding: 5px; border-radius: 5px; border: 1px solid #5C472E;">
+    <div class="applicant-search-bar">
+        <input type="text" class="applicant-search-input" placeholder="Search Job Applied..." onkeyup="searchFunction()">
+        <button class="applicant-search-button" onclick="searchFunction()">Search</button>
+        <select class="applicant-sort-dropdown" id="sortOptions" onchange="sortFunction()">
             <option value="" disabled selected>Sort</option>
             <option value="job_applied_asc">Job Applied (A-Z)</option>
             <option value="job_applied_desc">Job Applied (Z-A)</option>
@@ -26,11 +24,12 @@
     </div>
 
     <!-- Application Status Table -->
-    <table style="width: 100%; border-collapse: collapse;">
+    <table>
         <thead>
             <tr>
                 <th>Job Applied</th>
                 <th>Date Created</th>
+                <th>Company</th>
                 <th>Application Status</th>
                 <th>Date Applied</th>
                 <th>Interview Date</th>
@@ -42,6 +41,7 @@
                 <tr onclick="selectApplication({{ application.applicant_status_id }}, '{{ application.job__job_title }}', '{{ application.job__job_date_published }}', '{{ application.job__job_id }}')">
                     <td>{{ application.job__job_title }}</td>
                     <td>{{ application.job__job_date_published }}</td>
+                    <td>{{ application.job__job_company }}</td>
                     <td>{{ application.applicant_status }}</td>
                     <td>{{ application.submission_date }}</td>
                     <td>
@@ -75,47 +75,27 @@
     let selectedApplicantStatusId = null;
     let selectedJobId = null;
 
-    // Function that runs when a row is clicked
     function selectApplication(applicantStatusId, jobTitle, jobDatePublished, jobId) {
-        console.log("Clicked Row: ");
-        console.log("applicantStatusId:", applicantStatusId);
-        console.log("jobTitle:", jobTitle);
-        console.log("jobDatePublished:", jobDatePublished);
-        console.log("jobId:", jobId);
-        
         selectedApplicantStatusId = applicantStatusId;
-        selectedJobId = jobId;  // Set the job ID when the row is clicked
-        
-        // Log the selected job ID for debugging
-        console.log("selectedJobId:", selectedJobId);
-
-        // Highlight the selected row
+        selectedJobId = jobId;
         const rows = document.querySelectorAll("tbody tr");
         rows.forEach(row => row.classList.remove("selected"));
         event.currentTarget.classList.add("selected");
     }
 
-    // Function that redirects to the correct page
     function redirectToPage(page) {
-        console.log("Redirecting to:", page);
-
         if (!selectedApplicantStatusId) {
             alert('Please select an application first.');
             return;
         }
 
         let url;
-
-        // Log the selected job ID before redirecting
-        console.log("selectedJobId in redirect:", selectedJobId);
-
         if (page === 'jobreq') {
             if (!selectedJobId) {
                 alert('Invalid job selection.');
                 return;
             }
-            console.log("Redirecting to job description for Job ID: ", selectedJobId);
-            url = "{% url 'jobreq' 0 %}".replace('0', selectedJobId);  // Correctly replace with selectedJobId
+            url = "{% url 'jobreq' 0 %}".replace('0', selectedJobId);
         } else {
             switch (page) {
                 case 'viewfileupload':
@@ -129,15 +109,9 @@
                     return;
             }
         }
-
-        // Log the URL before redirecting
-        console.log("Redirect URL:", url);
-
-        // Perform the redirection
         window.location.href = url;
     }
 
-    // Function to handle sorting (optional)
     function sortFunction() {
         const sortOption = document.getElementById("sortOptions").value;
         const table = document.querySelector("tbody");
@@ -156,11 +130,11 @@
                     return valB.localeCompare(valA);
                 case "date_created_asc":
                     valA = new Date(a.cells[1].innerText);
-                    valB = new Date(b.cells[1].innerText);
+                    valB = new Date(a.cells[1].innerText);
                     return valA - valB;
                 case "date_created_desc":
                     valA = new Date(a.cells[1].innerText);
-                    valB = new Date(b.cells[1].innerText);
+                    valB = new Date(a.cells[1].innerText);
                     return valB - valA;
                 case "application_status_asc":
                     valA = a.cells[2].innerText.toLowerCase();
@@ -172,19 +146,19 @@
                     return valB.localeCompare(valA);
                 case "date_applied_asc":
                     valA = new Date(a.cells[3].innerText);
-                    valB = new Date(b.cells[3].innerText);
+                    valB = new Date(a.cells[3].innerText);
                     return valA - valB;
                 case "date_applied_desc":
                     valA = new Date(a.cells[3].innerText);
-                    valB = new Date(b.cells[3].innerText);
+                    valB = new Date(a.cells[3].innerText);
                     return valB - valA;
                 case "interview_date_asc":
                     valA = new Date(a.cells[4].innerText);
-                    valB = new Date(b.cells[4].innerText);
+                    valB = new Date(a.cells[4].innerText);
                     return valA - valB;
                 case "interview_date_desc":
                     valA = new Date(a.cells[4].innerText);
-                    valB = new Date(b.cells[4].innerText);
+                    valB = new Date(a.cells[4].innerText);
                     return valB - valA;
                 default:
                     return 0;
@@ -193,9 +167,8 @@
         rows.forEach(row => table.appendChild(row));
     }
 
-    // Function to handle search (optional)
     function searchFunction() {
-        const searchValue = document.getElementById("searchBar").value.toLowerCase();
+        const searchValue = document.querySelector(".applicant-search-input").value.toLowerCase();
         const table = document.querySelector("tbody");
         const rows = table.querySelectorAll("tr");
 
