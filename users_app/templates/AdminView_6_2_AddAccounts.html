@@ -16,18 +16,18 @@
     <form action="/admin_interviewer_account_setup/" method="post" style="font-family: Georgia; font-size: 18px; font-weight: bold;">
         {% csrf_token %}
         <label style="font-size: 20px;">Role:</label>
-        <select name="role" style="font-size: 18px;" required>
+        <select name="role" class="AD-admin-sort-dropdown"  style="font-size: 18px;" required>
             <option value="Interviewer">Interviewer</option>
             <option value="Admin">Admin</option>
         </select>
         <br><br>
     
         <label style="font-size: 20px;">Birthday:</label>
-        <input type="date" name="birthday" min="1900-01-01" max="2024-09-21" required>
+        <input type="date"  class="AD-calendar-input" name="birthday" min="1900-01-01" max="2024-09-21" required>
         <br><br>
     
         <label style="font-size: 20px;">Gender:</label>
-        <select name="gender" style="font-size: 18px;" required>
+        <select name="gender" class="AD-admin-sort-dropdown" style="font-size: 18px;" required>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
             <option value="Prefer not to say">Prefer not to say</option>
@@ -35,22 +35,22 @@
         <br><br>
     
         <label style="font-size: 20px;">First Name:</label>
-        <input type="text" name="first_name" placeholder="First Name" required>
+        <input type="text" class="search-input" name="first_name" placeholder="First Name" required>
         <br><br>
     
         <label style="font-size: 20px;">Middle Name:</label>
-        <input type="text" name="middle_name" placeholder="Middle Name" required>
+        <input type="text" class="search-input" name="middle_name" placeholder="Middle Name" required>
         <br><br>
     
         <label style="font-size: 20px;">Last Name:</label>
-        <input type="text" name="last_name" placeholder="Last Name" required>
+        <input type="text" class="search-input" name="last_name" placeholder="Last Name" required>
         <br><br>
     
         <label style="font-size: 20px;">Email:</label>
-        <input type="email" name="email" placeholder="Enter Email" required>
+        <input type="email" class="search-input" name="email" placeholder="Enter Email" required>
         <br><br>
 
-        <button type="submit" class="apply-button">Create</button>
+        <button type="submit" class="sfbutton">Create</button>
     </form>
 
 </div>
