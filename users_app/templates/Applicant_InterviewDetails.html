@@ -1,9 +1,13 @@
 {% extends "Applicant_Inheritance.html" %}
+{% load static %}
 
 {% block title %}Interview Details{% endblock %}
 
+{% block page_id %}data-page-id="interview-details"{% endblock %}
+
 {% block content %}
-<div class="main-content">
+<div class="main-content"
+     data-location-name="{{ interview_details.location|default:'' }}">
     <!-- Title -->
     <div class="header-text">Interview Details</div>
 
@@ -24,7 +28,11 @@
             <div class="info-container">{{ interview_details.interviewer_name }}</div>
             <div class="info-text">Schedule Date</div>
             <div class="info-container">{{ interview_details.schedule_date }}</div>
+            <div class="info-text">Interview Location</div>
+            <div class="info-container">{{ interview_details.location }}</div>
         </div>
+        <!-- Map Section -->
+        <div id="applicant-map" style="height: 300px; width: 100%; margin-top: 10px; border: 1px solid #ccc;"></div>
         <div class="message-section">
             <div class="message-text">Interviewer Message:</div>
             <div class="message-container">
@@ -36,8 +44,58 @@
 
     <!-- Buttons -->
     <div class="buttons-container">
-        <button class="button">Download</button>
-        <button class="button">Print</button>
+        <button id="downloadButton" class="button">Download</button>
+        <button id="printButton" class="button">Print</button>
     </div>
 </div>
+{% endblock %}
+
+{% block script %}
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const pageId = document.body.dataset.pageId;
+        if (pageId === 'interview-details') {
+            const mapContainer = document.getElementById('applicant-map');
+            const locationName = document.querySelector('.info-section .info-container:nth-child(7)')?.innerText.trim();
+
+            if (locationName && mapContainer) {
+                fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(locationName)}&format=json&addressdetails=1`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.length > 0) {
+                            const { lat, lon } = data[0];
+                            const map = L.map('applicant-map', {
+                                zoomControl: true,
+                                scrollWheelZoom: true,
+                                dragging: true
+                            }).setView([lat, lon], 13);
+
+                            // Add OpenStreetMap tiles
+                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                maxZoom: 19
+                            }).addTo(map);
+
+                            // Add a marker at the location
+                            L.marker([lat, lon]).addTo(map)
+                                .bindPopup(locationName)
+                                .openPopup();
+                        } else {
+                            console.warn('Location not found for geocoding.');
+                            mapContainer.innerHTML = `<p>Map data not available for this location.</p>`;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching geocoding data:', error);
+                        mapContainer.innerHTML = `<p>Error loading map data.</p>`;
+                    });
+            } else {
+                console.warn('Location data is missing or invalid.');
+                if (mapContainer) {
+                    mapContainer.innerHTML = `<p>Map data not available.</p>`;
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}
