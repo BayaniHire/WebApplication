@@ -1,53 +1,161 @@
 {% extends "Interviewer_Inheritance.html" %}
 
-{% block body %}
-    <div class="main-content">
-        <table width="100%">
-            <tr>
-                <td valign="top"> <!-- Group 1 -->
-                    <table>
-                        <tr><td>Name:</td><td>{{ applicant.first_name }} {{ applicant.middle_name }} {{ applicant.last_name }}</td></tr>
-                        <tr><td>Applied For:</td><td>{{ job_details.job_title }}</td></tr>
-                        <tr><td>Date Applied:</td><td>{{ submission_date }}</td></tr>
-                        <tr><td>Age:</td><td>{{ applicant.age }}</td></tr>
-                        <tr><td>Gender:</td><td>{{ applicant.gender }}</td></tr>
-                        <tr><td>Current Address:</td><td>{{ applicant.house_no }}, {{ applicant.street_village }}, {{ applicant.barangay }}, {{ applicant.city_municipality }}, {{ applicant.province }}, {{ applicant.state }} ({{ applicant.zipcode }})</td></tr>
-                        <tr><td>Mobile Number:</td><td>{{ applicant.mobile_number }}</td></tr>
-                        <tr><td>Email:</td><td>{{ applicant.email }}</td></tr>
-                        <tr><td>Username:</td><td>{{ applicant.username }}</td></tr>
-                    </table>
-                    <label>File Upload</label>
-                    <ul>
-                        {% if uploaded_files %}
-                            {% for file_name in uploaded_files %}
-                                <li>
-                                    {{ file_name }}
-                                    <button onclick="window.location.href='{% url 'viewing_files' file_name=file_name %}';">View File</button>
-                                    <button>Download</button>
-                                    <button onclick="printFile('{{ file_name }}')">Print</button>
-                                </li>
-                            {% endfor %}
-                        {% else %}
-                            <li>No files uploaded.</li>
-                        {% endif %}
-                    </ul>
-                </td>
-                <td valign="top"> <!-- Group 2 -->
-                    <table>
-                        <tr><td>Job Title:</td><td>{{ job_details.job_title }}</td></tr>
-                        <tr><td>Company:</td><td>{{ job_details.job_company }}</td></tr>
-                    </table>
-                    <textarea readonly placeholder="Job Requirements">{{ job_details.job_requirements }}</textarea><br>
-                    <label>Status: {{ applicant_status }}</label><br>
-                    
-                    <!-- Hidden input for applicant_status_id -->
-                    <input type="hidden" id="applicantStatusId" value="{{ applicant_status_id }}">
+{% block title %}View Information{% endblock %}
 
+{% block content %}
+<div class="main-content interviewer-main-content">
+    <table class="interviewer-main-table">
+        <tr>
+            <td class="interviewer-valign-top"> <!-- Group 1 -->
+                <table class="interviewer-inner-table">
+                    <tr><td><strong>Name:</strong></td><td>{{ applicant.first_name }} {{ applicant.middle_name }} {{ applicant.last_name }}</td></tr>
+                    <tr><td><strong>Applied For:</strong></td><td>{{ job_details.job_title }}</td></tr>
+                    <tr><td><strong>Date Applied:</strong></td><td>{{ submission_date }}</td></tr>
+                    <tr><td><strong>Age:</strong></td><td>{{ applicant.age }}</td></tr>
+                    <tr><td><strong>Gender:</strong></td><td>{{ applicant.gender }}</td></tr>
+                    <tr>
+                        <td><strong>Current Address:</strong></td>
+                        <td>{{ applicant.house_no }}, {{ applicant.street_village }}, {{ applicant.barangay }}, {{ applicant.city_municipality }}, {{ applicant.province }}, {{ applicant.state }} ({{ applicant.zipcode }})</td>
+                    </tr>
+                    <tr><td><strong>Mobile Number:</strong></td><td>{{ applicant.mobile_number }}</td></tr>
+                    <tr><td><strong>Email:</strong></td><td>{{ applicant.email }}</td></tr>
+                    <tr><td><strong>Username:</strong></td><td>{{ applicant.username }}</td></tr>
+                </table>
                 
+                <!-- File Upload Section -->
+                <label><strong>File Upload</strong></label>
+                <ul id="file-list">
+                    {% if uploaded_files %}
+                        {% for file in uploaded_files %}
+                            <li onclick="selectFile('{{ file.data }}', '{{ file.metadata }}')">{{ file.metadata }}</li>
+                        {% endfor %}
+                    {% else %}
+                        <li>No files uploaded.</li>
+                    {% endif %}
+                </ul>
                 
-                    
-                </td>
-            </tr>
-        </table>
+                <!-- Buttons for Viewing, Downloading, and Printing -->
+                <div class="interviewer-file-buttons">
+                    <button id="view-button" class="interviewer-button" onclick="viewFile()" disabled>View File</button>
+                    <button id="download-button" class="interviewer-button" onclick="downloadFile()">Download</button>
+                    <button id="print-button" class="interviewer-button" onclick="printFile()">Print</button>
+                </div>
+            </td>
+            <td class="interviewer-valign-top"> <!-- Group 2 -->
+                <table class="interviewer-inner-table">
+                    <tr><td><strong>Job Title:</strong></td><td>{{ job_details.job_title }}</td></tr>
+                    <tr><td><strong>Company:</strong></td><td>{{ job_details.job_company }}</td></tr>
+                </table>
+                <textarea readonly class="interviewer-textarea" placeholder="Job Requirements">{{ job_details.job_requirements }}</textarea>
+                <label><strong>Status:</strong> {{ applicant_status }}</label>
+            </td>
+        </tr>
+    </table>
+
+    <!-- File Name Container -->
+    <div id="file-container" class="file-container">
+        <h3>Selected File</h3>
+        <p>No file selected yet.</p>
     </div>
+
+    <!-- File Preview Section -->
+    <div id="file-preview" class="file-preview">
+        <h3>File Preview</h3>
+        <p>Select a file from the list and click "View File" to preview it here.</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    let selectedFileData = '';  // Store base64-encoded file data
+    let selectedFileName = ''; // Store file name
+
+    // Function to handle file selection
+    function selectFile(data, fileName) {
+        if (!data || !fileName) {
+            alert("Invalid file selection.");
+            return;
+        }
+        selectedFileData = data;  // Store the selected file's base64 data
+        selectedFileName = fileName;  // Store the file's name
+
+        // Update the selected file container
+        const fileContainer = document.getElementById('file-container');
+        fileContainer.innerHTML = `<h3>Selected File</h3><p><strong>${fileName}</strong></p>`;
+
+        // Enable the View File button
+        document.getElementById('view-button').disabled = false;
+    }
+
+    // Function to display the selected file inline
+    function viewFile() {
+        if (!selectedFileData || !selectedFileName) {
+            alert("Please select a file to view.");
+            return;
+        }
+
+        const filePreview = document.getElementById('file-preview');
+        filePreview.innerHTML = '<h3>File Preview</h3>';  // Clear previous content
+
+        if (selectedFileName.toLowerCase().endsWith('.pdf')) {
+            filePreview.innerHTML += `
+                <embed src="data:application/pdf;base64,${selectedFileData}" type="application/pdf" width="100%" height="600px">
+            `;
+        } else if (
+            selectedFileName.toLowerCase().endsWith('.jpg') ||
+            selectedFileName.toLowerCase().endsWith('.jpeg') ||
+            selectedFileName.toLowerCase().endsWith('.png')
+        ) {
+            filePreview.innerHTML += `
+                <img src="data:image/jpeg;base64,${selectedFileData}" style="width:100%; height:auto;" alt="File Preview">
+            `;
+        } else {
+            filePreview.innerHTML += '<p>Unsupported file type for preview.</p>';
+        }
+    }
+
+    // Function to download the selected file
+    function downloadFile() {
+        if (!selectedFileData || !selectedFileName) {
+            alert("Please select a file to download.");
+            return;
+        }
+
+        const link = document.createElement('a');
+        link.href = `data:application/octet-stream;base64,${selectedFileData}`;
+        link.download = selectedFileName;
+        link.click();
+    }
+
+    // Function to print the selected file
+    function printFile() {
+        if (!selectedFileData || !selectedFileName) {
+            alert("Please select a file to print.");
+            return;
+        }
+
+        const printWindow = window.open('', '', 'height=600,width=800');
+        printWindow.document.write('<html><body><h1>File Preview</h1>');
+
+        if (
+            selectedFileName.toLowerCase().endsWith('.jpg') ||
+            selectedFileName.toLowerCase().endsWith('.jpeg') ||
+            selectedFileName.toLowerCase().endsWith('.png')
+        ) {
+            printWindow.document.write(
+                `<img src="data:image/jpeg;base64,${selectedFileData}" style="width:100%; height:auto;">`
+            );
+        } else if (selectedFileName.toLowerCase().endsWith('.pdf')) {
+            printWindow.document.write(
+                `<embed src="data:application/pdf;base64,${selectedFileData}" type="application/pdf" width="100%" height="600px">`
+            );
+        } else {
+            printWindow.document.write('<p>Unsupported file type for printing.</p>');
+        }
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+        printWindow.print();
+    }
+</script>
 {% endblock %}
