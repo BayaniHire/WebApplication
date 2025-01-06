@@ -78,6 +78,8 @@ class ListOfApplicantsWithStatusAndCredentials(models.Model):
     admin_message = models.TextField(blank=True, null=True)
     interviewer_feedback = models.TextField(blank=True, null=True)
     interviewer_feedback_status = models.CharField(max_length=20, blank=True, null=True)
+    # Add location-related fields here
+    location = models.CharField(max_length=500, blank=True, null=True)  # Human-readable location
 
     class Meta:
         db_table = 'list_of_applicants_with_status_and_credentials'
