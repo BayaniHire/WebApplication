@@ -1612,8 +1612,14 @@ def Registration(request):
                 account_status='active'  # Set account status as 'active'
             )
             
-            # Redirect to a success page or login
-            return redirect('login')  # Change 'success_page' to the actual success page you have
+            # Add a success message with the username
+            messages.success(
+                request, 
+                f"You have successfully created an account! Username: {account_info.username}"
+            )
+            
+            # Redirect to the login page
+            return redirect('login')
     else:
         form = AccountInformationForm()
     
