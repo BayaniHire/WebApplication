@@ -43,11 +43,11 @@ class AccountInformationForm(forms.ModelForm):
         }
 
     def clean_username(self):
-        username = self.cleaned_data.get('username')
-        # Append the email domain (@bynhr.com)
-        if username and not username.endswith('@bynhr.com'):
-            username = f'{username}@bynhr.com'
-        return username
+            username = self.cleaned_data.get('username')
+            # Append the email domain (@bynhr.com)
+            if username and not username.endswith('@bynhr.com'):
+                username = f'{username}@bynhr.com'
+            return username
 
     def clean_birth_date(self):
         birth_date = self.cleaned_data.get('birth_date')
@@ -57,8 +57,8 @@ class AccountInformationForm(forms.ModelForm):
                 (today.month, today.day) < (birth_date.month, birth_date.day)
             )
             # Check age limits
-            if age < 18 or age > 40:
-                raise ValidationError("Sorry, you don't pass the age limit (18-40 years).")
+            if age < 18 or age > 65:
+                raise ValidationError("Sorry, but the age requirement is 18-65 years old.")
             self.cleaned_data['age'] = age
         return birth_date
 
@@ -84,6 +84,10 @@ class AccountInformationForm(forms.ModelForm):
     def save(self, commit=True):
         instance = super().save(commit=False)  # Save without committing initially
     
+        # Ensure mobile_number starts with '09' and retains leading zero
+        if instance.mobile_number and not instance.mobile_number.startswith("09"):
+            instance.mobile_number = f"0{instance.mobile_number}"
+    
         # Additional logic, e.g., setting age if needed
         if 'birth_date' in self.cleaned_data:
             birth_date = self.cleaned_data['birth_date']
@@ -93,6 +97,42 @@ class AccountInformationForm(forms.ModelForm):
         if commit:
             instance.save()  # This line actually saves the instance to the database
         return instance
+    
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+    
+        # Check if the username already contains the domain
+        if username and not username.endswith('@bynhr.com'):
+            username = f"{username}@bynhr.com"
+    
+        # Check if the username with domain already exists
+        if AccountInformation.objects.filter(username=username).exists():
+            raise ValidationError("Username is already taken.")
+    
+        return username
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if AccountInformation.objects.filter(email=email).exists():
+            raise ValidationError("An account with this email already exists.")
+        return email
+    
+    def clean_mobile_number(self):
+        mobile_number = self.cleaned_data.get('mobile_number')
+        
+        if not mobile_number:
+            raise ValidationError("Mobile number is required.")
+        
+        if not mobile_number.isdigit():
+            raise ValidationError("Mobile number must contain only numbers.")
+        
+        if len(mobile_number) != 11:
+            raise ValidationError("Mobile number must be exactly 11 digits.")
+        
+        if not mobile_number.startswith("09"):
+            raise ValidationError("Mobile number must start with '09'.")
+        
+        return mobile_number
 
     
 
