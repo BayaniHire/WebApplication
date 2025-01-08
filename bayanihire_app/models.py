@@ -20,7 +20,7 @@ class AccountInformation(models.Model):
     state = models.CharField(max_length=45, blank=True, null=True)
     zipcode = models.IntegerField(blank=True, null=True)
     email = models.EmailField(max_length=45, blank=True, null=True)
-    mobile_number = models.BigIntegerField(blank=True, null=True)
+    mobile_number = models.CharField(max_length=11, blank=True, null=True)
     birth_date = models.DateField(blank=True, null=True)
     age = models.IntegerField(blank=True, null=True) 
     gender = models.CharField(max_length=45, blank=True, null=True)
