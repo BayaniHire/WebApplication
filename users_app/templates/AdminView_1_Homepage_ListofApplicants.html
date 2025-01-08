@@ -8,25 +8,36 @@
     <p style="font-size: 14px; font-weight: bold; text-align: center;">
         Welcome to List of Applicants, where the System Admin can manage all the applicants applied in this system.
     </p>
-    <p>Number of New Applicants: <span style="color: red; ">{{ total_applicants }}</span></p>
+    <p>Number of New Applicants: <span style="color: red; ">{{ total_applicants_under_review }}</span></p>
 
     <form method="GET" action="" class="d-flex align-items-center mb-3">
-        <select name="sort" class="AD-admin-sort-dropdown" onchange="this.form.submit()">
-            <option value="asc" {% if sort_order == 'asc' %}selected{% endif %}>Sort Name A-Z</option>
-            <option value="desc" {% if sort_order == 'desc' %}selected{% endif %}>Sort Name Z-A</option>
+        <select name="sort_type" class="AD-admin-sort-dropdown" onchange="this.form.submit()">
+            <option value="" {% if not sort_type %}selected{% endif %}>Sort</option>
+            <option value="name_asc" {% if sort_type == 'name_asc' %}selected{% endif %}>Applicant Name (A-Z)</option>
+            <option value="name_desc" {% if sort_type == 'name_desc' %}selected{% endif %}>Applicant Name (Z-A)</option>
+            <option value="job_company_asc" {% if sort_type == 'job_company_asc' %}selected{% endif %}>Company (A-Z)</option>
+            <option value="job_company_desc" {% if sort_type == 'job_company_desc' %}selected{% endif %}>Company (Z-A)</option>
+            <option value="job_title_asc" {% if sort_type == 'job_title_asc' %}selected{% endif %}>Position Applied (A-Z)</option>
+            <option value="job_title_desc" {% if sort_type == 'job_title_desc' %}selected{% endif %}>Position Applied (Z-A)</option>
+            <option value="submission_date_asc" {% if sort_type == 'submission_date_asc' %}selected{% endif %}>Position Applied (Oldest to Newest)</option>
+        <option value="submission_date_desc" {% if sort_type == 'submission_date_desc' %}selected{% endif %}>Position Applied (Newest to Oldest)</option>
         </select>
     
-        <select name="date_sort" class="AD-admin-sort-dropdown" onchange="this.form.submit()">
-            <option value="asc" {% if date_sort == 'asc' %}selected{% endif %}>Date Applied Ascending</option>
-            <option value="desc" {% if date_sort == 'desc' %}selected{% endif %}>Date Applied Descending</option>
+        <select name="status" class="AD-admin-sort-dropdown" onchange="this.form.submit()">
+            <option value="" {% if not request.GET.status %}selected{% endif %}>All Statuses</option>
+            <option value="UNDER REVIEW" {% if request.GET.status == 'UNDER REVIEW' %}selected{% endif %}>Under Review</option>
+            <option value="FOR INTERVIEW" {% if request.GET.status == 'FOR INTERVIEW' %}selected{% endif %}>For Interview</option>
+            <option value="FAILED TO MEET REQUIREMENTS" {% if request.GET.status == 'FAILED TO MEET REQUIREMENTS' %}selected{% endif %}>Failed To Meet Requirements</option>
+            <option value="INCOMPLETE" {% if request.GET.status == 'INCOMPLETE' %}selected{% endif %}>Incomplete</option>
+            <option value="REJECTED" {% if request.GET.status == 'REJECTED' %}selected{% endif %}>Rejected</option>
+            <option value="QUALIFIED" {% if request.GET.status == 'QUALIFIED' %}selected{% endif %}>Qualified</option>
+            <option value="PASSED" {% if request.GET.status == 'PASSED' %}selected{% endif %}>Passed</option>
+            <option value="FAILED" {% if request.GET.status == 'FAILED' %}selected{% endif %}>Failed</option>
         </select>
-    
-        <input type="text" name="search" value="{{ search_query }}" class="applicant-search-input" placeholder="Search by name..." style="width: 25%;">
-    
-        <button type="submit" class="applicant-search-button">Search</button>
-    
-        <input type="number" name="rows" min="1" max="10" value="{{ rows_per_page }}" class="form-control mr-2" placeholder="Rows per page">
-    
+        
+        <input style="margin-right: 5px;" type="text" name="search" value="{{ search_query }}" class="applicant-search-input" placeholder="Search by name..." style="width: 55%;">
+        <button style="margin-right: 5px;" type="submit" class="applicant-search-button">Search</button>
+        <input type="number" name="rows" min="1" max="10" value="{{ rows_per_page }}" class="form-control mr-2" placeholder="Rows per page" style="width: 5%;">
         <button type="submit" class="applicant-search-button">Set Rows</button>
     </form>
     
@@ -61,13 +72,15 @@
                     {% endfor %}
                 {% else %}
                     <tr>
-                        <td colspan="7" style="text-align: center;">No applicants found.</td>
-                    </tr>
+                        <td colspan="7" style="text-align: center;">No Applicants/Company/Position found.</td>
+                    </tr>      
                 {% endif %}
             </tbody>
         </table>
     </div>
+    <p id="no-match" style="display:none;">No Applicants/Company/Position found.</p>
 
+    
     <!-- Pagination Links -->
     <div class="pagination">
         {% if page_obj.has_previous %}
@@ -83,29 +96,44 @@
 </div>
 
 <script>
+    
 function searchTable() {
-    let input = document.getElementById('search-input').value.toLowerCase();
-    let rows = document.querySelectorAll('tbody tr'); // Ensure correct selector for your table rows
-    let noMatch = document.getElementById('no-match');
-    let matchFound = false;
+    var input = document.querySelector('input[name="search"]').value.toLowerCase();
+    var rows = document.querySelectorAll('tbody tr:not(#no-match)');
+    var noMatch = document.getElementById('no-match');
+    var matchFound = false;
 
-    rows.forEach(row => {
-        let name = row.cells[1].textContent.toLowerCase(); // Assuming name is in the second column
-        if (name.includes(input)) {
+    if (input.trim() === '') {
+        // If the search input is empty, display all rows
+        rows.forEach(function(row) {
             row.style.display = '';
-            matchFound = true;
-        } else {
-            row.style.display = 'none';
-        }
-    });
-
-    noMatch.style.display = matchFound ? 'none' : '';
+        });
+        noMatch.style.display = 'none';
+    } else {
+        // Iterate over each row to check for matches when there is input
+        rows.forEach(function(row) {
+            var text = row.textContent.toLowerCase();
+            if (text.includes(input)) {
+                row.style.display = '';
+                matchFound = true;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        // Display the 'no match' message if no rows are found
+        noMatch.style.display = matchFound ? 'none' : 'block';
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('search-input');
+    var searchInput = document.querySelector('input[name="search"]');
     searchInput.addEventListener('keyup', searchTable);
 });
+
+
+
 </script>
 
 {% endblock %}
+
+
