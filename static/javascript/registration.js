@@ -35,3 +35,13 @@ window.addEventListener("click", function(event){
 modalCheckbox.addEventListener("change", function(){
     regCheckbox.checked = this.checked;
 });
+
+
+// Validate checkbox on form submission
+document.querySelector('.register-form').addEventListener('submit', function(event) {
+    var regCheckbox = document.getElementById("terms");
+    if (!regCheckbox.checked) {
+        event.preventDefault(); // Prevent form submission
+        alert("Please agree to the Terms and Conditions by checking the box.");
+    }
+});
