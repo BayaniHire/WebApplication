@@ -496,28 +496,45 @@ def list_of_applicants(request):
         return auth_response
         
     search_query = request.GET.get('search', '').strip()
-    sort_order = request.GET.get('sort', 'asc')
-    date_sort = request.GET.get('date_sort', 'asc')  # New parameter for date sorting
+    sort_type = request.GET.get('sort_type', '')
+    sort_order = request.GET.get('sort_order', 'asc')
+    status_filter = request.GET.get('status', '')
     rows_param = request.GET.get('rows', '5')
     rows_per_page = max(min(int(rows_param), 10), 1) if rows_param.isdigit() else 5
 
-    query = Q(account__first_name__icontains=search_query) | Q(account__middle_name__icontains=search_query) | Q(account__last_name__icontains=search_query)
+    query = (
+        Q(account__first_name__icontains=search_query) | 
+        Q(account__middle_name__icontains=search_query) | 
+        Q(account__last_name__icontains=search_query) | 
+        Q(job__job_company__icontains=search_query) | 
+        Q(job__job_title__icontains=search_query)
+    )
+    
     if search_query:
         applicants = ListOfApplicantsWithStatusAndCredentials.objects.filter(query)
     else:
         applicants = ListOfApplicantsWithStatusAndCredentials.objects.all()
 
-    # Handling sorting by name
-    if sort_order == 'desc':
-        applicants = applicants.order_by('-account__first_name', '-account__middle_name', '-account__last_name')
-    else:
-        applicants = applicants.order_by('account__first_name', 'account__middle_name', 'account__last_name')
+    if status_filter:
+        applicants = applicants.filter(applicant_status=status_filter)
     
-    # Handling sorting by date
-    if date_sort == 'desc':
-        applicants = applicants.order_by('-submission_date')
-    elif date_sort == 'asc':
-        applicants = applicants.order_by('submission_date')
+    total_applicants_under_review = ListOfApplicantsWithStatusAndCredentials.objects.filter(applicant_status="UNDER REVIEW").count()
+
+    # Handling sorting based on the type and order
+    if sort_type:
+        if 'name' in sort_type:
+            base_sort_field = 'account__last_name' if 'name' in sort_type else sort_type
+            direction = '-' if 'desc' in sort_type else ''
+            applicants = applicants.order_by(direction + 'account__first_name', direction + 'account__middle_name', direction + 'account__last_name')
+        elif 'job_company' in sort_type:
+            direction = '-' if 'desc' in sort_type else ''
+            applicants = applicants.order_by(direction + 'job__job_company')
+        elif 'job_title' in sort_type:
+            direction = '-' if 'desc' in sort_type else ''
+            applicants = applicants.order_by(direction + 'job__job_title')
+        elif 'submission_date' in sort_type:
+            direction = '-' if 'desc' in sort_type else ''
+            applicants = applicants.order_by(direction + 'submission_date')
 
     paginator = Paginator(applicants, rows_per_page)
     page_number = request.GET.get('page', 1)
@@ -529,15 +546,16 @@ def list_of_applicants(request):
             'full_name': f"{a.account.first_name} {a.account.middle_name or ''} {a.account.last_name}",
             'company': a.job.job_company,
             'position_applied': a.job.job_title,
-            'date_applied': a.submission_date,
+            'date_applied': a.submission_date.strftime("%Y-%m-%d"),  # Ensure dates are formatted nicely
             'status': a.applicant_status,
             'applicant_status_id': a.applicant_status_id,
         } for idx, a in enumerate(page_obj)],
-        'total_applicants': paginator.count,
+        'total_applicants_under_review': total_applicants_under_review,
         'page_obj': page_obj,
         'search_query': search_query,
         'sort_order': sort_order,
-        'date_sort': date_sort,  # Pass this to template for maintaining state
+        'sort_type': sort_type,
+        'status_filter': status_filter,
         'rows_per_page': rows_per_page,
     }
     return render(request, 'AdminView_1_Homepage_ListofApplicants.html', context)
