@@ -85,11 +85,28 @@
             <div class="mb-4">
                 <label class="form-label">Contact Information</label>
                 <div class="row g-3">
+                    <!-- Email Field -->
                     <div class="col">
                         {{ form.email }}
+                        <!-- Error message for email field -->
+                        {% if form.email.errors %}
+                            <div class="text-danger">
+                                {% for error in form.email.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}     
                     </div>
                     <div class="col">
                         {{ form.mobile_number }}
+                        <!-- Error message for mobile_number field -->
+                        {% if form.mobile_number.errors %}
+                            <div class="text-danger">
+                                {% for error in form.mobile_number.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
                     <div class="col">
                         <div class="d-flex align-items-center"> <!-- Flexbox to align label and input -->
@@ -126,6 +143,15 @@
                     {{ form.username }}
                     <span class="input-group-text" style="margin-left: 5px;">@bynhr.com</span>
                 </div>
+            
+                <!-- Error message for username field -->
+                {% if form.username.errors %}
+                    <div class="text-danger">
+                        {% for error in form.username.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
             
             <!-- Password -->
