@@ -658,6 +658,7 @@ def open_applicants(request, applicant_status_id):
         request.session['previous_page'] = reconstructed_url
 
     if request.method == 'POST':
+        applicant = get_object_or_404(ListOfApplicantsWithStatusAndCredentials, applicant_status_id=applicant_status_id)
         # Handle status update
         if applicant.applicant_status in ["FAILED", "PASSED"]:
             # Redirect back to the stored previous page with an error message
