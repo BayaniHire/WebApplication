@@ -58,6 +58,7 @@ from django.utils.timezone import now, timedelta
 from django.template.loader import render_to_string
 from xhtml2pdf import pisa
 from django.shortcuts import get_object_or_404
+from urllib.parse import urlparse, parse_qs, urlencode
 
 def logout_view(request):
     logout(request)
