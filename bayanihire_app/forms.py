@@ -7,7 +7,7 @@ import re
 
 class AccountInformationForm(forms.ModelForm):
     confirm_password = forms.CharField(
-        widget=forms.PasswordInput(attrs={'placeholder': 'Confirm Password', 'required': True}),
+        widget=forms.PasswordInput(attrs={'placeholder': 'Confirm your password', 'required': True}),
         label="Confirm Password"
     )
 
@@ -20,25 +20,30 @@ class AccountInformationForm(forms.ModelForm):
             'email', 'mobile_number', 'birth_date', 'age', 'gender'
         ]
         widgets = {
-            'first_name': forms.TextInput(attrs={'placeholder': 'First Name', 'required': True}),
-            'middle_name': forms.TextInput(attrs={'placeholder': 'Middle Name', 'required': True}),
-            'last_name': forms.TextInput(attrs={'placeholder': 'Last Name', 'required': True}),
-            'house_no': forms.TextInput(attrs={'placeholder': 'House No.', 'required': True}),
-            'street_village': forms.TextInput(attrs={'placeholder': 'Street/Village', 'required': True}),
-            'barangay': forms.TextInput(attrs={'placeholder': 'Barangay', 'required': True}),
-            'city_municipality': forms.TextInput(attrs={'placeholder': 'City/Municipality', 'required': True}),
-            'province': forms.TextInput(attrs={'placeholder': 'Province', 'required': True}),
-            'state': forms.TextInput(attrs={'placeholder': 'State', 'required': True}),
-            'zipcode': forms.TextInput(attrs={'placeholder': 'Zip Code', 'required': True}),
-            'email': forms.EmailInput(attrs={'placeholder': 'Email Address', 'required': True}),
-            'mobile_number': forms.TextInput(attrs={'placeholder': 'Mobile Number', 'required': True}),
+            'first_name': forms.TextInput(attrs={'placeholder': 'e.g., Juan', 'required': True}),
+            'middle_name': forms.TextInput(attrs={'placeholder': 'e.g., Santos (N/A if none)', 'required': True}),
+            'last_name': forms.TextInput(attrs={'placeholder': 'e.g., Dela Cruz', 'required': True}),
+            'house_no': forms.TextInput(attrs={'placeholder': 'e.g., 1234', 'required': True}),
+            'street_village': forms.TextInput(attrs={'placeholder': 'e.g., Green Village', 'required': True}),
+            'barangay': forms.TextInput(attrs={'placeholder': 'e.g., Barangay 123', 'required': True}),
+            'city_municipality': forms.TextInput(attrs={'placeholder': 'e.g., Quezon City', 'required': True}),
+            'province': forms.TextInput(attrs={'placeholder': 'e.g., Laguna, Cebu', 'required': True}),
+            'state': forms.TextInput(attrs={
+                'placeholder': 'Philippines', 
+                'required': True, 
+                'readonly': True,  
+                'value': 'Philippines'  
+            }),
+            'zipcode': forms.TextInput(attrs={'placeholder': 'e.g., 4001', 'required': True}),
+            'email': forms.EmailInput(attrs={'placeholder': 'example@gmail.com', 'required': True}),
+            'mobile_number': forms.TextInput(attrs={'placeholder': '09xxxxxxxxx', 'required': True}),
             'birth_date': forms.DateInput(attrs={'type': 'date', 'required': True}),
-            'username': forms.TextInput(attrs={'placeholder': 'Username', 'required': True}),
-            'password': forms.PasswordInput(attrs={'placeholder': 'Password', 'required': True}),
+            'username': forms.TextInput(attrs={'placeholder': 'juan12', 'required': True}),
+            'password': forms.PasswordInput(attrs={'placeholder': 'use 6 or more characters', 'required': True}),
             'gender': forms.Select(attrs={'required': True}, choices=[
+                ('prefer-not-to-say', 'Prefer not to say'),
                 ('male', 'Male'),
                 ('female', 'Female'),
-                ('prefer-not-to-say', 'Prefer not to say'),
             ]),
         }
 
@@ -133,6 +138,103 @@ class AccountInformationForm(forms.ModelForm):
             raise ValidationError("Mobile number must start with '09'.")
         
         return mobile_number
+
+    def clean_first_name(self):
+        first_name = self.cleaned_data.get('first_name')
+        # Allow alphabetic characters and spaces
+        if not re.match(r"^[a-zA-Z\s]+$", first_name):
+            raise ValidationError("First name must contain only alphabetic characters and spaces.")
+        if len(first_name) < 2:
+            raise ValidationError("First name must be at least 2 characters long.")
+        return first_name
+
+    def clean_middle_name(self):
+        middle_name = self.cleaned_data.get('middle_name')
+        if middle_name and middle_name.upper() not in ["N/A", "NOT APPLICABLE"]:
+            # Allow alphabetic characters and spaces for middle name
+            if not re.match(r"^[a-zA-Z\s]+$", middle_name):
+                raise ValidationError("Middle name must contain only alphabetic characters, spaces, or 'N/A'.")
+            if len(middle_name) < 2:
+                raise ValidationError("Middle name must be at least 2 characters long.")
+        return middle_name
+
+    def clean_last_name(self):
+        last_name = self.cleaned_data.get('last_name')
+        # Allow alphabetic characters and spaces
+        if not re.match(r"^[a-zA-Z\s]+$", last_name):
+            raise ValidationError("Last name must contain only alphabetic characters and spaces.")
+        if len(last_name) < 2:
+            raise ValidationError("Last name must be at least 2 characters long.")
+        return last_name
+        
+    def clean_house_no(self):
+        house_no = self.cleaned_data.get('house_no')
+    
+        # Ensure `house_no` is treated as a string
+        house_no = str(house_no)
+    
+        # Allow alphanumeric characters (letters and numbers), spaces, and optional dashes
+        if not re.match(r"^[a-zA-Z0-9\s-]+$", house_no):
+            raise ValidationError("House number must contain only letters, numbers, spaces, or dashes.")
+        if len(house_no.strip()) < 1:
+            raise ValidationError("House number must not be empty.")
+    
+        return house_no
+
+    def clean_street_village(self):
+        street_village = self.cleaned_data.get('street_village')
+        if not re.match(r"^[a-zA-Z0-9\s.,-]+$", street_village):
+            raise ValidationError("Street or village must contain only letters, numbers, spaces, commas, or hyphens.")
+        if len(street_village) < 3:
+            raise ValidationError("Street or village must be at least 3 characters long.")
+        return street_village
+
+    def clean_barangay(self):
+        barangay = self.cleaned_data.get('barangay')
+        if not re.match(r"^[a-zA-Z0-9\s.,-]+$", barangay):
+            raise ValidationError("Barangay must contain only letters, numbers, spaces, commas, or hyphens.")
+        if len(barangay) < 3:
+            raise ValidationError("Barangay must be at least 3 characters long.")
+        return barangay
+
+    def clean_city_municipality(self):
+        city_municipality = self.cleaned_data.get('city_municipality')
+        if not re.match(r"^[a-zA-Z\s]+$", city_municipality):
+            raise ValidationError("City or municipality must contain only letters and spaces.")
+        if len(city_municipality) < 2:
+            raise ValidationError("City or municipality must be at least 2 characters long.")
+        return city_municipality
+
+    def clean_province(self):
+        province = self.cleaned_data.get('province')
+        if not re.match(r"^[a-zA-Z\s]+$", province):
+            raise ValidationError("Province must contain only letters and spaces.")
+        if len(province) < 2:
+            raise ValidationError("Province must be at least 2 characters long.")
+        return province
+
+    def clean_state(self):
+        state = self.cleaned_data.get('state')
+        # Ensure it always remains "Philippines"
+        if state.strip().lower() != "philippines":
+            raise ValidationError("State must be 'Philippines'.")
+        return "Philippines"
+
+    
+    def clean_zipcode(self):
+        zipcode = self.cleaned_data.get('zipcode')
+
+        # Convert to string before validation
+        if zipcode is not None:
+            zipcode = str(zipcode)
+
+        # Validate that it's exactly 4 digits
+        if not re.match(r"^\d{4}$", zipcode):
+            raise ValidationError("Zipcode must be exactly 4 digits.")
+    
+        return zipcode
+    
+
 
     
 
