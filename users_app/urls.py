@@ -31,7 +31,8 @@ urlpatterns = [
     path('interviewdetails/<int:applicant_status_id>/', views.applicant_interviewdetails, name='interviewdetails'),
     path('profile_applicant/', views.applicant_profile, name='profile'),
 ##########################APPLICANT###############################################
-    
+    path('generate-pdf/', generate_pdf, name='generate_pdf'),
+#######################GENERATE PDF#################################
  ##########################ADMIN##########################################
     path('logout/', views.logout_view, name='logout'),
     path('dashboard_admin/', views.list_of_applicants, name='list_of_applicants'),
