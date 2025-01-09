@@ -137,6 +137,29 @@ body {
 
 }
 
+/* Instruction Text Styling */
+.instruction-text {
+    font-size: 0.85rem; /* Smaller than label text */
+    font-weight: normal; /* Remove bold */
+    color: white; /* Lighter gray for distinction */
+    margin-top: 4px; /* Slight spacing below the label */
+    display: block; /* Ensure it appears on a new line */
+}
+
+/* Responsive Adjustments for Instruction Text */
+@media (max-width: 768px) {
+    .instruction-text {
+        font-size: 0.8rem; /* Slightly smaller for tablet screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .instruction-text {
+        font-size: 0.75rem; /* Smaller for mobile screens */
+    }
+}
+
+
 /* Form Styling */
 .register-form label {
     display: block;
@@ -150,11 +173,12 @@ body {
     border: 1px solid  #8c592a;        /* Border color */
     background-color: #d2b486;        /* Background color */
     color: #333;                   /* Text color */
+    padding: 10px; /* Improved padding */
     
 }
 
 .form-label {
-    margin-bottom: 5px; /* Reduce space between label and input */
+    margin-bottom: 20px; /* Reduce space between label and input */
     font-weight: bold; /* Keep labels bold for visibility */
 }
 
@@ -170,6 +194,105 @@ body {
     color: #333;
     border-radius: 5px;
 }
+
+/* Name Fields Container Styling */
+.name-field-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px; /* Added spacing between fields */
+}
+
+@media (max-width: 768px) {
+    .name-field-container {
+        display: block; /* Stack fields vertically */
+    }
+
+    .name-field-container input {
+        width: 100%; /* Ensure full width on smaller screens */
+        margin-bottom: 10px; /* Add spacing */
+    }
+}
+
+/* Placeholder Styling */
+.register-form input::placeholder {
+    color: #666; /* Lighter placeholder color */
+    font-style: italic;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 480px) {
+    .register-form input {
+        padding: 8px;
+        font-size: 14px;
+    }
+}
+
+/* Address Section Styling */
+.address-section label {
+    margin-bottom: 20px;
+    display: block;
+    margin-bottom: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+}
+
+.address-section input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: 1px solid #8c592a;
+    background-color: #d2b486;
+    color: #333;
+    box-sizing: border-box;
+}
+
+/* Placeholder Styling */
+.address-section input::placeholder {
+    color: #666;
+    font-style: italic;
+}
+
+/* Focus State */
+.address-section input:focus {
+    border-color: #007bff;
+    background-color: #fff;
+    outline: none;
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+    .address-section input {
+        width: 100%; /* Ensure full width on smaller screens */
+    }
+}
+
+/* Specific styling for Current Address label */
+.register-form .form-label[for="address"] {
+    margin-top: 45px !important;/* Add space above the label */
+    margin-bottom: 15px !important; /* Add space below the label */
+    padding-top: 10px; /* Optional: Add internal spacing if needed */
+    font-size: 18px!important; /* Optional: Adjust the font size */
+    display: block; /* Ensure the label spans a new line */
+    color: white; /* Ensure it matches your theme */
+}
+
+/* Increase spacing between sections */
+.register-form .mb-4 {
+    margin-bottom: 30px!important; /* Adjust margin for larger spacing */
+    margin-top: 45px !important;
+}
+
+.text-muted {
+    font-size: 0.875rem; /* Make the font slightly smaller */
+    color: white; /* Muted gray color */
+}
+.text-muted strong {
+    color: #333; /* Use a darker shade for emphasis */
+}
+
+
 
 /* Button Styling */
 .button-container {
@@ -327,6 +450,9 @@ a.register-btn {
 a.register-btn:hover {
     color: #E64A19; /* Change this to a darker shade or a different color for hover */
 }
+
+
+
 
 
 
