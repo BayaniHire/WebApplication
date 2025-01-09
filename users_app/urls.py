@@ -55,8 +55,7 @@ urlpatterns = [
     
     path('admin_interviewer_account_setup/', views.admin_interviewer_account_setup, name='admin_interviewer_account_setup'),
     path('admin_creatingjob/', views.admin_creatingjob, name='admin_creatingjob'),
-    path('applicant/update/<int:applicant_status_id>/', views.update_applicant_status, name='update_applicant_status'),
-
+    
     #### wag galawing sa update to###
     path('update_password/', views.update_password, name='update_password'),
     
