@@ -1670,7 +1670,7 @@ def login(request):
                     request.session['account_id'] = account.account_id
                     return redirect('Security')
                 
-                elif account_storage.account_status == 'deactivate':
+                elif account_storage.account_status == 'deactivated':
                     return render(request, 'login.html', {"message": "Account is deactivated. Please contact support."})
                 
                 # If account_status is neither 'new' nor 'deactivate', proceed to role-based redirection
