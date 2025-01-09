@@ -12,6 +12,34 @@
     <!-- Your custom CSS -->
     <link rel="stylesheet" href="{% static 'applicant_styles.css' %}">
     <link rel="stylesheet" href="{% static 'admin_styles.css' %}">
+
+    <!-- Custom Alert CSS -->
+    <style>
+        .alert-hidden {
+            display: none;
+        }
+
+        .alert-box {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .alert-success {
+            background-color: #4CAF50; /* Green for success messages */
+            color: white;
+        }
+
+        .alert-error {
+            background-color: #f44336; /* Red for error messages */
+            color: white;
+        }
+    </style>
 </head>
 <body>
 
@@ -20,7 +48,6 @@
         <h1 class="center-text">BayaniHire: Admin Center</h1>
         <div class="profile-button" onclick="window.location.href='{% url 'adminprofile' %}';">Profile</div>
     </div>
-    
     <div class="content-area d-flex">  <!-- Added Bootstrap flex utility -->
         <div class="sidebar">
             <div class="image-placeholder">
@@ -36,7 +63,46 @@
         <div class="main-content flex-grow-1">  <!-- Added Bootstrap flex-grow utility -->
             {% block content %}
             <!-- Content will be defined in inheriting templates -->
+
+            <script>
+                    // THIS IS FOR THE DAMN MESSAGE ALERT
+                    function removeQueryParameters() {
+                    history.replaceState({}, document.title, location.pathname);
+                }
+            
+                document.addEventListener('DOMContentLoaded', () => {
+                    const params = new URLSearchParams(window.location.search);
+                    const message = params.get('message');
+                    const type = params.get('type');
+            
+                    if (message) {
+                        const alertBox = document.createElement('div');
+                        alertBox.className = `alert-box alert-${type}`;
+                        alertBox.textContent = message;
+                        document.body.appendChild(alertBox);
+            
+                        // Show the alert box
+                        alertBox.style.display = 'block';
+            
+                        // Remove the alert box after 3 seconds
+                        setTimeout(() => {
+                            alertBox.remove();
+                            // Remove query parameters from URL
+                            removeQueryParameters();
+                        }, 3000);
+                    }
+                });
+                
+            
+            </script>
             {% endblock %}
+        </div>
+    </div>
+
+    <div id="admincustomalert" class="alert-hidden">
+        <div class="alert-box" id="alertContent">
+            <p></p>
+            <button onclick="closeAdminCustomAlert()">Close</button>
         </div>
     </div>
 
@@ -50,6 +116,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+
+
 <!-- css -->
 <style>
     #no-match {
@@ -60,6 +128,46 @@
         color: #666; /* Sets the text color, adjust as needed */
         display: none; /* Initially hidden */
     }
+
+    .table-no-border td, .table-no-border th {
+        border: none; /* Removes table borders */
+    }
+
+    .bold-label {
+        font-weight: bold; /* Makes text bold */
+    }
+
+    #admin_filelist {
+        list-style-type: none; /* Removes bullet points from the list */
+        padding: 0;
+        margin: 0;
+        border: 0; /* Light grey border */
+        width: 100%; /* Full width */
+        max-width: 600px; /* Optional: Set a max width for the list */
+    }
+
+    #admin_filelist li {
+        padding: 10px;
+        border-bottom: 1px solid #ddd; /* Light grey line between items */
+        cursor: pointer; /* Changes cursor to pointer to indicate clickable */
+        transition: background-color 0.3s; /* Smooth transition for hover effect */
+        background-color: transparent; /* No background by default */
+    }
+
+    #admin_filelist li:hover {
+        background-color: #361f02; /* Golden background color */
+        color: #D3B18B; /* Dark brown text color */
+    }
+
+    #admin_filelist li.active {
+        background-color: #361f02; /* Green background for selected items */
+        color: #D3B18B; /* Dark brown text color */
+    }
+
+    #admin_filelist li:last-child {
+        border-bottom: none; /* Removes bottom border from the last item */
+    }
+    
 </style>
 
 {% block script %}{% endblock %}

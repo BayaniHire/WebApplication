@@ -11,21 +11,21 @@
         <div class="row">
             <div class="col-md-6">
                 <!-- Applicant Information Table -->
-                <table style="width: 100%; border-collapse: collapse;">
-                    <tr><td>Name:</td><td>{{ applicant.first_name }} {{ applicant.middle_name }} {{ applicant.last_name }}</td></tr>
-                    <tr><td>Applied For:</td><td>{{ job_details.job_title }}</td></tr>
-                    <tr><td>Date Applied:</td><td>{{ submission_date }}</td></tr>
-                    <tr><td>Age:</td><td>{{ applicant.age }}</td></tr>
-                    <tr><td>Gender:</td><td>{{ applicant.gender }}</td></tr>
-                    <tr><td>Current Address:</td><td>{{ applicant.house_no }}, {{ applicant.street_village }}, {{ applicant.barangay }}, {{ applicant.city_municipality }}, {{ applicant.province }}, {{ applicant.state }} ({{ applicant.zipcode }})</td></tr>
-                    <tr><td>Mobile Number:</td><td>{{ applicant.mobile_number }}</td></tr>
-                    <tr><td>Email:</td><td>{{ applicant.email }}</td></tr>
-                    <tr><td>Username:</td><td>{{ applicant.username }}</td></tr>
-                </table>
+                <table style="width: 100%; border-collapse: collapse;" class="table-no-border">
+                    <tr><td><span class="bold-label">Name:</span></td><td>{{ applicant.first_name }} {{ applicant.middle_name }} {{ applicant.last_name }}</td></tr>
+                    <tr><td><span class="bold-label">Applied For:</span></td><td>{{ job_details.job_title }}</td></tr>
+                    <tr><td><span class="bold-label">Date Applied:</span></td><td>{{ submission_date }}</td></tr>
+                    <tr><td><span class="bold-label">Age:</span></td><td>{{ applicant.age }}</td></tr>
+                    <tr><td><span class="bold-label">Gender:</span></td><td>{{ applicant.gender }}</td></tr>
+                    <tr><td><span class="bold-label">Current Address:</span></td><td>{{ applicant.house_no }}, {{ applicant.street_village }}, {{ applicant.barangay }}, {{ applicant.city_municipality }}, {{ applicant.province }}, {{ applicant.state }} ({{ applicant.zipcode }})</td></tr>
+                    <tr><td><span class="bold-label">Mobile Number:</span></td><td>{{ applicant.mobile_number }}</td></tr>
+                    <tr><td><span class="bold-label">Email:</span></td><td>{{ applicant.email }}</td></tr>
+                    <tr><td><span class="bold-label">Username:</span></td><td>{{ applicant.username }}</td></tr>
+                </table><br>
                 
                 <!-- File Upload List with Displayed Metadata -->
-                <label>File Upload</label>
-                <ul id="file-list">
+                <label><strong>File Upload</strong></label>
+                <ul id="admin_filelist">
                     {% if uploaded_files %}
                         {% for file in uploaded_files %}
                             <li onclick="selectFile('{{ file.data }}', '{{ file.metadata }}')">{{ file.metadata }}</li>
@@ -34,29 +34,36 @@
                         <li>No files uploaded.</li>
                     {% endif %}
                 </ul>
-                
+                <br>
                 <!-- View File Button (displays selected file) -->
                 <button id="view-button" class="sfbutton" onclick="viewFile()" disabled>View File</button>
             </div>
 
             <div class="col-md-6">
-                <!-- Job and Applicant Status -->
-                <table style="width: 100%; border-collapse: collapse;">
-                    <tr><td>Job Title:</td><td>{{ job_details.job_title }}</td></tr>
-                    <tr><td>Company:</td><td>{{ job_details.job_company }}</td></tr>
+
+                <table style="width: 100%; border-collapse: collapse;" class="table-no-border">
+                    <tr><td><span class="bold-label">Job Title:</span></td><td>{{ job_details.job_title }}</td></tr>
+                    <tr><td><span class="bold-label">Company:</span></td><td>{{ job_details.job_company }}</td></tr>
+                    <tr><td><span class="bold-label">Job Description:</span></td></tr>
                 </table>
-                <textarea readonly class="form-control" rows="5">{{ job_details.job_requirements }}</textarea>
-                <label>Status: {{ applicant_status }}</label><br>
-                <form method="POST" action="{% url 'update_applicant_status' applicant_status_id=applicant_status_id %}">
+                <textarea readonly class="form-control" style="height: 260px;">{{ job_details.job_requirements }}</textarea>
+
+                <br>
+                <label><strong>Status:</strong> {{ applicant_status }}</label><br>
+                
+                <form method="POST" action="{% url 'open_applicants' applicant_status_id=applicant_status_id %}">
                     {% csrf_token %}
-                    <select name="new_status" class="form-control mb-3">
-                        <option value="FOR INTERVIEW">FOR INTERVIEW</option>
-                        <option value="FAILED TO MEET REQUIREMENTS">FAILED TO MEET REQUIREMENTS</option>
-                        <option value="INCOMPLETE">INCOMPLETE</option>
-                        <option value="REJECTED">REJECTED</option>
+                    <select name="new_status" class="form-control mb-3" {% if applicant_status == "FAILED" or applicant_status == "PASSED" %}disabled{% endif %}>
+                        <option value="FOR INTERVIEW" {% if applicant_status == "FOR INTERVIEW" %}selected{% endif %}>FOR INTERVIEW</option>
+                        <option value="FAILED TO MEET REQUIREMENTS" {% if applicant_status == "FAILED TO MEET REQUIREMENTS" %}selected{% endif %}>FAILED TO MEET REQUIREMENTS</option>
+                        <option value="INCOMPLETE" {% if applicant_status == "INCOMPLETE" %}selected{% endif %}>INCOMPLETE</option>
+                        <option value="REJECTED" {% if applicant_status == "REJECTED" %}selected{% endif %}>REJECTED</option>
+                        <option value="UNDER REVIEW" {% if applicant_status == "UNDER REVIEW" %}selected{% endif %}>UNDER REVIEW</option>
                     </select>
-                    <button type="submit" class="sfbutton">Save</button>
+                    <button type="submit" class="sfbutton" onclick="preventRapidClick(event)">Save</button>
+                    <span id="clickWarning" style="color: red; display: none;"></span>
                 </form>
+        
             </div>
         </div>
 
@@ -73,7 +80,7 @@
         </div>
 
         <!-- File Preview Container -->
-        <div class="row mt-4">
+        <div class="row mt-4" id="file-preview-container" style="display: none;">
             <div class="col-12">
                 <div class="container bg-light border p-3">
                     <h3>File Preview</h3>
@@ -87,6 +94,9 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+            
         </div>
     </div>
 </div>
@@ -110,14 +120,13 @@
 
     // Function to display the selected file's preview
     function viewFile() {
+        const previewElement = document.getElementById('file-preview');
         if (!selectedFileData) {
             alert("Please select a file first.");
             return;
         }
-
-        const previewElement = document.getElementById('file-preview');
         previewElement.innerHTML = '';  // Clear previous content
-
+        // Add the logic to handle different file types and show preview accordingly
         if (selectedFileName.toLowerCase().endsWith('.jpg') || selectedFileName.toLowerCase().endsWith('.jpeg') || selectedFileName.toLowerCase().endsWith('.png')) {
             const img = document.createElement('img');
             img.src = `data:image/jpeg;base64,${selectedFileData}`;
@@ -136,7 +145,6 @@
             previewElement.innerHTML = '<p>Unsupported file type for preview.</p>';
         }
     }
-
     // Function to download the selected file
     function downloadFile() {
         if (!selectedFileData || !selectedFileName) {
@@ -182,5 +190,48 @@
         printWindow.document.close();
         printWindow.print();
     }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const listItems = document.querySelectorAll('#admin_filelist li');
+        const filePreviewContainer = document.getElementById('file-preview-container'); // Entire File Preview Container
+        const fileDisplayContainer = document.getElementById('file-container'); // Container for showing selected file info
+        const viewButton = document.getElementById('view-button'); // View button that triggers file preview
+
+        // Initially hide the entire file preview container
+        filePreviewContainer.style.display = 'none';
+
+        listItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // Toggle 'active' class on the clicked item
+                if (this.classList.contains('active')) {
+                    // If already active, remove the class and hide file preview
+                    this.classList.remove('active');
+                    fileDisplayContainer.innerHTML = "<strong>Selected File:</strong> No file selected yet.";
+                    filePreviewContainer.style.display = 'none'; // Hide the entire file preview container
+                    viewButton.disabled = true; // Disable the view button
+                } else {
+                    // Remove 'active' class from all items first
+                    listItems.forEach(innerItem => {
+                        innerItem.classList.remove('active');
+                    });
+                    // Add 'active' class to the clicked item
+                    this.classList.add('active');
+                    fileDisplayContainer.innerHTML = `<strong>Selected File:</strong> ${this.textContent}`;
+                    viewButton.disabled = false; // Enable the view button
+                }
+            });
+        });
+
+        // Handle the view button click to show or hide the preview dynamically
+        viewButton.addEventListener('click', function() {
+            if (selectedFileData) {
+                filePreviewContainer.style.display = 'block'; // Show the entire file preview container
+                viewFile(); // Function to populate the preview based on selected file
+            } else {
+                filePreviewContainer.style.display = 'none'; // Ensure container is hidden if no file data
+            }
+        });
+    });
+
 </script>
 {% endblock %}
