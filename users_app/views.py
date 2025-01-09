@@ -641,11 +641,37 @@ def open_applicants(request, applicant_status_id):
     auth_response = ensure_authenticated(request)
     if auth_response:
         return auth_response
-        
+
     # Fetch the applicant using the provided applicant_status_id
     applicant = get_object_or_404(ListOfApplicantsWithStatusAndCredentials, applicant_status_id=applicant_status_id)
 
-    # Fetch related account and job details
+    # Store the current page as the "previous_page" in session
+    if request.method == 'GET':
+        referrer = request.META.get('HTTP_REFERER', '/list_of_applicants/')
+        parsed_url = urlparse(referrer)
+        base_url = parsed_url.path
+        query_params = parse_qs(parsed_url.query)
+
+        # Reconstruct the URL with query parameters
+        reconstructed_url = f"{base_url}?{urlencode(query_params, doseq=True)}"
+        request.session['previous_page'] = reconstructed_url
+
+    if request.method == 'POST':
+        # Handle status update
+        if applicant.applicant_status in ["FAILED", "PASSED"]:
+            # Redirect back to the stored previous page with an error message
+            previous_page = request.session.get('previous_page', '/list_of_applicants/')
+            return redirect(f"{previous_page}&message=This applicant has already been interviewed and cannot be updated further.&type=error")
+
+        new_status = request.POST.get('new_status')
+        applicant.applicant_status = new_status
+        applicant.save()
+
+        # Redirect back to the stored previous page with a success message
+        previous_page = request.session.get('previous_page', '/list_of_applicants/')
+        return redirect(f"{previous_page}&message=Applicant status updated successfully.&type=success")
+
+    # Handle GET: Display applicant details
     account_info = applicant.account
     job_details = applicant.job
 
@@ -653,7 +679,6 @@ def open_applicants(request, applicant_status_id):
     uploaded_files = []
     filenames = applicant.file_metadata.split(", ") if applicant.file_metadata else []
 
-    # Process credentials data to prepare each file as base64 encoded
     if applicant.credentials:
         total_files_size = len(applicant.credentials)
         individual_file_size = total_files_size // len(filenames) if filenames else 0
@@ -677,7 +702,6 @@ def open_applicants(request, applicant_status_id):
         if not matching_file:
             raise Http404("File not found")
 
-        # Return JSON response with file data and type for preview
         return JsonResponse({'file_data': matching_file['data'], 'file_type': matching_file['type']})
 
     # Render page with applicant and job details, status, and uploaded files
@@ -691,30 +715,6 @@ def open_applicants(request, applicant_status_id):
     }
 
     return render(request, 'AdminView_1_1_OpenApplicants.html', context)
-
-def update_applicant_status(request, applicant_status_id):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-        
-    # Ensure the request method is POST
-    if request.method == 'POST':
-        # Fetch the applicant using the provided applicant_status_id
-        applicant = get_object_or_404(ListOfApplicantsWithStatusAndCredentials, applicant_status_id=applicant_status_id)
-        
-        # Get the new status from the form
-        new_status = request.POST.get('new_status')
-        
-        # Update the applicant's status in the database
-        applicant.applicant_status = new_status
-        applicant.save()
-        
-        messages.success(request, 'Applicant status updated successfully.')
-        
-        # Redirect to the dashboard after the update
-        return redirect('list_of_applicants')  # Update this to your actual URL name for the dashboard
-
-    return redirect('list_of_applicants')  # Redirect if not a POST request
 
 def viewing_files(request, file_name):
     auth_response = ensure_authenticated(request)
