@@ -661,7 +661,7 @@ def open_applicants(request, applicant_status_id):
         # Handle status update
         if applicant.applicant_status in ["FAILED", "PASSED"]:
             # Redirect back to the stored previous page with an error message
-            previous_page = request.session.get('previous_page', '/list_of_applicants/')
+            previous_page = request.session.get('previous_page')
             return redirect(f"{previous_page}&message=This applicant has already been interviewed and cannot be updated further.&type=error")
 
         new_status = request.POST.get('new_status')
@@ -669,7 +669,7 @@ def open_applicants(request, applicant_status_id):
         applicant.save()
 
         # Redirect back to the stored previous page with a success message
-        previous_page = request.session.get('previous_page', '/list_of_applicants/')
+        previous_page = request.session.get('previous_page')
         return redirect(f"{previous_page}&message=Applicant status updated successfully.&type=success")
 
     # Handle GET: Display applicant details
