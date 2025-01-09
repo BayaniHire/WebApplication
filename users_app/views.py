@@ -55,6 +55,9 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth import logout
 from django.utils.timezone import now, timedelta
+from django.template.loader import render_to_string
+from xhtml2pdf import pisa
+from django.shortcuts import get_object_or_404
 
 def logout_view(request):
     logout(request)
@@ -477,13 +480,86 @@ def applicant_interviewdetails(request, applicant_status_id):
         })
 
 
+
 def applicant_profile(request):
+
+    # Get the interviewer's account ID from the session
     auth_response = ensure_authenticated(request)
     if auth_response:
         return auth_response
         
-    return render(request, 'Applicant_profile.html')
+    account_id = request.session.get('account_id')
+    user = get_object_or_404(AccountInformation, account_id=account_id)
+
+    if request.method == "POST":
+        # Change Password Logic
+        current_password = request.POST.get('current_password')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+        
+        # Check if the current password matches
+        if user.password != current_password:
+            messages.error(request, "Current password is incorrect.")
+        elif new_password == current_password:
+            messages.error(request, "New password must be different from the current password.")
+        elif new_password != confirm_password:
+            messages.error(request, "New password and confirm password do not match.")
+        else:
+            # Update the password
+            user.password = new_password
+            user.save()
+            messages.success(request, "Password updated successfully.")
+            return redirect('INTprofile')  # Redirect to the interviewer profile page
+
+    # Display profile info
+    context = {
+        'username': user.username,
+        'full_name': f"{user.first_name} {user.middle_name or ''} {user.last_name}",
+        'email': user.email
+    }
+    return render(request, 'Applicant_profile.html', context)
+
 ###################APPLICANT############################
+def generate_pdf(request):
+    # Ensure the user is logged in
+    account_id = request.session.get('account_id')
+    if not account_id:
+        return HttpResponse("You must be logged in to generate a PDF.", status=403)
+
+    # Fetch Account Information
+    account_info = get_object_or_404(AccountInformation, account_id=account_id)
+
+    # Fetch Job Application Details
+    job_details = JobDetailsAndRequirements.objects.filter(account=account_info)
+
+    # Fetch Applicants and Status
+    applicants = ListOfApplicantsWithStatusAndCredentials.objects.filter(account=account_info)
+
+    # Context for the template
+    context = {
+        'account_info': account_info,
+        'job_details': job_details,
+        'applicants': applicants,
+    }
+
+    # Render the template to HTML
+    html = render_to_string('Generatepdf_Applicant.html', context)
+
+    # Create a PDF
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="application_details.pdf"'
+    pisa_status = pisa.CreatePDF(html, dest=response)
+
+    # Check for PDF generation errors
+    if pisa_status.err:
+        return HttpResponse("There was an error generating the PDF.", status=500)
+
+    return response
+
+###################APPLICANT############################
+
+    
+
 
 
 
