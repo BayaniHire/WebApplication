@@ -35,58 +35,147 @@
 
             <!-- Full Name -->
             <div class="mb-4">
-                <label for="full-name" class="form-label ">Full Name</label>
+                <label for="full-name" class="form-label">Please enter your full name correctly in each field:</label>
                 <div class="row g-3 justify-content-center">
                     <div class="col">
+                        <label for="full-name" class="instruction-text">First Name</label>
                         {{ form.first_name }}
+                        <!-- Error message for first_name field -->
+                        {% if form.first_name.errors %}
+                            <div class="text-danger">
+                                {% for error in form.first_name.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
                     <div class="col">
+                        <label for="full-name" class="instruction-text">Middle Name</label>
                         {{ form.middle_name }}
+                        <!-- Error message for middle_name field -->
+                        {% if form.middle_name.errors %}
+                            <div class="text-danger">
+                                {% for error in form.middle_name.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
                     <div class="col">
+                        <label for="full-name" class="instruction-text">Last Name</label>
                         {{ form.last_name }}
+                        <!-- Error message for last_name field -->
+                        {% if form.last_name.errors %}
+                            <div class="text-danger">
+                                {% for error in form.last_name.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
 
             <!-- Current Address -->
             <div class="mb-4">
-                <label for="address" class="form-label">Current Address</label>
+                <label for="address" class="form-label">Please provide your complete <strong>current address</strong> in the fields below:</label>
                 <div class="row g-3 mb-2">
                     <div class="col">
+                        <label for="address" class="instruction-text">House Number</label>
                         {{ form.house_no }}
+                        <!-- Error message for house_no -->
+                        {% if form.house_no.errors %}
+                            <div class="text-danger">
+                                {% for error in form.house_no.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
                     <div class="col">
+                        <label for="address" class="instruction-text">Street or Village</label>
                         {{ form.street_village }}
+                        <!-- Error message for street_village -->
+                        {% if form.street_village.errors %}
+                            <div class="text-danger">
+                                {% for error in form.street_village.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
                     <div class="col">
+                        <label for="address" class="instruction-text">Barangay</label>
                         {{ form.barangay }}
+                        <!-- Error message for barangay -->
+                        {% if form.barangay.errors %}
+                            <div class="text-danger">
+                                {% for error in form.barangay.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="row g-3 mb-2">
                     <div class="col">
+                        <label for="address" class="instruction-text">City or Municipality</label>
                         {{ form.city_municipality }}
+                        <!-- Error message for city_municipality -->
+                        {% if form.city_municipality.errors %}
+                            <div class="text-danger">
+                                {% for error in form.city_municipality.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
                     <div class="col">
+                        <label for="address" class="instruction-text">Province</label>
                         {{ form.province }}
+                        {% if form.province.errors %}
+                            <div class="text-danger">
+                                {% for error in form.province.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
                     <div class="col">
+                        <label for="address" class="instruction-text">Country</label>
                         {{ form.state }}
+                        <!-- Error message for state field -->
+                        {% if form.state.errors %}
+                            <div class="text-danger">
+                                {% for error in form.state.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="row g-3">
                     <div class="col">
+                        <label for="address" class="instruction-text">Zipcode</label>
                         {{ form.zipcode }}
+                        {% if form.zipcode.errors %}
+                            <div class="text-danger">
+                                {% for error in form.zipcode.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
 
             <!-- Contact Info -->
             <div class="mb-4">
-                <label class="form-label">Contact Information</label>
+                <label class="form-label">Contact Information:</label>
                 <div class="row g-3">
                     <!-- Email Field -->
                     <div class="col">
+                        <label class="instruction-text">Email</label>
                         {{ form.email }}
                         <!-- Error message for email field -->
                         {% if form.email.errors %}
@@ -98,6 +187,7 @@
                         {% endif %}     
                     </div>
                     <div class="col">
+                        <label class="instruction-text">Mobile Number</label>
                         {{ form.mobile_number }}
                         <!-- Error message for mobile_number field -->
                         {% if form.mobile_number.errors %}
@@ -109,10 +199,8 @@
                         {% endif %}
                     </div>
                     <div class="col">
-                        <div class="d-flex align-items-center"> <!-- Flexbox to align label and input -->
                             <label for="birthdate" class="form-label me-2">Birthday:</label> <!-- Add margin-end for spacing -->
                             {{ form.birth_date }}
-                        </div>
                         <!-- Error message for birth_date field -->
                         {% if form.birth_date.errors %}
                             <div class="text-danger">
@@ -139,6 +227,9 @@
             <!-- Username with Domain Suffix -->
             <div class="mb-4">
                 <label for="username" class="form-label">Username</label>
+                <label class="instruction-text">
+                    Please enter your username only. <strong>Do not include "@bynhr.com."</strong>
+                </label>
                 <div class="input-group">
                     {{ form.username }}
                     <span class="input-group-text" style="margin-left: 5px;">@bynhr.com</span>
