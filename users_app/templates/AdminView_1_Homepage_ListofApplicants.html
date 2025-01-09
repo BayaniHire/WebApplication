@@ -11,6 +11,10 @@
     <p>Number of New Applicants: <span style="color: red; ">{{ total_applicants_under_review }}</span></p>
 
     <form method="GET" action="" class="d-flex align-items-center mb-3">
+        <input type="hidden" name="sort_type" value="{{ sort_type }}">
+        <input type="hidden" name="sort_order" value="{{ sort_order }}">
+        <input type="hidden" name="status" value="{{ status_filter }}">
+
         <select name="sort_type" class="AD-admin-sort-dropdown" onchange="this.form.submit()">
             <option value="" {% if not sort_type %}selected{% endif %}>Sort</option>
             <option value="name_asc" {% if sort_type == 'name_asc' %}selected{% endif %}>Applicant Name (A-Z)</option>
@@ -84,13 +88,13 @@
     <!-- Pagination Links -->
     <div class="pagination">
         {% if page_obj.has_previous %}
-            <a href="?page=1&sort={{ sort_order }}&rows={{ rows_per_page }}&search={{ search_query }}">First</a>
-            <a href="?page={{ page_obj.previous_page_number }}&sort={{ sort_order }}&rows={{ rows_per_page }}&search={{ search_query }}">Previous</a>
+            <a href="?page=1&sort_type={{ sort_type }}&sort_order={{ sort_order }}&status={{ status_filter }}&rows={{ rows_per_page }}&search={{ search_query }}">First</a>
+            <a href="?page={{ page_obj.previous_page_number }}&sort_type={{ sort_type }}&sort_order={{ sort_order }}&status={{ status_filter }}&rows={{ rows_per_page }}&search={{ search_query }}">Previous</a>
         {% endif %}
         <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.</span>
         {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}&sort={{ sort_order }}&rows={{ rows_per_page }}&search={{ search_query }}">Next</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}&sort={{ sort_order }}&rows={{ rows_per_page }}&search={{ search_query }}">Last</a>
+            <a href="?page={{ page_obj.next_page_number }}&sort_type={{ sort_type }}&sort_order={{ sort_order }}&status={{ status_filter }}&rows={{ rows_per_page }}&search={{ search_query }}">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}&sort_type={{ sort_type }}&sort_order={{ sort_order }}&status={{ status_filter }}&rows={{ rows_per_page }}&search={{ search_query }}">Last</a>
         {% endif %}
     </div>
 </div>
