@@ -61,41 +61,13 @@
         </div>
         
         <div class="main-content flex-grow-1">  <!-- Added Bootstrap flex-grow utility -->
-            {% block content %}
-            <!-- Content will be defined in inheriting templates -->
 
-            <script>
-                    // THIS IS FOR THE DAMN MESSAGE ALERT
-                    function removeQueryParameters() {
-                    history.replaceState({}, document.title, location.pathname);
-                }
-            
-                document.addEventListener('DOMContentLoaded', () => {
-                    const params = new URLSearchParams(window.location.search);
-                    const message = params.get('message');
-                    const type = params.get('type');
-            
-                    if (message) {
-                        const alertBox = document.createElement('div');
-                        alertBox.className = `alert-box alert-${type}`;
-                        alertBox.textContent = message;
-                        document.body.appendChild(alertBox);
-            
-                        // Show the alert box
-                        alertBox.style.display = 'block';
-            
-                        // Remove the alert box after 3 seconds
-                        setTimeout(() => {
-                            alertBox.remove();
-                            // Remove query parameters from URL
-                            removeQueryParameters();
-                        }, 3000);
-                    }
-                });
-                
-            
-            </script>
-            {% endblock %}
+        
+        {% block content %}
+        <!-- Content will be defined in inheriting templates -->
+        
+        
+        {% endblock %}
         </div>
     </div>
 
@@ -117,6 +89,45 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 
+<script>
+
+    console.log('Notification script loaded');
+
+    // THIS IS FOR THE DAMN MESSAGE ALERT
+    function removeQueryParameters() {
+        history.replaceState({}, document.title, location.pathname);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const params = new URLSearchParams(window.location.search);
+        const message = params.get('message');
+        const type = params.get('type');
+
+        // Debugging: Log the parameters to the console
+        console.log(`Message: ${message}, Type: ${type}`);
+
+        if (message) {
+            const alertBox = document.createElement('div');
+            alertBox.className = `alert-box alert-${type}`;
+            alertBox.textContent = message;
+
+            // Add to body
+            document.body.appendChild(alertBox);
+
+            // Show the alert box
+            alertBox.style.display = 'block';
+
+            // Remove the alert box after 3 seconds
+            setTimeout(() => {
+                alertBox.remove();
+                // Remove query parameters from URL
+                history.replaceState({}, document.title, location.pathname);
+            }, 3000);
+        }
+    });
+    
+
+</script>
 
 <!-- css -->
 <style>
