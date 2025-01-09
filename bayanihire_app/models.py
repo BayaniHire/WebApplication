@@ -17,7 +17,7 @@ class AccountInformation(models.Model):
     barangay = models.CharField(max_length=45, blank=True, null=True)
     street_village = models.CharField(max_length=45, blank=True, null=True)
     city_municipality = models.CharField(max_length=45, blank=True, null=True)
-    state = models.CharField(max_length=45, blank=True, null=True)
+    state = models.CharField(max_length=50, default="Philippines")
     zipcode = models.IntegerField(blank=True, null=True)
     email = models.EmailField(max_length=45, blank=True, null=True)
     mobile_number = models.CharField(max_length=11, blank=True, null=True)
