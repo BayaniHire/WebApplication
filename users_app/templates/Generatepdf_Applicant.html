@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 30px;
+            margin: 15px;
             color: #333;
             line-height: 1.5; /* Slightly increased line spacing */
             font-size: 10px; /* Increased base font size */
@@ -53,6 +53,18 @@
         .list-item span {
             font-weight: bold;
         }
+        .info-text {
+            margin-bottom: 10px;
+            text-align: justify;
+            font-size: 12px;
+            line-height: 1.8;
+        }
+        .signature-section {
+            margin-top: 10px;
+            text-align: left;
+            font-size: 12px;
+            line-height: 1.6;
+        }
         .footer {
             text-align: center;
             font-size: 16px; /* Increased footer font size */
@@ -66,7 +78,10 @@
 <body>
     <!-- Header -->
     <div class="header">
-        <h1>Bayanihire Hiring Application</h1>
+        <h1>Bayanihire Hiring | Interview Slip</h1>
+    </div>
+    <div class="info-text">
+        This interview slip serves as an official document to present to the interviewer at BAYANIHIRE Recruitment Agency. Please ensure that all the details provided are accurate and complete before attending your interview. This slip contains important information about your application, job details, and interview schedule, which will be used to facilitate the interview process. It is essential to bring this slip with you, as it verifies your identity and scheduled appointment. Your cooperation is greatly appreciated, as it helps maintain the efficiency and professionalism of our recruitment process.
     </div>
 
     <!-- Personal Information Section -->
@@ -97,6 +112,15 @@
             <li class="list-item"><span>Interview Message:</span> {{ job.interview_message }}</li>
             {% endfor %}
         </ul>
+    </div>
+
+    <div class="signature-section">
+        Sincerely,<br>
+        BAYANIHIRE HIRING SYSTEM Team<br>
+        Benitez, Trysha Rhoy<br>
+        Marito, Wein Jazfer<br>
+        Quiambao, John Michael<br>
+        Rodriguez, Irish Mae
     </div>
 
     <!-- Footer -->
