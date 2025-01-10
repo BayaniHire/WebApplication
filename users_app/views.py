@@ -414,18 +414,21 @@ def applicant_viewfileupload(request, applicant_status_id):
     auth_response = ensure_authenticated(request)
     if auth_response:
         return auth_response
-        
+
     # Retrieve the application details using the applicant_status_id
     application = get_object_or_404(ListOfApplicantsWithStatusAndCredentials, applicant_status_id=applicant_status_id)
+
+    # Fetch account information from the related model (assuming a ForeignKey relationship)
+    applicant_account = application.account  # Replace `account` with the actual field name if different
 
     # Prepare to retrieve the uploaded files as binary
     uploaded_files = []
 
     # Split the file_metadata string into individual file names
-    filenames = application.file_metadata.split(', ')  # Split by comma and space
+    filenames = application.file_metadata.split(', ') if application.file_metadata else []  # Split by comma and space
 
     # Ensure you have the credentials data for each file
-    if application.credentials:
+    if application.credentials and filenames:
         total_files_size = len(application.credentials)
         individual_file_size = total_files_size // len(filenames)  # Assume equal sizes for simplicity
 
@@ -447,12 +450,26 @@ def applicant_viewfileupload(request, applicant_status_id):
 
     # Pass the relevant information to the template
     context = {
-        'application': application,
+        'applicant': {
+            'full_name': f"{applicant_account.first_name} {applicant_account.middle_name} {applicant_account.last_name}",
+            'age': applicant_account.age,
+            'gender': applicant_account.gender,
+            'mobile_number': applicant_account.mobile_number,
+            'email': applicant_account.email,
+            'address':  (
+                f"{getattr(applicant_account, 'house_no', '')}, "
+                f"{getattr(applicant_account, 'street_village', '')}, "
+                f"{getattr(applicant_account, 'barangay', '')}, "
+                f"{getattr(applicant_account, 'city_municipality', '')}, "
+                f"{getattr(applicant_account, 'province', '')}, "
+                f"{getattr(applicant_account, 'state', '')} "
+                f"({getattr(applicant_account, 'zipcode', '')})"
+            ).strip(', '),  # Remove trailing commas and spaces
+        },
         'uploaded_files': uploaded_files,
     }
 
     return render(request, 'Applicant_Viewfileupload.html', context)
-
 
 
 def applicant_interviewdetails(request, applicant_status_id):
