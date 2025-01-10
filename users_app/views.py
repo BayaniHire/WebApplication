@@ -465,6 +465,8 @@ def applicant_interviewdetails(request, applicant_status_id):
                 'schedule_date': applicant.applicant_schedule_date,
                 'interview_message': applicant.admin_message,
                 'location': applicant.location,
+                'applicant_job_id': applicant.applicant_status_id
+
             }
             return render(request, 'Applicant_InterviewDetails.html', {
                 'interview_details': interview_details
@@ -479,7 +481,6 @@ def applicant_interviewdetails(request, applicant_status_id):
         return render(request, 'Applicant_InterviewDetails.html', {
             'show_not_qualified_message': True
         })
-
 
 
 def applicant_profile(request):
@@ -521,26 +522,56 @@ def applicant_profile(request):
     return render(request, 'Applicant_profile.html', context)
 
 ###################APPLICANT############################
-def generate_pdf(request):
+def generate_pdf(request, applicant_status_id):
     # Ensure the user is logged in
     account_id = request.session.get('account_id')
     if not account_id:
         return HttpResponse("You must be logged in to generate a PDF.", status=403)
+    
+    user = get_object_or_404(AccountInformation, account_id=account_id)
 
-    # Fetch Account Information
-    account_info = get_object_or_404(AccountInformation, account_id=account_id)
+    # Fetch the specific qualified job application
+    application = get_object_or_404(
+        ListOfApplicantsWithStatusAndCredentials,
+        applicant_status_id=applicant_status_id,
+        account=user,
+        applicant_status="QUALIFIED"
+    )
 
-    # Fetch Job Application Details
-    job_details = JobDetailsAndRequirements.objects.filter(account=account_info)
+    # Fetch the related job and interviewer details
+    job = application.job
+    interview_instance = application.interview_applicant_id  # Fetch interview details if available
 
-    # Fetch Applicants and Status
-    applicants = ListOfApplicantsWithStatusAndCredentials.objects.filter(account=account_info)
+    # Prepare job details for the specific application
+    job_details = [{
+        'applicant_job_id': application.applicant_status_id,
+        'job_title': job.job_title,
+        'job_company': job.job_company,
+        'job_date_published': job.job_date_published,
+        'application_status': application.applicant_status,
+        'submission_date': application.submission_date,
+        'interviewer_name': interview_instance.interviewer_name if interview_instance else "N/A",
+        'schedule_date': application.applicant_schedule_date if application.applicant_schedule_date else "N/A",
+        'interview_message': application.admin_message if application.admin_message else "N/A",
+        'location': application.location if application.location else "N/A",
+    }]
+
+    # Generate dynamic file name: "{last_name}_Application_{job_title}.pdf"
+    file_name = f"{user.last_name or 'Applicant'}_Application.pdf"
 
     # Context for the template
     context = {
-        'account_info': account_info,
+        'account_info': {
+            'full_name': f"{user.first_name} {user.middle_name or ''} {user.last_name}".strip(),
+            'email': user.email,
+            'mobile_number': user.mobile_number,
+            'birth_date': user.birth_date,
+            'age': user.age,
+            'gender': user.gender,
+            'address': f"{user.house_no} {user.street_village}, {user.barangay}, {user.city_municipality}, "
+                       f"{user.province}, {user.state}, {user.zipcode}".strip(),
+        },
         'job_details': job_details,
-        'applicants': applicants,
     }
 
     # Render the template to HTML
@@ -548,7 +579,7 @@ def generate_pdf(request):
 
     # Create a PDF
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="application_details.pdf"'
+    response['Content-Disposition'] = f'attachment; filename="{file_name}"'
     pisa_status = pisa.CreatePDF(html, dest=response)
 
     # Check for PDF generation errors
@@ -556,6 +587,7 @@ def generate_pdf(request):
         return HttpResponse("There was an error generating the PDF.", status=500)
 
     return response
+
 
 ###################APPLICANT############################
 
