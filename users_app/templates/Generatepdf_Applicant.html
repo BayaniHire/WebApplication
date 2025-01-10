@@ -1,63 +1,62 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Application Details</title>
-    {% load static %}
+    <title>Interview Application Form</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 30px;
             color: #333;
+            line-height: 1.5; /* Slightly increased line spacing */
+            font-size: 10px; /* Increased base font size */
         }
-        h1, h2 {
+        h1 {
             text-align: center;
             color: #020202;
-            margin-bottom: 20px;
-        }
-        .section {
-            margin-bottom: 30px;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background-color: #f9f9f9;
-        }
-        .section-title {
-            font-size: 18px;
-            font-weight: bold;
             margin-bottom: 15px;
+            font-size: 25px; /* Increased font size for the main title */
+        }
+        h2 {
             text-align: center;
-            color: #444;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #f4f4f4;
-            font-weight: bold;
-        }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
+            color: #020202;
+            margin-bottom: 15px;
+            font-size: 20px; /* Increased font size for section titles */
         }
         .header {
             text-align: center;
             margin-bottom: 20px;
         }
         .header img {
-            width: 100px;
+            width: 120px; /* Increased logo size */
             margin-bottom: 10px;
+        }
+        .section {
+            margin-bottom: 15px;
+        }
+        .section-title {
+            font-size: 16px; /* Slightly larger section titles */
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-decoration: underline;
+            color: #444;
+        }
+        .list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .list-item {
+            margin-bottom: 5px;
+            font-size: 14px; /* Increased font size for list items */
+        }
+        .list-item span {
+            font-weight: bold;
         }
         .footer {
             text-align: center;
-            font-size: 14px;
-            margin-top: 30px;
+            font-size: 16px; /* Increased footer font size */
+            margin-top: 10px;
             border-top: 1px solid #ddd;
             padding-top: 10px;
             color: #777;
@@ -67,80 +66,37 @@
 <body>
     <!-- Header -->
     <div class="header">
-        <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo">
-        <h1>BayaniHire Hiring</h1>
+        <h1>Bayanihire Hiring Application</h1>
     </div>
 
-    <!-- Applicant's Personal Information -->
+    <!-- Personal Information Section -->
     <div class="section">
-        <h2 class="section-title">Applicant's Personal Information</h2>
-        <table>
-            <tr>
-                <th>Full Name</th>
-                <td>{{ account_info.full_name }}</td>
-            </tr>
-            <tr>
-                <th>Email Address</th>
-                <td>{{ account_info.email }}</td>
-            </tr>
-            <tr>
-                <th>Mobile Number</th>
-                <td>{{ account_info.mobile_number }}</td>
-            </tr>
-            <tr>
-                <th>Birth Date</th>
-                <td>{{ account_info.birth_date }}</td>
-            </tr>
-            <tr>
-                <th>Age</th>
-                <td>{{ account_info.age }}</td>
-            </tr>
-            <tr>
-                <th>Gender</th>
-                <td>{{ account_info.gender }}</td>
-            </tr>
-            <tr>
-                <th>Address</th>
-                <td>{{ account_info.address }}</td>
-            </tr>
-        </table>
+        <h2 class="section-title">Personal Information</h2>
+        <ul class="list">
+            <li class="list-item"><span>Name:</span> {{ account_info.full_name }}</li>
+            <li class="list-item"><span>Age:</span> {{ account_info.age }}</li>
+            <li class="list-item"><span>Birth Date:</span> {{ account_info.birth_date }}</li>
+            <li class="list-item"><span>Gender:</span> {{ account_info.gender }}</li>
+            <li class="list-item"><span>Contact Number:</span> {{ account_info.mobile_number }}</li>
+            <li class="list-item"><span>Email Address:</span> {{ account_info.email }}</li>
+            <li class="list-item"><span>Address:</span> {{ account_info.address }}</li>
+        </ul>
     </div>
 
-    <!-- Job Application and Interview Details -->
+    <!-- Position Applied For Section -->
     <div class="section">
-        <h2 class="section-title">Job Application and Interview Details</h2>
-        {% for job in job_details %}
-        <table>
-            <tr>
-                <th>Job Title</th>
-                <td>{{ job.job_title }}</td>
-            </tr>
-            <tr>
-                <th>Company</th>
-                <td>{{ job.job_company }}</td>
-            </tr>
-            <tr>
-                <th>Application Status</th>
-                <td>{{ job.application_status }}</td>
-            </tr>
-            <tr>
-                <th>Interviewer Name</th>
-                <td>{{ job.interviewer_name }}</td>
-            </tr>
-            <tr>
-                <th>Schedule Date</th>
-                <td>{{ job.schedule_date }}</td>
-            </tr>
-            <tr>
-                <th>Message</th>
-                <td>{{ job.interview_message }}</td>
-            </tr>
-            <tr>
-                <th>Location</th>
-                <td>{{ job.location }}</td>
-            </tr>
-        </table>
-        {% endfor %}
+        <h2 class="section-title">Application Details</h2>
+        <ul class="list">
+            {% for job in job_details %}
+            <li class="list-item"><span>Position:</span> {{ job.job_title }}</li>
+            <li class="list-item"><span>Company:</span> {{ job.job_company }}</li>
+            <li class="list-item"><span>Application Status:</span> {{ job.application_status }}</li>
+            <li class="list-item"><span>Interviewer Name:</span> {{ job.interviewer_name }}</li>
+            <li class="list-item"><span>Interview Schedule Date:</span> {{ job.schedule_date }}</li>
+            <li class="list-item"><span>Interview Location:</span> {{ job.location }}</li>
+            <li class="list-item"><span>Interview Message:</span> {{ job.interview_message }}</li>
+            {% endfor %}
+        </ul>
     </div>
 
     <!-- Footer -->
