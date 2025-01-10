@@ -168,15 +168,37 @@
     }
 
     function searchFunction() {
-        const searchValue = document.querySelector(".applicant-search-input").value.toLowerCase();
+        const searchValue = document.querySelector(".applicant-search-input").value.toLowerCase().trim(); // Get search input value
         const table = document.querySelector("tbody");
         const rows = table.querySelectorAll("tr");
 
         rows.forEach(row => {
-            const jobTitle = row.cells[0].innerText.toLowerCase();
-            const jobStatus = row.cells[2].innerText.toLowerCase();
-            row.style.display = (jobTitle.includes(searchValue) || jobStatus.includes(searchValue)) ? "" : "none";
+            // Skip rows without cells (e.g., "No applications found" row)
+            if (!row.cells.length) return;
+
+            const jobTitle = row.cells[0]?.innerText.toLowerCase();
+            const jobCompany = row.cells[2]?.innerText.toLowerCase();
+            const applicationStatus = row.cells[3]?.innerText.toLowerCase();
+
+            // Check if the search value matches any of the relevant columns
+            if (
+                jobTitle.includes(searchValue) ||
+                jobCompany.includes(searchValue) ||
+                applicationStatus.includes(searchValue)
+            ) {
+                row.style.display = ""; // Show matching row
+            } else {
+                row.style.display = "none"; // Hide non-matching row
+            }
         });
+
+        // Check if no rows match and display a "No results found" message
+        const visibleRows = Array.from(rows).filter(row => row.style.display !== "none");
+        if (visibleRows.length === 0) {
+            table.innerHTML = `<tr><td colspan="6" style="text-align: center;">No results found.</td></tr>`;
+        }
     }
+
+
 </script>
 {% endblock %}
