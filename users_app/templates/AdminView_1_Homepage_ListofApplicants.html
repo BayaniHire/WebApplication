@@ -8,9 +8,9 @@
     <p style="font-size: 14px; font-weight: bold; text-align: center;">
         Welcome to List of Applicants, where the System Admin can manage all the applicants applied in this system.
     </p>
-    <p>Number of New Applicants: <span style="color: red; ">{{ total_applicants_under_review }}</span></p>
+    <p class="form-inline d-flex justify-content-center align-items-center">Number of New Applicants: <span style="color: red; ">{{ total_applicants_under_review }}</span></p>
 
-    <form method="GET" action="" class="d-flex align-items-center mb-3">
+    <form method="GET" action="" class="form-inline d-flex justify-content-center align-items-center">
         <input type="hidden" name="sort_type" value="{{ sort_type }}">
         <input type="hidden" name="sort_order" value="{{ sort_order }}">
         <input type="hidden" name="status" value="{{ status_filter }}">
