@@ -1899,6 +1899,11 @@ def change_password(request):
         account_id = request.session['account_id']
         account = AccountInformation.objects.get(account_id=account_id)
 
+        # Validate that the new password is at least 6 characters long
+        if len(new_password) < 6:
+            messages.error(request, "Password must be at least 6 characters long.")
+            return redirect('Security')
+
         # Check if the new password is the same as the old password
         if new_password == account.password:
             messages.error(request, "New password cannot be the same as the old password.")
