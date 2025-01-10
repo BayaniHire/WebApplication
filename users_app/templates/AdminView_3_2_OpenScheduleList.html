@@ -7,9 +7,9 @@
     <h2>Schedule of Interviews</h2>
 
     <form method="GET" action="" class="form-inline" id="filterForm">
-        <!-- Interviewer Selection -->
-        <select name="interviewer" class="AD-admin-sort-dropdown" onchange="document.getElementById('filterForm').submit()">
-            <option value="">Select Interviewer</option>
+        <!-- Interviewer Selection Dropdown -->
+        <select name="interviewer" class="AD-admin-sort-dropdown" onchange="this.form.submit()">
+            <option value="" {% if not interviewer_name %}selected{% endif %}>Select Interviewer</option>
             {% for interviewer in interviewers %}
                 <option value="{{ interviewer.interviewer_name }}" {% if interviewer.interviewer_name == interviewer_name %}selected{% endif %}>
                     {{ interviewer.interviewer_name }}
@@ -17,16 +17,19 @@
             {% endfor %}
         </select>
 
-        <!-- Sort by Date (only enabled if an interviewer is selected) -->
-        {% if interviewer_name %}
-            <select name="date_sort" class="form-control mr-2" onchange="document.getElementById('filterForm').submit()">
-                <option value="asc" {% if sort_order == 'asc' %}selected{% endif %}>Date Ascending</option>
-                <option value="desc" {% if sort_order == 'desc' %}selected{% endif %}>Date Descending</option>
-            </select>
-        {% endif %}
+        <!-- Sorting Dropdown -->
+        <select name="sort_type" class="AD-admin-sort-dropdown" onchange="this.form.submit()">
+            <option value="" {% if not sort_type %}selected{% endif %}>Sort</option>
+            <option value="name_asc" {% if sort_type == 'name_asc' %}selected{% endif %}>Qualified Applicants (A-Z)</option>
+            <option value="name_desc" {% if sort_type == 'name_desc' %}selected{% endif %}>Qualified Applicants (Z-A)</option>
+            <option value="interviewer_asc" {% if sort_type == 'interviewer_asc' %}selected{% endif %}>Interviewer Name (A-Z)</option>
+            <option value="interviewer_desc" {% if sort_type == 'interviewer_desc' %}selected{% endif %}>Interviewer Name (Z-A)</option>
+            <option value="date_asc" {% if sort_type == 'date_asc' %}selected{% endif %}>Interview Date (Oldest to Newest)</option>
+            <option value="date_desc" {% if sort_type == 'date_desc' %}selected{% endif %}>Interview Date (Newest to Oldest)</option>
+        </select>
 
-        <!-- Search by Name -->
-        <input type="text" name="search" id="search-input" value="{{ search_query }}" class="search-input" placeholder="Search qualified applicants by name">
+        <!-- Search Input -->
+        <input type="text" name="search" value="{{ search_query }}" class="search-input" placeholder="Search by name">
         <button type="submit" class="sfbutton">Search</button>
 
         <!-- Rows per Page -->
@@ -34,12 +37,14 @@
         <button type="submit" class="sfbutton">Set Rows</button>
     </form>
 
+    <!-- Table to Display Data -->
     <div class="table-container">
         <table style="width: 100%; border-collapse: collapse;">
-            <thead class="thead-dark">
+            <thead>
                 <tr>
                     <th>No.</th>
-                    <th>List of Qualified Applicants</th>
+                    <th>Qualified Applicants</th>
+                    <th>Interviewer</th>
                     <th>Interview Date</th>
                 </tr>
             </thead>
@@ -47,15 +52,15 @@
                 {% if applicants %}
                     {% for applicant in applicants %}
                     <tr>
-                        <!-- Display row number based on pagination -->
-                        <td>{{ page_obj.start_index|add:forloop.counter0 }}</td>
+                        <td>{{ forloop.counter }}</td>
                         <td>{{ applicant.account.first_name }} {{ applicant.account.last_name }}</td>
-                        <td>{{ applicant.applicant_schedule_date }}</td>
+                        <td>{{ applicant.interviewer_name }}</td>
+                        <td>{{ applicant.applicant_schedule_date|default:"Not yet Assigned Interview" }}</td>
                     </tr>
                     {% endfor %}
                 {% else %}
                     <tr>
-                        <td colspan="3" style="text-align: center;">No qualified applicants found.</td>
+                        <td colspan="4" style="text-align: center;">No qualified applicants found.</td>
                     </tr>
                 {% endif %}
             </tbody>
@@ -65,44 +70,49 @@
     <!-- Pagination Controls -->
     <div class="pagination">
         {% if page_obj.has_previous %}
-            <a href="?page=1&date_sort={{ sort_order }}&rows={{ rows_per_page }}&search={{ search_query }}&interviewer={{ interviewer_name }}">First</a>
-            <a href="?page={{ page_obj.previous_page_number }}&date_sort={{ sort_order }}&rows={{ rows_per_page }}&search={{ search_query }}&interviewer={{ interviewer_name }}">Previous</a>
+            <a href="?page={{ page_obj.previous_page_number }}&rows={{ rows_per_page }}&search={{ search_query }}&interviewer={{ interviewer_name }}&sort_type={{ sort_type }}">Previous</a>
         {% endif %}
-        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.</span>
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
         {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}&date_sort={{ sort_order }}&rows={{ rows_per_page }}&search={{ search_query }}&interviewer={{ interviewer_name }}">Next</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}&date_sort={{ sort_order }}&rows={{ rows_per_page }}&search={{ search_query }}&interviewer={{ interviewer_name }}">Last</a>
+            <a href="?page={{ page_obj.next_page_number }}&rows={{ rows_per_page }}&search={{ search_query }}&interviewer={{ interviewer_name }}&sort_type={{ sort_type }}">Next</a>
         {% endif %}
     </div>
 </div>
 
 <script>
-// Function to perform live search on the entire dataset
-document.getElementById('search-input').addEventListener('input', function() {
-    const searchValue = this.value.toLowerCase();
-    const rows = document.querySelectorAll('tbody tr');
-    let matchFound = false;
+function searchTable() {
+    var input = document.querySelector('input[name="search"]').value.toLowerCase();
+    var rows = document.querySelectorAll('tbody tr:not(#no-match)');
+    var noMatch = document.getElementById('no-match');
+    var matchFound = false;
 
-    rows.forEach(row => {
-        const applicantName = row.cells[1].textContent.toLowerCase();  // Adjusted for "List of Qualified Applicants" column
-        if (applicantName.includes(searchValue)) {
-            row.style.display = '';  // Show matching rows
-            matchFound = true;
-        } else {
-            row.style.display = 'none';  // Hide non-matching rows
-        }
-    });
-
-    // If no match is found, display a "No results found" row
-    if (!matchFound) {
-        const noResultsRow = document.createElement('tr');
-        noResultsRow.innerHTML = '<td colspan="3" style="text-align: center;">No results found.</td>';
-        document.querySelector('tbody').appendChild(noResultsRow);
+    if (input.trim() === '') {
+        // If the search input is empty, display all rows
+        rows.forEach(function(row) {
+            row.style.display = '';
+        });
+        noMatch.style.display = 'none';
     } else {
-        // Remove "No results found" message if there are matches
-        const noResultsRow = document.querySelector('tbody tr.no-results');
-        if (noResultsRow) noResultsRow.remove();
+        // Iterate over each row to check for matches when there is input
+        rows.forEach(function(row) {
+            var text = row.textContent.toLowerCase();
+            if (text.includes(input)) {
+                row.style.display = '';
+                matchFound = true;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        // Display the 'no match' message if no rows are found
+        noMatch.style.display = matchFound ? 'none' : 'block';
     }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    var searchInput = document.querySelector('input[name="search"]');
+    searchInput.addEventListener('keyup', searchTable);
 });
+
+
 </script>
 {% endblock %}
