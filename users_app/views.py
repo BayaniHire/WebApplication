@@ -2173,9 +2173,16 @@ def reset_password_view(request):
 
         try:
             account = AccountInformation.objects.get(account_id=account_id)
+
+            # Check if the new password is the same as the old password
+            if account.password == new_password:
+                return JsonResponse({"success": False, "error": "This is your old password, make a new one."})
+                
             account.password = new_password  # Save plain text as per your requirement
             account.save()
+            
             return JsonResponse({"success": True, "message": "Password updated successfully!"})
+            
         except AccountInformation.DoesNotExist:
             return JsonResponse({"success": False, "error": "Account not found."})
 
