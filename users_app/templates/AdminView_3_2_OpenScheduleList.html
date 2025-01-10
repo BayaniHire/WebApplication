@@ -3,10 +3,14 @@
 {% block title %}BayaniHire Admin Center{% endblock %}
 
 {% block content %}
-<div class="main-content" style="text-align: center;">
-    <h2>Schedule of Interviews</h2>
+<div class="main-content" style="padding: 0; margin: 0; text-align: center; display: flex; flex-direction: column; align-items: center;"></div>
+    <h2 style="font-size: 36px; font-weight: bold; text-align: center;">Schedule of Interviews</h2>
+    <p style="font-size: 14px; font-weight: bold; text-align: center;">
+        Welcome! This section allows the System Administrator to view all applicants who are either ready to be scheduled, scheduled for an interview, currently undergoing an interview, or have recently completed their interview.
+    </p>
+    
 
-    <form method="GET" action="" class="form-inline" id="filterForm">
+    <form method="GET" action="" class="form-inline d-flex justify-content-center align-items-center" id="filterForm">
         <!-- Interviewer Selection Dropdown -->
         <select name="interviewer" class="AD-admin-sort-dropdown" onchange="this.form.submit()">
             <option value="" {% if not interviewer_name %}selected{% endif %}>Select Interviewer</option>
