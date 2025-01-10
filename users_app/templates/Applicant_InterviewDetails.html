@@ -9,7 +9,7 @@
 <div class="main-content"
      data-location-name="{{ interview_details.location|default:'' }}">
     <!-- Title -->
-    <div class="header-text">Interview Details</div>
+    <h2 style="font-size: 36px; font-weight: bold; text-align: center;">Interview Details</h2>
 
     <div class="info-section">
         {% if show_not_qualified_message %}
@@ -41,59 +41,10 @@
 
     <!-- Buttons -->
     <div class="buttons-container">
-        <button class="sfbutton" onclick="location.href='{% url 'generate_pdf' applicant_status_id=interview_details.applicant_job_id %}'">Download PDF</button>
+        <div class="info-text">Print Interview Details</div>
         <br>
-        <button id="printButton" class="button">Print</button>
+        <button class="sfbutton" onclick="location.href='{% url 'generate_pdf' applicant_status_id=interview_details.applicant_job_id %}'">GENERATE PDF</button>
     </div>
 </div>
 {% endblock %}
 
-{% block script %}
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const pageId = document.body.dataset.pageId;
-        if (pageId === 'interview-details') {
-            const mapContainer = document.getElementById('.admin-map-container');
-            const locationName = document.querySelector('.info-section .info-container:nth-child(7)')?.innerText.trim();
-
-            iif (locationName && mapContainer) {
-                fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(locationName)}&format=json&addressdetails=1`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.length > 0) {
-                            const { lat, lon } = data[0];
-                            const map = L.map(mapContainer, {
-                                zoomControl: true,
-                                scrollWheelZoom: true,
-                                dragging: true
-                            }).setView([lat, lon], 13);
-
-                            // Add OpenStreetMap tiles
-                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                                maxZoom: 19
-                            }).addTo(map);
-
-                            // Add a marker at the location
-                            L.marker([lat, lon]).addTo(map)
-                                .bindPopup(locationName)
-                                .openPopup();
-                        } else {
-                            console.warn('Location not found for geocoding.');
-                            mapContainer.innerHTML = `<p>Map data not available for this location.</p>`;
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching geocoding data:', error);
-                        mapContainer.innerHTML = `<p>Error loading map data.</p>`;
-                    });
-            } else {
-                console.warn('Location data is missing or invalid.');
-                if (mapContainer) {
-                    mapContainer.innerHTML = `<p>Map data not available.</p>`;
-                }
-            }
-        }
-    });
-</script>
-{% endblock %}
