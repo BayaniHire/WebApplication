@@ -1817,3 +1817,101 @@ tr.selected {
         max-width: 180px; /* Adjust width for small screens */
     }
 }
+
+/************************APPLICANT ULIT**************************************/
+
+.AP-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.AP-table-no-border {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.AP-file-list {
+    list-style-type: disc;
+    margin-left: 20px;
+    padding: 0;
+}
+
+.AP-file-list li {
+    cursor: pointer;
+    color: #007bff;
+    margin-bottom: 10px;
+}
+
+.AP-file-preview-container {
+    margin-top: 20px; /* Adds space above the file preview container */
+    background-color: #f9f9f9; /* Light background for contrast */
+    border: 1px solid #ddd; /* Border for separation */
+    border-radius: 8px; /* Rounded corners */
+    padding: 15px; /* Padding inside the container */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.AP-file-preview-header {
+    font-size: 18px; /* Larger font size for the header */
+    font-weight: bold; /* Bold header */
+    margin-bottom: 10px; /* Space below the header */
+    text-align: center; /* Center-align the header */
+    color: #333; /* Neutral dark color */
+}
+
+.AP-file-preview {
+    height: 400px; /* Fixed height for consistent layout */
+    overflow-y: auto; /* Adds a scrollbar if content overflows */
+    background-color: #fff; /* White background for contrast */
+    border: 1px solid #ccc; /* Border for the preview area */
+    border-radius: 5px; /* Rounded corners */
+    display: flex; /* Flexbox layout for centering */
+    align-items: center; /* Vertical centering */
+    justify-content: center; /* Horizontal centering */
+    text-align: center; /* Center-align text inside */
+    padding: 10px; /* Padding for inner content */
+}
+
+.AP-file-preview p {
+    margin: 0; /* Removes default margin */
+    font-size: 14px; /* Adjusted font size */
+    color: #666; /* Muted text color */
+}
+
+
+.AP-container-bg-light {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 5px;
+    height: 400px;
+    overflow-y: auto;
+}
+
+
+.AP-button-group {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.AP-button-group .button {
+    margin-right: 10px;
+    padding: 10px 15px;
+    background-color: #361f02;
+    color: #FFD8AD;
+    border: 1px solid #5C472E;
+    border-radius: 5px;
+    font-family: "Georgia", serif;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.AP-button-group .button:hover {
+    background-color: #5C472E;
+    color: #FFF;
+}
+
+
