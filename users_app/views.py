@@ -560,6 +560,7 @@ def generate_pdf(request, applicant_status_id):
 
     # Generate dynamic file name: "{last_name}_Application_{job_title}.pdf"
     file_name = f"{user.last_name or 'Applicant'}_Application.pdf"
+    
 
     # Context for the template
     context = {
@@ -589,6 +590,7 @@ def generate_pdf(request, applicant_status_id):
         return HttpResponse("There was an error generating the PDF.", status=500)
 
     return response
+
 
 
 ###################APPLICANT############################
