@@ -1038,18 +1038,23 @@ tr.selected {
 
 
 
+
 .info-section {
     width: 100%;
     display: flex;
+    flex-wrap: wrap; /* Allows wrapping for smaller screens */
     gap: 20px;
     margin-bottom: 20px;
+    justify-content: space-between; /* Evenly spaces out columns */
 }
 
 .info-column {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    width: 50%;
+    width: 48%; /* Adjusted for responsiveness and better balance */
+    min-width: 300px; /* Ensures a minimum width on smaller screens */
+    box-sizing: border-box; /* Ensures padding is included in the width */
 }
 
 .info-text {
@@ -1059,11 +1064,19 @@ tr.selected {
 
 .info-container {
     background-color: #FFFFFF;
-    padding: 10px;
-    border-radius: 5px;
-    font-size: 16px;
+    padding: 15px; /* Increased padding for better readability */
+    border-radius: 8px; /* Slightly increased border radius for a modern look */
+    font-size: 18px; /* Increased font size for better readability */
     color: #5C472E;
     border: 1px solid #5C472E;
+    width: 100%; /* Ensures full width within the column */
+    box-sizing: border-box; /* Includes padding and border in width */
+}
+
+@media (max-width: 768px) {
+    .info-column {
+        width: 100%; /* Stack columns vertically on small screens */
+    }
 }
 
 .message-section {
