@@ -778,89 +778,169 @@ def list_of_jobs(request):
     auth_response = ensure_authenticated(request)
     if auth_response:
         return auth_response
-        
+
     search_query = request.GET.get('search', '').strip()
-    sort_order = request.GET.get('sort', 'title_asc')  # Default sort by job title ascending
-    rows_param = request.GET.get('rows', '5')  # Set default rows to 5
+    sort_type = request.GET.get('sort', '')  # Default sort by job title ascending
+    sort_order = 'desc' if 'desc' in sort_type else 'asc'  # Ensure proper sort order
+    job_status = request.GET.get('status', '')  # Retrieve job status filter
+    rows_param = request.GET.get('rows', '5')  # Default rows per page is 5
     rows_per_page = max(min(int(rows_param), 10), 1) if rows_param.isdigit() else 5
 
+    # Build query for job title or company search
     query = Q(job_title__icontains=search_query) | Q(job_company__icontains=search_query)
+
+    if job_status:
+        query &= Q(job_status__iexact=job_status)  # Apply status filter
+
     jobs = JobDetailsAndRequirements.objects.filter(query)
 
-    # Apply sorting based on the sort_order
-    if sort_order == 'title_desc':
-        jobs = jobs.order_by('-job_title')
-    elif sort_order == 'company_asc':
-        jobs = jobs.order_by('job_company')
-    elif sort_order == 'company_desc':
-        jobs = jobs.order_by('-job_company')
-    elif sort_order == 'date_asc':
-        jobs = jobs.order_by('job_date_published')
-    elif sort_order == 'date_desc':
-        jobs = jobs.order_by('-job_date_published')
-    else:
-        jobs = jobs.order_by('job_title')
+    # Apply sorting based on the type
+    direction = '-' if sort_order == 'desc' else ''
+    if 'title' in sort_type:
+        jobs = jobs.order_by(f"{direction}job_title")
+    elif 'company' in sort_type:
+        jobs = jobs.order_by(f"{direction}job_company")
+    elif 'date' in sort_type:
+        jobs = jobs.order_by(f"{direction}job_date_published")
 
+    # Setup pagination
     paginator = Paginator(jobs, rows_per_page)
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
-
-    start_index = (page_obj.number - 1) * rows_per_page + 1
 
     context = {
         'jobs': page_obj,
         'active_jobs_count': JobDetailsAndRequirements.objects.filter(job_status="ACTIVE").count(),
         'page_obj': page_obj,
         'search_query': search_query,
-        'sort_order': sort_order,
-        'rows_per_page': rows_per_page,  # Make sure to pass this back to the template
-        'start_index': start_index 
+        'sort_type': sort_type,
+        'job_status': job_status,
+        'rows_per_page': rows_per_page,
+        'start_index': (page_obj.number - 1) * rows_per_page + 1,
     }
+
     return render(request, 'AdminView_2_ListofJobs.html', context)
 
 def edit_job_details(request, job_id):
     auth_response = ensure_authenticated(request)
     if auth_response:
         return auth_response
-        
+
     job = get_object_or_404(JobDetailsAndRequirements, pk=job_id)
+
+    # Store the current page as the "previous_page" in session
+    if request.method == 'GET':
+        referrer = request.META.get('HTTP_REFERER', '/list_of_jobs/')
+        parsed_url = urlparse(referrer)
+        base_url = parsed_url.path
+        query_params = parse_qs(parsed_url.query)
+
+        # Reconstruct the URL with query parameters
+        reconstructed_url = f"{base_url}?{urlencode(query_params, doseq=True)}"
+        request.session['previous_page'] = reconstructed_url
 
     if request.method == 'POST':
         # Update fields with form data
-        job.job_title = request.POST.get('job_title')
-        job.job_company = request.POST.get('company')
-        job.job_description = request.POST.get('job_description')
-        job.job_benefits = request.POST.get('job_benefits')
-        job.job_requirements = request.POST.get('job_requirements')
-        job.job_status = request.POST.get('status')
+        try:
+            job.job_title = request.POST.get('job_title')
+            job.job_company = request.POST.get('company')
+            job.job_description = request.POST.get('job_description')
+            job.job_benefits = request.POST.get('job_benefits')
+            job.job_requirements = request.POST.get('job_requirements')
+            job.job_status = request.POST.get('status')
 
-        # Update the date field if a new date is provided
-        new_date = request.POST.get('date')
-        if new_date:
-            job.job_date_published = new_date
+            # Update the date field if a new date is provided
+            new_date = request.POST.get('date')
+            if new_date:
+                job.job_date_published = new_date
 
-        # Save changes to the database
-        job.save()
-        return redirect('list_of_jobs')
+            # Save changes to the database
+            job.save()
+
+            # Redirect back to the stored previous page with a success message
+            previous_page = request.session.get('previous_page')
+            return redirect(f"{previous_page}&message=Job details updated successfully.&type=success")
+
+        except Exception as e:
+            # Redirect back to the stored previous page with an error message
+            previous_page = request.session.get('previous_page')
+            return redirect(f"{previous_page}&message=Error updating job details: {str(e)}.&type=error")
 
     # Format the date for display, default to today if no date is set
     job_date = job.job_date_published or date.today()
     job_date = job_date.strftime("%Y-%m-%d")  # Format as YYYY-MM-DD for HTML input
 
-    # Count the number of active jobs
-    active_jobs_count = JobDetailsAndRequirements.objects.filter(job_status="ACTIVE").count()
-
     return render(request, 'AdminView_2_1_EditJobDetails.html', {
         'job': job,
         'job_date': job_date,
     })
-    
 
 def create_job_details(request):
     auth_response = ensure_authenticated(request)
     if auth_response:
         return auth_response
-        
+
+    # Store the current page as the "previous_page" in session
+    if request.method == 'GET':
+        referrer = request.META.get('HTTP_REFERER', '/list_of_jobs/')
+        parsed_url = urlparse(referrer)
+        base_url = parsed_url.path
+        query_params = parse_qs(parsed_url.query)
+
+        # Reconstruct the URL with query parameters
+        reconstructed_url = f"{base_url}?{urlencode(query_params, doseq=True)}"
+        request.session['previous_page'] = reconstructed_url
+
+    if request.method == 'POST':
+        # Get the form data
+        status = request.POST.get('status')
+        job_title = request.POST.get('job_title')
+        job_benefits = request.POST.get('job_benefits')
+        company = request.POST.get('company')
+        job_description = request.POST.get('job_description')
+        job_requirements = request.POST.get('job_requirements')
+
+        # Set the job_date_published to today's date
+        job_date_published = datetime.now().date()
+
+        # Fetch the account ID from the session
+        account_id = request.session.get('account_id')
+
+        # Ensure the account ID is present and valid
+        if not account_id:
+            return redirect('login')  # Redirect to login if no user is logged in
+
+        account = get_object_or_404(AccountInformation, account_id=account_id)
+
+        # Validate required fields
+        if not (status and job_title and company and job_description and job_requirements):
+            previous_page = request.session.get('previous_page')
+            return redirect(f"{previous_page}&message=All fields are required.&type=error")
+
+        try:
+            # Create and save the job entry
+            new_job = JobDetailsAndRequirements(
+                account=account,
+                job_title=job_title,
+                job_company=company,
+                job_description=job_description,
+                job_benefits=job_benefits,
+                job_requirements=job_requirements,
+                job_status=status,
+                job_date_published=job_date_published
+            )
+            new_job.save()
+
+            # Redirect back to the stored previous page with a success message
+            previous_page = request.session.get('previous_page')
+            return redirect(f"{previous_page}&message=Job created successfully.&type=success")
+
+        except Exception as e:
+            # Redirect back to the stored previous page with an error message
+            previous_page = request.session.get('previous_page')
+            return redirect(f"{previous_page}&message=Error creating job: {str(e)}.&type=error")
+
+    # Process GET request
     today_date = date.today().strftime("%Y-%m-%d")  # Format today's date as YYYY-MM-DD
     return render(request, 'AdminView_2_2_CreateJobDetails.html', {'today_date': today_date})
 
@@ -1449,54 +1529,6 @@ def admin_interviewer_account_setup(request):
     # Render the form if it's not a POST request
     return render(request, 'users_app/AdminView_6_2_AddAccounts.html')
 
-def admin_creatingjob(request):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-        
-    if request.method == 'POST':
-        # Get the form data
-        status = request.POST.get('status')
-        job_title = request.POST.get('job_title')
-        job_benefits = request.POST.get('job_benefits')
-        company = request.POST.get('company')
-        job_description = request.POST.get('job_description')
-        job_requirements = request.POST.get('job_requirements')
-
-        # Set the job_date_published to today's date
-        job_date_published = datetime.now().date()
-
-        # Fetch the account ID from the session
-        account_id = request.session.get('account_id')
-
-        # Ensure the account ID is present and valid
-        if account_id:
-            account = get_object_or_404(AccountInformation, account_id=account_id)
-        else:
-            return redirect('login')  # Redirect to login if no user is logged in
-        
-         # Validate required fields
-        if not (status and job_title and company and job_description and job_requirements):
-            return render(request, 'users_app/create_job.html', {'error': 'All fields are required'})
-        
-        # Create and save the job entry
-        new_job = JobDetailsAndRequirements(
-            account=account,
-            job_title=job_title,
-            job_company=company,
-            job_description=job_description,
-            job_benefits=job_benefits,
-            job_requirements=job_requirements,
-            job_status=status,
-            job_date_published=job_date_published
-        )
-        new_job.save()
-
-        # Redirect to a relevant page (e.g., list of jobs) after saving
-        return redirect('list_of_jobs')  # Adjust to your desired URL
-
-    # Render the form if it's a GET request
-    return render(request, 'users_app/create_job.html')
 
 ###########################ADMIN RETRIEVAL####################################
 
