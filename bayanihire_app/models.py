@@ -18,12 +18,13 @@ class AccountInformation(models.Model):
     street_village = models.CharField(max_length=45, blank=True, null=True)
     city_municipality = models.CharField(max_length=45, blank=True, null=True)
     state = models.CharField(max_length=50, default="Philippines")
-    zipcode = models.IntegerField(blank=True, null=True)
+    zipcode = models.IntegerField(max_length=4, blank=True, null=True)
     email = models.EmailField(max_length=45, blank=True, null=True)
     mobile_number = models.CharField(max_length=11, blank=True, null=True)
     birth_date = models.DateField(blank=True, null=True)
     age = models.IntegerField(blank=True, null=True) 
     gender = models.CharField(max_length=45, blank=True, null=True)
+    verified = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'account_information'
@@ -103,4 +104,18 @@ class OTPVerification(models.Model):
     
     def __str__(self):
         return f"OTP for {self.email} - {self.otp}"
+
+
+class VerificationToken(models.Model):
+    account = models.ForeignKey('AccountInformation', on_delete=models.CASCADE)  # Link to AccountInformation
+    token = models.CharField(max_length=255, unique=True)
+    created_at = models.DateTimeField(default=now)
+    is_used = models.BooleanField(default=False)
+    
+    def is_expired(self):
+        expiration_time = self.created_at + timedelta(days=1)  # Token valid for 1 day
+        return now() > expiration_time
+
+    def __str__(self):
+        return f"Token for {self.account.username} - {self.token}"
 
