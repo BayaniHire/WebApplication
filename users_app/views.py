@@ -1784,6 +1784,34 @@ def verify_email(request, token):
     except VerificationToken.DoesNotExist:
         return HttpResponse("Invalid verification link.", status=400)
 
+def send_success_email(account):
+    subject = "Welcome to BayaniHire - Account Successfully Created!"
+    html_content = f"""
+    <html>
+    <body style="font-family: Arial, sans-serif; text-align: center; margin: 20px; padding: 20px; background-color: #FFFFFF; border: 1px solid #ddd; border-radius: 10px;">
+        <div>
+            <h1 style="color: #5c332e;">BayaniHire</h1>
+            <p style="color: #000000; margin-bottom: 15px;">Congratulations, {account.first_name}!</p>
+            <p style="color: #000000; margin-bottom: 15px;">Your account has been successfully created and verified.</p>
+            <p style="color: #000000; margin-bottom: 15px;">You can now log in using the following username:</p>
+            <p style="font-size: 18px; font-weight: bold; color: #5c332e; margin-bottom: 15px;">{account.username}</p>
+            <p style="color: #000000; margin-bottom: 15px;">Use your account to find job opportunities and explore our platform. We’re excited to have you onboard!</p>
+            <p style="color: #000000; margin-bottom: 15px;">If you have any questions, feel free to contact our support team.</p>
+            <p style="color: #000000; margin-top: 20px; margin-bottom: 15px; font-weight: bold;">Happy job hunting!</p>
+        </div>
+    </body>
+    </html>
+    """
+
+    email_message = EmailMultiAlternatives(
+        subject=subject,
+        body=f"Congratulations {account.first_name}, your account has been verified! You can now log in using your username: {account.username}.",  # Fallback plain text
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[account.email],
+    )
+    email_message.attach_alternative(html_content, "text/html")
+    email_message.send()
+
     
 def change_password(request):
     # Only allow POST requests and check if account_id exists in the session
@@ -2088,3 +2116,11 @@ def reset_password_view(request):
             return JsonResponse({"success": False, "error": "Account not found."})
 
     return JsonResponse({"success": False, "error": "Invalid request."})
+
+
+
+
+
+
+
+
