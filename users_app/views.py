@@ -2118,6 +2118,41 @@ def reset_password_view(request):
     return JsonResponse({"success": False, "error": "Invalid request."})
 
 
+def send_verification_email(account, token):
+    verification_link = f"{settings.BASE_URL}/verify-email/{token}/"
+    subject = "Verify Your Email - BayaniHire"
+    html_content = f"""
+    <html>
+    <body style="font-family: Arial, sans-serif; text-align: center; margin: 20px; padding: 20px; background-color: #FFFFFF; border: 1px solid #ddd; border-radius: 10px;">
+        <div>
+            <h1 style="color: #5c332e;">BayaniHire</h1>
+            <p style="color: #000000; margin-bottom: 15px;">Thanks for signing up, {account.first_name}!</p>
+            <p style="color: #000000; margin-bottom: 15px;">We're excited to have you get started.</p>
+            <p style="color: #000000; margin-bottom: 15px;">First, you need to verify your account. Just press the button below.</p>
+            <a href="{verification_link}" style="background-color: #5c332e; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; margin-bottom: 15px;">
+                Verify Email Now
+            </a>
+            <p style="color: #000000; margin-top: 20px; margin-bottom: 15px;">If you didn't create this account, please ignore this email.</p>
+        </div>
+    </body>
+    </html>
+    """
+
+
+    email_message = EmailMultiAlternatives(
+        subject=subject,
+        body=f"Please verify your email by clicking the following link: {verification_link}",  # Fallback plain text
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[account.email],
+    )
+    email_message.attach_alternative(html_content, "text/html")
+    email_message.send()
+    
+    
+    
+
+    
+
 
 
 
