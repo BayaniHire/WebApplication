@@ -8,13 +8,13 @@
     <p style="font-size: 14px; font-weight: bold; text-align: center;">
         Welcome to List of Jobs, where the System Admin can manage all the jobs deployed in the webapp.
     </p>
-    <div class="d-flex align-items-center mb-3">
+    <div class="form-inline d-flex justify-content-center align-items-center">
         <p class="mb-0 mr-3">Active Jobs: <span style="color: red;">{{ active_jobs_count }}</span></p>
         <button class="sfbutton" onclick="window.location.href='{% url 'create_job_details' %}';">Create Job</button>
     </div>
 
     <!-- Form for sorting, searching, and setting rows per page -->
-    <form method="GET" action="" class="d-flex justify-content-between mb-3">
+    <form method="GET" action="" class="form-inline d-flex justify-content-center align-items-center">
         <input type="hidden" name="sort" value="{{ sort_type }}">
         
         <input type="hidden" name="sort_order" value="{{ sort_order }}">
