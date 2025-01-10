@@ -59,6 +59,8 @@ from django.template.loader import render_to_string
 from xhtml2pdf import pisa
 from django.shortcuts import get_object_or_404
 from urllib.parse import urlparse, parse_qs, urlencode
+import uuid
+
 
 def logout_view(request):
     logout(request)
@@ -1684,33 +1686,32 @@ def ensure_authenticated(request):
 
 def login(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+        username = request.POST.get('username').strip()
+        password = request.POST.get('password').strip()
         
         try:
-            
-            # Authenticate the user
+            # Retrieve the account using the username and password
             account = AccountInformation.objects.get(username=username, password=password)
-            print("Account found:", account)  # Debug: Print the retrieved account
-            
-            # Retrieve the account status from AccountStorage using the foreign key
+            print("Account found:", account)  # Debugging statement to check retrieved account
+
+            # Check if the account is verified
+            if not account.verified:
+                return render(request, 'login.html', {"message": "Account not verified. Please check your email for verification."})
+
+            # Retrieve account storage details (if applicable)
             account_storage = AccountStorage.objects.filter(account=account).first()
-            print("Account Storage found:", account_storage)
-            
+            print("Account Storage found:", account_storage)  # Debugging statement to check storage
+
             if account_storage:
-                # Check the account status
                 if account_storage.account_status == 'new':
-                    # Store account ID in the session to reference it in change_password view
                     request.session['account_id'] = account.account_id
                     return redirect('Security')
-                
+
                 elif account_storage.account_status == 'deactivated':
                     return render(request, 'login.html', {"message": "Account is deactivated. Please contact support."})
-                
-                # If account_status is neither 'new' nor 'deactivate', proceed to role-based redirection
-                request.session['account_id'] = account.account_id
-                
+
                 # Redirect based on role
+                request.session['account_id'] = account.account_id
                 if account_storage.role == 'applicant':
                     return redirect('homepage')
                 elif account_storage.role == 'admin':
@@ -1723,35 +1724,66 @@ def login(request):
                 return render(request, 'login.html', {"message": "Incorrect username or password."})
         
         except AccountInformation.DoesNotExist:
+            # If username or password does not match, show error message
             return render(request, 'login.html', {"message": "Incorrect username or password."})
 
     return render(request, 'login.html')
 
-def Registration(request):    
+
+def Registration(request):
     if request.method == 'POST':
         form = AccountInformationForm(request.POST)
         if form.is_valid():
-            account_info = form.save()  # Save the AccountInformation instance
-            
+            # Save the AccountInformation instance without committing
+            account_info = form.save(commit=False)
+            account_info.verified = False  # Initially set as not verified
+            account_info.save()  # Save the account information
+
             # Create the corresponding AccountStorage entry
             AccountStorage.objects.create(
                 account=account_info,  # Link to the account
-                role='applicant',  # Set role as 'applicant'
-                account_status='active'  # Set account status as 'active'
+                role='applicant',  # Set default role as 'applicant'
+                account_status='active'  # Set default account status as 'active'
             )
-            
-            # Add a success message with the username
-            messages.success(
-                request, 
-                f"You have successfully created an account! Username: {account_info.username}"
-            )
-            
-            # Redirect to the login page
+
+            # Generate a unique verification token
+            token = uuid.uuid4()
+            VerificationToken.objects.create(account=account_info, token=token)
+
+            # Send the verification email
+            send_verification_email(account_info, token)
+
+            # Add a success message
+            messages.success(request, "A verification email has been sent. Please verify your email.")
             return redirect('login')
     else:
         form = AccountInformationForm()
-    
+
     return render(request, 'registration.html', {'form': form})
+
+##verify email
+def verify_email(request, token):
+    try:
+        verification_token = VerificationToken.objects.get(token=token)
+
+        if verification_token.is_expired():  # Check if the token is expired
+            return HttpResponse("This verification link has expired.", status=400)
+
+        account = verification_token.account
+        account.verified = True  # Mark the account as verified
+        account.save()
+
+        # Delete the token after successful verification
+        verification_token.delete()
+
+        # Send success welcome email
+        send_success_email(account)
+
+        # Redirect to a success page or login page
+        return redirect('login')
+    except VerificationToken.DoesNotExist:
+        return HttpResponse("Invalid verification link.", status=400)
+
     
 def change_password(request):
     # Only allow POST requests and check if account_id exists in the session
