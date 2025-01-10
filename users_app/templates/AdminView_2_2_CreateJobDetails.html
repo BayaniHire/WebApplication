@@ -6,7 +6,7 @@
 <div class="main-content"style="padding: 0; margin: 0; text-align: center; display: flex; flex-direction: column; align-items: center;"></div>
     <h2 class="font-weight-bold my-4" style="font-size: 36px; text-align: center;">Create Job Details & Requirements</h2>
   
-    <form action="{% url 'admin_creatingjob' %}" method="post" style="font-family: Georgia; font-size: 18px; font-weight: bold;">
+    <form action="{% url 'create_job_details' %}" method="post" style="font-family: Georgia; font-size: 18px; font-weight: bold;">
         {% csrf_token %}
         <div class="table-responsive">
             <table class="table table-borderless mx-auto w-75" style="border-collapse: collapse;">
@@ -15,7 +15,7 @@
                     <td>
                         <select name="status" class="form-control" required>
                             <option value="ACTIVE">ACTIVE</option>
-                            <option value="CLOSE">CLOSE</option>
+                            <option value="CLOSED">CLOSED</option>
                         </select>
                     </td>
                     <td><strong>Date:</strong></td>

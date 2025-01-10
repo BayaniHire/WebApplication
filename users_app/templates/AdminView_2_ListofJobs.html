@@ -14,19 +14,32 @@
     </div>
 
     <!-- Form for sorting, searching, and setting rows per page -->
-    <form id="searchForm" method="GET" action="" class="d-flex justify-content-between mb-3">
-        <select name="sort" class="form-control w-auto" onchange="this.form.submit()">
-            <option value="title_asc" {% if sort_order == 'title_asc' %}selected{% endif %}>Sort by Title A-Z</option>
-            <option value="title_desc" {% if sort_order == 'title_desc' %}selected{% endif %}>Sort by Title Z-A</option>
-            <option value="company_asc" {% if sort_order == 'company_asc' %}selected{% endif %}>Sort by Company A-Z</option>
-            <option value="company_desc" {% if sort_order == 'company_desc' %}selected{% endif %}>Sort by Company Z-A</option>
-            <option value="date_asc" {% if sort_order == 'date_asc' %}selected{% endif %}>Sort by Date Posted Ascending</option>
-            <option value="date_desc" {% if sort_order == 'date_desc' %}selected{% endif %}>Sort by Date Posted Descending</option>
+    <form method="GET" action="" class="d-flex justify-content-between mb-3">
+        <input type="hidden" name="sort" value="{{ sort_type }}">
+        
+        <input type="hidden" name="sort_order" value="{{ sort_order }}">
+        
+
+        <select name="sort" class="AD-admin-sort-dropdown" onchange="this.form.submit()">
+            <option value="" {% if not sort_type %}selected{% endif %}>Sort</option>
+            <option value="title_asc" {% if sort_type == 'title_asc' %}selected{% endif %}>Title (A-Z)</option>
+            <option value="title_desc" {% if sort_type == 'title_desc' %}selected{% endif %}>Title (Z-A)</option>
+            <option value="company_asc" {% if sort_type == 'company_asc' %}selected{% endif %}>Company (A-Z)</option>
+            <option value="company_desc" {% if sort_type == 'company_desc' %}selected{% endif %}>Company (Z-A)</option>
+            <option value="date_asc" {% if sort_type == 'date_asc' %}selected{% endif %}>Date (Oldest to Newest)</option>
+            <option value="date_desc" {% if sort_type == 'date_desc' %}selected{% endif %}>Date (Newest to Oldest)</option>
         </select>
-        <input type="text" name="search" value="{{ search_query }}" class="form-control w-25" placeholder="Search by position or company">
-        <button type="submit" class="sfbutton">Search</button>
-        <input type="number" name="rows" value="{{ rows_per_page }}" min="1" max="10" class="form-control w-auto" onchange="this.form.submit()">
-        <button type="submit" class="sfbutton">Set Rows</button>
+
+        <select name="status" class="AD-admin-sort-dropdown" onchange="this.form.submit()">
+            <option value="" {% if not job_status %}selected{% endif %}>All Statuses</option>
+            <option value="ACTIVE" {% if job_status == 'ACTIVE' %}selected{% endif %}>Active</option>
+            <option value="CLOSED" {% if job_status == 'CLOSED' %}selected{% endif %}>Closed</option>
+        </select>
+
+        <input style="margin-right: 5px;" type="text" name="search" value="{{ search_query }}" class="applicant-search-input" placeholder="Search by position or company" style="width: 55%;">
+        <button style="margin-right: 5px;" type="submit" class="applicant-search-button">Search</button>
+        <input type="number" name="rows" min="1" max="10" value="{{ rows_per_page }}" class="form-control mr-2" placeholder="Rows per page" style="width: 5%;">
+        <button type="submit" class="applicant-search-button">Set Rows</button>
     </form>
     
     <!-- Jobs Table -->
@@ -56,42 +69,65 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" style="text-align: center;">No jobs available.</td>
+                    <td colspan="6" style="text-align: center;">No jobs available.</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 
+    <p id="no-match" style="display:none;">No jobs available.</p>
+
     <!-- Pagination Links -->
-    <div>
+    <div class="pagination">
         {% if page_obj.has_previous %}
-        <a href="?page=1&sort={{ sort_order }}&rows={{ rows_per_page }}&search={{ search_query }}">First</a>
-        <a href="?page={{ page_obj.previous_page_number }}&sort={{ sort_order }}&rows={{ rows_per_page }}&search={{ search_query }}">Previous</a>
+            <a href="?page=1&sort={{ sort_type }}&sort_order={{ sort_order }}&status={{ job_status }}&rows={{ rows_per_page }}&search={{ search_query }}">First</a>
+            <a href="?page={{ page_obj.previous_page_number }}&sort={{ sort_type }}&sort_order={{ sort_order }}&status={{ job_status }}&rows={{ rows_per_page }}&search={{ search_query }}">Previous</a>
         {% endif %}
         <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
         {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}&sort={{ sort_order }}&rows={{ rows_per_page }}&search={{ search_query }}">Next</a>
-        <a href="?page={{ page_obj.paginator.num_pages }}&sort={{ sort_order }}&rows={{ rows_per_page }}&search={{ search_query }}">Last</a>
+            <a href="?page={{ page_obj.next_page_number }}&sort={{ sort_type }}&sort_order={{ sort_order }}&status={{ job_status }}&rows={{ rows_per_page }}&search={{ search_query }}">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}&sort={{ sort_type }}&sort_order={{ sort_order }}&status={{ job_status }}&rows={{ rows_per_page }}&search={{ search_query }}">Last</a>
         {% endif %}
     </div>
 </div>
 
 <script>
-function submitForm() {
-    document.getElementById('searchForm').submit();
+
+function searchTable() {
+    var input = document.querySelector('input[name="search"]').value.toLowerCase();
+    var rows = document.querySelectorAll('tbody tr:not(#no-match)');
+    var noMatch = document.getElementById('no-match');
+    var matchFound = false;
+
+    if (input.trim() === '') {
+        // If the search input is empty, display all rows
+        rows.forEach(function(row) {
+            row.style.display = '';
+        });
+        noMatch.style.display = 'none';
+    } else {
+        // Iterate over each row to check for matches when there is input
+        rows.forEach(function(row) {
+            var text = row.textContent.toLowerCase();
+            if (text.includes(input)) {
+                row.style.display = '';
+                matchFound = true;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        // Display the 'no match' message if no rows are found
+        noMatch.style.display = matchFound ? 'none' : 'block';
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('search-input');
-    if (searchInput) {
-        searchInput.addEventListener('keypress', function(event) {
-            if (event.keyCode === 13) { // Enter key is pressed
-                submitForm();
-            }
-        });
-    }
+    var searchInput = document.querySelector('input[name="search"]');
+    searchInput.addEventListener('keyup', searchTable);
 });
+
+
 </script>
 
 {% endblock %}

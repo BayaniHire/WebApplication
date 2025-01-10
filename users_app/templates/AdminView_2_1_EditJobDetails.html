@@ -15,7 +15,7 @@
                     <td>
                         <select name="status" class="form-control" required>
                             <option value="ACTIVE" {% if job.job_status == 'ACTIVE' %}selected{% endif %}>ACTIVE</option>
-                            <option value="CLOSE" {% if job.job_status == 'CLOSE' %}selected{% endif %}>CLOSE</option>
+                            <option value="CLOSED" {% if job.job_status == 'CLOSED' %}selected{% endif %}>CLOSED</option>
                         </select>
                     </td>
                     <td><strong>Date:</strong></td>
