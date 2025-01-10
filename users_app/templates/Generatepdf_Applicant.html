@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Application Details</title>
+    {% load static %}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            color: #333;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #020202;
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #444;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header img {
+            width: 100px;
+            margin-bottom: 10px;
+        }
+        .footer {
+            text-align: center;
+            font-size: 14px;
+            margin-top: 30px;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo">
+        <h1>BayaniHire Hiring</h1>
+    </div>
+
+    <!-- Applicant's Personal Information -->
+    <div class="section">
+        <h2 class="section-title">Applicant's Personal Information</h2>
+        <table>
+            <tr>
+                <th>Full Name</th>
+                <td>{{ account_info.full_name }}</td>
+            </tr>
+            <tr>
+                <th>Email Address</th>
+                <td>{{ account_info.email }}</td>
+            </tr>
+            <tr>
+                <th>Mobile Number</th>
+                <td>{{ account_info.mobile_number }}</td>
+            </tr>
+            <tr>
+                <th>Birth Date</th>
+                <td>{{ account_info.birth_date }}</td>
+            </tr>
+            <tr>
+                <th>Age</th>
+                <td>{{ account_info.age }}</td>
+            </tr>
+            <tr>
+                <th>Gender</th>
+                <td>{{ account_info.gender }}</td>
+            </tr>
+            <tr>
+                <th>Address</th>
+                <td>{{ account_info.address }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Job Application and Interview Details -->
+    <div class="section">
+        <h2 class="section-title">Job Application and Interview Details</h2>
+        {% for job in job_details %}
+        <table>
+            <tr>
+                <th>Job Title</th>
+                <td>{{ job.job_title }}</td>
+            </tr>
+            <tr>
+                <th>Company</th>
+                <td>{{ job.job_company }}</td>
+            </tr>
+            <tr>
+                <th>Application Status</th>
+                <td>{{ job.application_status }}</td>
+            </tr>
+            <tr>
+                <th>Interviewer Name</th>
+                <td>{{ job.interviewer_name }}</td>
+            </tr>
+            <tr>
+                <th>Schedule Date</th>
+                <td>{{ job.schedule_date }}</td>
+            </tr>
+            <tr>
+                <th>Message</th>
+                <td>{{ job.interview_message }}</td>
+            </tr>
+            <tr>
+                <th>Location</th>
+                <td>{{ job.location }}</td>
+            </tr>
+        </table>
+        {% endfor %}
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        BayaniHire © 2024. All rights reserved.
+    </div>
+</body>
+</html>
