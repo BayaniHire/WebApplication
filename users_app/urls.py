@@ -65,6 +65,7 @@ urlpatterns = [
     path('resend-otp/', views.resend_otp, name='resend_otp'),
     path('reset-password/', views.reset_password_view, name='reset_password_view'),
     path('force-change-password/', views.force_change_password, name='force_change_password'),
+    path('verify-email/<str:token>/', verify_email, name='verify_email'),
 ##########################ADMIN##########################################
 
     ###wag po galawin pang log in to
