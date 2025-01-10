@@ -30,21 +30,19 @@
             <div class="info-container">{{ interview_details.schedule_date }}</div>
             <div class="info-text">Interview Location</div>
             <div class="info-container">{{ interview_details.location }}</div>
-        </div>
-        <!-- Map Section -->
-        <div id="applicant-map" style="height: 300px; width: 100%; margin-top: 10px; border: 1px solid #ccc;"></div>
-        <div class="message-section">
             <div class="message-text">Interviewer Message:</div>
             <div class="message-container">
                 {{ interview_details.interview_message }}
             </div>
         </div>
+        <div class="admin-map-container"></div>
         {% endif %}
     </div>
 
     <!-- Buttons -->
     <div class="buttons-container">
-        <button id="downloadButton" class="button">Download</button>
+        <button class="sfbutton" onclick="location.href='{% url 'generate_pdf' applicant_status_id=interview_details.applicant_job_id %}'">Download PDF</button>
+        <br>
         <button id="printButton" class="button">Print</button>
     </div>
 </div>
@@ -56,16 +54,16 @@
     document.addEventListener('DOMContentLoaded', function () {
         const pageId = document.body.dataset.pageId;
         if (pageId === 'interview-details') {
-            const mapContainer = document.getElementById('applicant-map');
+            const mapContainer = document.getElementById('.admin-map-container');
             const locationName = document.querySelector('.info-section .info-container:nth-child(7)')?.innerText.trim();
 
-            if (locationName && mapContainer) {
+            iif (locationName && mapContainer) {
                 fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(locationName)}&format=json&addressdetails=1`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.length > 0) {
                             const { lat, lon } = data[0];
-                            const map = L.map('applicant-map', {
+                            const map = L.map(mapContainer, {
                                 zoomControl: true,
                                 scrollWheelZoom: true,
                                 dragging: true
