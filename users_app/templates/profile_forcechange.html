@@ -30,6 +30,13 @@
             <label for="confirm-password">Confirm Password:</label>
             <input type="password" id="confirm-password" name="confirm_password" required placeholder="Confirm new password">
 
+            <!-- Display error message near the submit button -->
+            {% if messages %}
+                {% for message in messages %}
+                    <p style="color: red; text-align: center;">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+
             <!-- Submit Button Only -->
             <div class="button-container">
                 <button type="submit" class="submit-btn">Submit</button>
