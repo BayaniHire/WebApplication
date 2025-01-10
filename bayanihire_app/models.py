@@ -2,8 +2,10 @@ from datetime import timedelta
 from django.utils.timezone import now
 from django.db import models
 import logging
+from django.core.validators import RegexValidator
 
 logger = logging.getLogger(__name__)
+
 
 class AccountInformation(models.Model):
     account_id = models.AutoField(primary_key=True)
@@ -18,7 +20,18 @@ class AccountInformation(models.Model):
     street_village = models.CharField(max_length=45, blank=True, null=True)
     city_municipality = models.CharField(max_length=45, blank=True, null=True)
     state = models.CharField(max_length=50, default="Philippines")
-    zipcode = models.IntegerField(max_length=4, blank=True, null=True)
+    zipcode = models.CharField(
+    max_length=4,
+    blank=True,
+    null=True,
+    validators=[
+        RegexValidator(
+            regex=r'^\d{1,4}$',  # Allows only numeric values up to 4 digits
+            message='Zipcode must be a number with up to 4 digits.',
+            code='invalid_zipcode'
+        )
+    ]
+)
     email = models.EmailField(max_length=45, blank=True, null=True)
     mobile_number = models.CharField(max_length=11, blank=True, null=True)
     birth_date = models.DateField(blank=True, null=True)
