@@ -1,103 +1,116 @@
 {% extends "Applicant_Inheritance.html" %}
 
-{% block title %}View Mode Page{% endblock %}
+{% block title %}View Uploaded Files{% endblock %}
 
 {% block content %}
 <div class="main-content">
-    <div class="upload-info">
-        You are in View Mode. Please select a file to View/Download.
+    <h2 style="font-size: 28px; font-weight: bold; text-align: center; margin-bottom: 20px;">Uploaded Files and Applicant Information</h2>
+
+    <!-- Applicant Information Table -->
+    <div style="margin-bottom: 20px;">
+        <table class="AP-table-no-border" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+            <tr><td style="font-weight: bold;">Name:</td><td>{{ applicant.full_name }}</td></tr>
+            <tr><td style="font-weight: bold;">Age:</td><td>{{ applicant.age }}</td></tr>
+            <tr><td style="font-weight: bold;">Gender:</td><td>{{ applicant.gender }}</td></tr>
+            <tr><td style="font-weight: bold;">Contact Number:</td><td>{{ applicant.mobile_number }}</td></tr>
+            <tr><td style="font-weight: bold;">Email Address:</td><td>{{ applicant.email }}</td></tr>
+            <tr><td style="font-weight: bold;">Address:</td><td>{{ applicant.address }}</td></tr>
+        </table>
     </div>
 
-    <div class="upload-container">
-        <div class="small-container">
+    <!-- File Upload List -->
+    <div style="margin-bottom: 20px;">
+        <h4>Uploaded Files</h4>
+        <ul class="AP-file-list" id="file-list">
             {% if uploaded_files %}
-                <ul>
-                    {% for file in uploaded_files %}
-                    <li class="file-item" onclick="selectFile('{{ file.data }}', '{{ file.metadata }}')">{{ file.metadata }}</li>
-                    {% endfor %}
-                </ul>
+                {% for file in uploaded_files %}
+                    <li onclick="selectFile('{{ file.data }}', '{{ file.metadata }}')">{{ file.metadata }}</li>
+                {% endfor %}
             {% else %}
-                <p>No files uploaded yet.</p>
+                <li>No files uploaded yet.</li>
             {% endif %}
-        </div>
-
-        <div class="large-container">
-            <div class="file-preview" id="file-preview">
-                <p>Select a file and click VIEW to preview it.</p>
-            </div>
-        </div>
+        </ul>
     </div>
 
-    <div class="verbutton-group">
-        <button class="button" id="view-button" onclick="viewFile()">VIEW</button>
-        <button class="button" id="download-button" onclick="downloadFile()">DOWNLOAD</button>
+    <div class="AP-button-group">
+        <button id="view-button" class="sfbutton" onclick="viewFile()" disabled>View File</button>
     </div>
+
+    <!-- File Preview Section -->
+    <div class="AP-container">
+        <h3 class="AP-file-preview-header">File Preview</h3>
+        <div class="AP-file-preview" id="file-preview">
+            <p>Select a file from the list and click "View File" to see the preview here.</p>
+        </div>
+        <div class="AP-button-group">
+            <button id="download-button" class="sfbutton" onclick="downloadFile()" disabled>Download</button>
+        </div>
+    </div>
+    
+
+  
 </div>
 {% endblock %}
 
-
 {% block script %}
 <script>
-    // Variables to hold selected file data and name
-    let selectedFileData = '';
-    let selectedFileName = '';
+    let selectedFileData = '';  // Store the selected file's data
+    let selectedFileName = ''; // Store the selected file's name
 
-    // Called when a file is clicked in the file list
-    function selectFile(data, filename) {
-        selectedFileData = data; // Set the data of the selected file
-        selectedFileName = filename; // Set the name of the selected file
+    // Function to handle file selection
+    function selectFile(data, fileName) {
+        selectedFileData = data;  // Store the selected file data (base64)
+        selectedFileName = fileName;  // Store the selected file name
 
-        // Log the selection for debugging
-        console.log(`Selected file: ${selectedFileName}, Data length: ${selectedFileData.length}`);
-        document.getElementById('file-preview').innerHTML = `<p>Ready to view: ${filename}</p>`;
+        // Enable buttons
+        document.getElementById('view-button').disabled = false;
+        document.getElementById('download-button').disabled = false;
+
+        // Show selected file name
+        document.getElementById('file-preview').innerHTML = `<p>Selected File: <strong>${fileName}</strong></p>`;
     }
 
-    // Function to display file preview when "VIEW" button is clicked
+    // Function to view the selected file
     function viewFile() {
         const previewElement = document.getElementById('file-preview');
-        previewElement.innerHTML = ''; // Clear previous preview
+        previewElement.innerHTML = '';  // Clear the preview
 
-        // Check if there is selected file data and name
         if (selectedFileData && selectedFileName) {
-            console.log(`Viewing file: ${selectedFileName}`);
-
-            // Determine file type and display accordingly
             if (selectedFileName.toLowerCase().endsWith('.jpg') || 
                 selectedFileName.toLowerCase().endsWith('.jpeg') || 
                 selectedFileName.toLowerCase().endsWith('.png')) {
-                
                 // Image preview
                 const img = document.createElement('img');
                 img.src = `data:image/jpeg;base64,${selectedFileData}`;
                 img.alt = 'File Preview';
-                img.style.maxWidth = '400%';
-                img.style.maxHeight = '400px';
+                img.style.maxWidth = '100%';
+                img.style.height = 'auto';
                 previewElement.appendChild(img);
             } else if (selectedFileName.toLowerCase().endsWith('.pdf')) {
                 // PDF preview
                 const embed = document.createElement('embed');
                 embed.src = `data:application/pdf;base64,${selectedFileData}`;
                 embed.type = 'application/pdf';
-                embed.style.width = '400%';
-                embed.style.height = '400px';
+                embed.style.width = '100%';
+                embed.style.height = '600px';
                 previewElement.appendChild(embed);
             } else {
-                previewElement.innerHTML = `<p>Preview not available for this file type.</p>`;
+                previewElement.innerHTML = '<p>Preview not available for this file type.</p>';
             }
         } else {
-            previewElement.innerHTML = `<p>No file selected to preview.</p>`;
+            previewElement.innerHTML = '<p>No file selected to preview.</p>';
         }
     }
 
-    // Download function for selected file
+    // Function to download the selected file
     function downloadFile() {
         if (selectedFileData && selectedFileName) {
-            const a = document.createElement('a');
-            a.href = `data:application/octet-stream;base64,${selectedFileData}`;
-            a.download = selectedFileName;
-            a.click();
+            const link = document.createElement('a');
+            link.href = `data:application/octet-stream;base64,${selectedFileData}`;
+            link.download = selectedFileName;
+            link.click();
         } else {
-            alert("Please select a file to download.");
+            alert('Please select a file to download.');
         }
     }
 </script>
