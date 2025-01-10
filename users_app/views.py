@@ -60,6 +60,8 @@ from xhtml2pdf import pisa
 from django.shortcuts import get_object_or_404
 from urllib.parse import urlparse, parse_qs, urlencode
 import uuid
+from django.db.models import F, Value
+from django.db.models.functions import Coalesce
 
 
 def logout_view(request):
@@ -1113,52 +1115,62 @@ def confirm_send_schedule(request):
 
     return redirect('send_schedule')  # Redirect if method is not POST
 
-
-
 def open_schedule_list(request):
     auth_response = ensure_authenticated(request)
     if auth_response:
         return auth_response
-        
+
+    # Extract parameters
     interviewer_name = request.GET.get('interviewer', None)
     search_query = request.GET.get('search', '').strip()
-    sort_order = request.GET.get('date_sort', 'asc')
+    sort_type = request.GET.get('sort_type', '')
     rows_param = request.GET.get('rows', '5')
     rows_per_page = max(min(int(rows_param), 10), 1) if rows_param.isdigit() else 5
 
-    # Base queryset of applicants
-    applicants = ListOfApplicantsWithStatusAndCredentials.objects.none()
+    # Annotate each applicant with the interviewer's name from the related InterviewStorage
+    applicants = ListOfApplicantsWithStatusAndCredentials.objects.annotate(
+        interviewer_name=Coalesce(F('interview_applicant_id__interviewer_name'), Value('Interviewer Still Pending'))
+    )
 
+    # Apply filtering
     if interviewer_name:
-        # Filter applicants by the selected interviewer
-        interviews = InterviewStorage.objects.filter(interviewer_name=interviewer_name)
-        applicants = ListOfApplicantsWithStatusAndCredentials.objects.filter(
-            interview_applicant_id__in=interviews,
-            account__first_name__icontains=search_query
-        ).distinct()
+        applicants = applicants.filter(interviewer_name__icontains=interviewer_name)
 
-        # Apply date sorting if an interviewer is selected
-        if sort_order == 'desc':
-            applicants = applicants.order_by('-applicant_schedule_date')
-        else:
-            applicants = applicants.order_by('applicant_schedule_date')
+    if search_query:
+        applicants = applicants.filter(
+            Q(account__first_name__icontains=search_query) |
+            Q(account__last_name__icontains=search_query)
+        )
 
-    # Pagination
+    # Sorting logic
+    if sort_type == 'name_asc':
+        applicants = applicants.order_by('account__first_name', 'account__last_name')
+    elif sort_type == 'name_desc':
+        applicants = applicants.order_by('-account__first_name', '-account__last_name')
+    elif sort_type == 'interviewer_asc':
+        applicants = applicants.order_by('interviewer_name')
+    elif sort_type == 'interviewer_desc':
+        applicants = applicants.order_by('-interviewer_name')
+    elif sort_type == 'date_asc':
+        applicants = applicants.order_by('applicant_schedule_date')
+    elif sort_type == 'date_desc':
+        applicants = applicants.order_by('-applicant_schedule_date')
+
+    # Pagination setup
     paginator = Paginator(applicants, rows_per_page)
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
 
-    # Retrieve distinct interviewers
-    interviewer_ids = InterviewStorage.objects.values('interviewer_name').annotate(max_id=Max('interview_applicant_id')).values('max_id')
-    interviewers = InterviewStorage.objects.filter(interview_applicant_id__in=interviewer_ids)
+    # Fetch unique interviewer names for the dropdown
+    interviewers = InterviewStorage.objects.values('interviewer_name').distinct()
 
-    # Context for rendering
+    # Context data
     context = {
         'applicants': page_obj,
         'interviewers': interviewers,
         'search_query': search_query,
         'interviewer_name': interviewer_name,
-        'sort_order': sort_order,
+        'sort_type': sort_type,
         'rows_per_page': rows_per_page,
         'page_obj': page_obj,
     }
