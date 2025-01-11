@@ -304,9 +304,23 @@ def applicant_fileupload(request, job_id):
 
     if request.method == 'POST':
         uploaded_files = request.FILES.getlist('files')
+        max_file_size = 64 * 1024 * 1024  # 64MB
+
+        allowed_file_types = ['application/pdf', 'image/jpeg', 'image/png']
 
         if not uploaded_files:
             return JsonResponse({"error": "No files selected."}, status=400)
+        
+        for uploaded_file in uploaded_files:
+            if uploaded_file.size > max_file_size:
+                return JsonResponse(
+                    {"error": f"File '{uploaded_file.name}' exceeds the 64MB size limit."}, status=400
+                )
+            
+            if uploaded_file.content_type not in allowed_file_types:
+                return JsonResponse(
+                    {"error": f"File '{uploaded_file.name}' is not a valid format. Only PDF, PNG, and JPEG are allowed."}, status=400
+                )
 
         job_instance = get_object_or_404(JobDetailsAndRequirements, job_id=job_id)
         account_id = request.session.get('account_id')
@@ -358,9 +372,10 @@ def applicant_fileupload(request, job_id):
         context = {
             'job_id': job_id,
             'uploaded_files_display': uploaded_files_display,
-            'success_message': "Files successfully uploaded!"
         }
-        return render(request, 'Applicant_fileupload.html', context)
+
+        success_url = reverse('homepage') + "?message=Successfully applied! Your application has been submitted.&type=success"
+        return redirect(success_url)
 
     return JsonResponse({"error": "Invalid request method."}, status=405)
 
