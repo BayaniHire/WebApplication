@@ -1514,10 +1514,6 @@ def adminprofile(request):
 
 @role_required('admin') 
 def add_accounts(request):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-
     if request.method == 'GET':
         referrer = request.META.get('HTTP_REFERER', '/list_of_applicants/')
         parsed_url = urlparse(referrer)
