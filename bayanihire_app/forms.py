@@ -105,6 +105,10 @@ class AccountInformationForm(forms.ModelForm):
     
     def clean_username(self):
         username = self.cleaned_data.get('username')
+
+        # Check if the username contains spaces
+        if username and " " in username:
+            raise ValidationError("Username must not contain spaces.")
     
         # Check if the username already contains the domain
         if username and not username.endswith('@bynhr.com'):
@@ -231,6 +235,10 @@ class AccountInformationForm(forms.ModelForm):
         # Validate that it's exactly 4 digits
         if not re.match(r"^\d{4}$", zipcode):
             raise ValidationError("Zipcode must be exactly 4 digits.")
+
+        # Validate that the zipcode is within the range 0400 to 9811
+        if not (400 <= int(zipcode) <= 9811):
+            raise ValidationError("Please input a valid Philippine zipcode")
     
         return zipcode
     
