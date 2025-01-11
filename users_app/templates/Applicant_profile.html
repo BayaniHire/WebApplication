@@ -43,7 +43,7 @@
         <button class="save-button">Save</button>
     </div>
 </div>
-<div class="sign-out-button" onclick="signOut()">Sign Out</div>
+<button class="sign-out-button" onclick="event.preventDefault(); window.location.href='{% url 'logout_view' %}';">Sign Out</button>
 {% endblock %}
 
 {% block script %}
