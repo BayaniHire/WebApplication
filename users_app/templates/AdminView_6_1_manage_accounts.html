@@ -3,40 +3,53 @@
 {% block title %}BayaniHire: Admin Center{% endblock %}
 
 {% block content %}
-
-<div class="main-content container" style="padding: 0; margin: 0; text-align: center; display: flex; flex-direction: column; align-items: center;"></div>
-    <div class="text-center" style="font-family: Georgia; text-align: center; margin: 0 auto;">
-        <h2 style="font-size: 36px; font-weight: bold;">Admin Manage Accounts</h2>
-        <p style="font-size: 14px; font-weight: bold;">
-            Welcome to Admin Manage Accounts, where the System Admin can manage all the accounts registered in the system.
-        </p>
-        <br>
-    </div>
-
+<div class="main-content" style="padding: 0; margin: 0; text-align: center; display: flex; flex-direction: column; align-items: center;"></div>
+    <h2 style="font-size: 36px; font-weight: bold; text-align: center;">Admin Manage Accounts</h2>
+    <p style="font-size: 14px; font-weight: bold; text-align: center;">
+        Welcome to Admin Manage Accounts, where the System Admin can manage all the accounts registered in the system.
+    </p>
     <!-- Search Input -->
 
 
-    <div class="row-selection mb-4 d-flex align-items-center" style="font-family: Georgia; gap: 10px;">
-        <!-- Sort and Rows Form -->
-        <form method="GET" id="sort-form" class="d-flex align-items-center" style="gap: 10px;">
-            <input type="number" id="row-count" name="rows" placeholder="Enter number of rows..." min="1" max="10" 
-                   class="form-control w-auto" style="padding: 10px;" value="{{ request.GET.rows|default:'5' }}">
-            <button type="submit" class="sfbutton">Set Rows</button>
-            <select id="sort-select" class="form-control w-auto" name="sort" onchange="document.getElementById('sort-form').submit()">
-                <option value="asc" {% if request.GET.sort == 'asc' %}selected{% endif %}>Sort Username A-Z</option>
-                <option value="desc" {% if request.GET.sort == 'desc' %}selected{% endif %}>Sort Username Z-A</option>
-            </select>
-        </form>
-    
-        <!-- Search Form -->
-        <form method="GET" action="{% url 'manage_accounts' %}" class="d-flex align-items-center" style="gap: 10px;">
-            <input type="text" id="search-input" name="search" placeholder="Search by username..." value="{{ search_query }}" 
-                   class="form-control w-auto" style="padding: 10px;">
-            <button type="submit" class="sfbutton">Search</button>
-        </form>
-    </div>
 
-    <table id="accounts-table" class="table table-bordered" style="font-family: Georgia; width: 80%;">
+    <!-- Sort and Rows Form -->
+    <form id="sort-form" method="GET" action="" class="form-inline d-flex justify-content-center align-items-center">
+        <input type="hidden" name="search" value="{{ search_query }}">
+        <input type="hidden" name="rows" value="{{ rows_param }}">
+        
+        <!-- Sorting by Username -->
+        <select id="sort-select" class="AD-admin-sort-dropdown" name="sort" onchange="this.form.submit()">
+            <option value="" {% if not sort_order %}selected{% endif %}>Sort</option>
+            <option value="asc" {% if sort_order == 'asc' %}selected{% endif %}>Username (A-Z)</option>
+            <option value="desc" {% if sort_order == 'desc' %}selected{% endif %}>Username (Z-A)</option>
+        </select>
+    
+        <!-- Filter by Role -->
+        <select id="role-select" class="AD-admin-sort-dropdown" name="role" onchange="this.form.submit()">
+            <option value="" {% if not role_filter %}selected{% endif %}>All Roles</option>
+            <option value="Admin" {% if role_filter == 'Admin' %}selected{% endif %}>Admin</option>
+            <option value="Interviewer" {% if role_filter == 'Interviewer' %}selected{% endif %}>Interviewer</option>
+        </select>
+    
+        <!-- Filter by Status -->
+        <select id="status-select" class="AD-admin-sort-dropdown" name="status" onchange="this.form.submit()">
+            <option value="" {% if not status_filter %}selected{% endif %}>All Status</option>
+            <option value="New" {% if status_filter == 'New' %}selected{% endif %}>New</option>
+            <option value="Active" {% if status_filter == 'Active' %}selected{% endif %}>Active</option>
+            <option value="Deactivated" {% if status_filter == 'Deactivated' %}selected{% endif %}>Deactivated</option>
+        </select>
+    
+        <!-- Search Field -->
+        <input type="text" name="search" value="{{ search_query }}" class="applicant-search-input" placeholder="Search by username...">
+    
+        <!-- Rows Per Page -->
+        <input type="number" name="rows" min="1" max="10" value="{{ rows_param }}" class="form-control mr-2" placeholder="Rows per page">
+        <button type="submit" class="sfbutton">Set Row</button>
+    </form>
+
+
+
+    <table id="accounts-table" class="table table-bordered" style="font-family: Georgia; width: 80%; margin: 0 auto;">
         <thead>
             <tr>
                 <th>No.</th>
@@ -78,22 +91,17 @@
     </table>
 
     <div class="pagination">
-        <span class="step-links">
-            {% if page_obj.has_previous %}
-                <a href="?page=1&sort={{ request.GET.sort }}&rows={{ request.GET.rows }}&search={{ search_query }}">First</a>
-                <a href="?page={{ page_obj.previous_page_number }}&sort={{ request.GET.sort }}&rows={{ request.GET.rows }}&search={{ search_query }}">Previous</a>
-            {% endif %}
-    
-            <span class="current">
-                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-            </span>
-    
-            {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}&sort={{ request.GET.sort }}&rows={{ request.GET.rows }}&search={{ search_query }}">Next</a>
-                <a href="?page={{ page_obj.paginator.num_pages }}&sort={{ request.GET.rows }}&search={{ search_query }}">Last</a>
-            {% endif %}
-        </span>
+        {% if page_obj.has_previous %}
+            <a href="?page=1&search={{ search_query }}&sort={{ sort_order }}&role={{ role_filter }}&status={{ status_filter }}&rows={{ rows_param }}">First</a>
+            <a href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}&sort={{ sort_order }}&role={{ role_filter }}&status={{ status_filter }}&rows={{ rows_param }}">Previous</a>
+        {% endif %}
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}&search={{ search_query }}&sort={{ sort_order }}&role={{ role_filter }}&status={{ status_filter }}&rows={{ rows_param }}">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}&search={{ search_query }}&sort={{ sort_order }}&role={{ role_filter }}&status={{ status_filter }}&rows={{ rows_param }}">Last</a>
+        {% endif %}
     </div>
+
 </div>
 
 <script>
