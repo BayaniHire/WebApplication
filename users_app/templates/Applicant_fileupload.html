@@ -72,36 +72,71 @@
         const maxFileSize = 64 * 1024 * 1024; // Maximum file size 64MB
         const allowedFileTypes = ['application/pdf', 'image/jpeg', 'image/png'];
 
-        for (const file of files) {
-            if (file.size > maxFileSize) {
-                showCustomAlert(`File "${file.name}" exceeds the 64MB size limit.`, 'error');
-                continue; // Skip adding this file
-            }
-
-            if (!allowedFileTypes.includes(file.type)) {
-                showCustomAlert(`File "${file.name}" is not a valid format. Only PDF, PNG, and JPEG are allowed.`, 'error');
-                continue; // Skip adding this file
-            }
-
-            const fileNameElement = document.createElement('div');
-            fileNameElement.textContent = file.name;
-            fileNameElement.className = 'file-name';
-            fileNameElement.onclick = () => {
-                if (selectedFile === file) {
-                    selectedFile = null;
-                    fileNameElement.classList.remove('selected');
-                } else {
-                    selectedFile = file;
-                    const fileNames = document.getElementsByClassName('file-name');
-                    for (let el of fileNames) {
-                        el.classList.remove('selected');
-                    }
-                    fileNameElement.classList.add('selected');
-                }
-                viewButton.disabled = !selectedFile; // Enable/disable view button
-            };
-            fileList.appendChild(fileNameElement);
+        // Check if a file is already uploaded
+        if (selectedFile) {
+            showCustomAlert("You can only upload one file at a time. Please delete the current file first.", "error");
+            setTimeout(() => {
+                const customAlert = document.getElementById('custom-alert');
+                customAlert.style.display = 'none'; // Hide the alert after 3 seconds
+            }, 2000);
+            return;
         }
+
+        // Only process the first file if multiple files are selected
+        if (files.length > 1) {
+            showCustomAlert("You can only upload one file at a time.", "error");
+            setTimeout(() => {
+                const customAlert = document.getElementById('custom-alert');
+                customAlert.style.display = 'none'; // Hide the alert after 3 seconds
+            }, 2000);
+            return;
+        }
+
+        const file = files[0]; // Get the first file
+        if (file.size > maxFileSize) {
+            showCustomAlert(`File "${file.name}" exceeds the 64MB size limit.`, "error");
+            setTimeout(() => {
+                const customAlert = document.getElementById('custom-alert');
+                customAlert.style.display = 'none'; // Hide the alert after 3 seconds
+            }, 2000);
+            return;
+        }
+
+        if (!allowedFileTypes.includes(file.type)) {
+            showCustomAlert(`File "${file.name}" is not a valid format. Only PDF, PNG, and JPEG are allowed.`, "error");
+            setTimeout(() => {
+                const customAlert = document.getElementById('custom-alert');
+                customAlert.style.display = 'none'; // Hide the alert after 3 seconds
+            }, 2000);
+            return;
+        }
+
+        // Clear any existing files in the list
+        fileList.innerHTML = '';
+        selectedFile = file; // Set the selected file
+
+        // Create and display the file name element
+        const fileNameElement = document.createElement('div');
+        fileNameElement.textContent = file.name;
+        fileNameElement.className = 'file-name';
+        fileNameElement.onclick = () => {
+            if (selectedFile === file) {
+                selectedFile = null;
+                fileNameElement.classList.remove('selected');
+            } else {
+                selectedFile = file;
+                const fileNames = document.getElementsByClassName('file-name');
+                for (let el of fileNames) {
+                    el.classList.remove('selected');
+                }
+                fileNameElement.classList.add('selected');
+            }
+            viewButton.disabled = !selectedFile; // Enable/disable view button
+        };
+        fileList.appendChild(fileNameElement);
+
+        deleteButton.disabled = false; // Enable the delete button
+        viewButton.disabled = false; // Enable the view button
     });
 
     // Handle delete button click
@@ -135,6 +170,11 @@
             reader.readAsDataURL(selectedFile);
         } else {
             showCustomAlert("Please select a file to view.", "error");
+            setTimeout(() => {
+                const customAlert = document.getElementById('custom-alert');
+                customAlert.style.display = 'none'; // Hide the alert after 3 seconds
+            }, 2000);
+            return;
         }
     });
 
@@ -145,6 +185,10 @@
         const fileNames = Array.from(fileList.getElementsByClassName('file-name'));
         if (fileNames.length === 0) {
             showCustomAlert("Please select a file to upload.", "error");
+            setTimeout(() => {
+                const customAlert = document.getElementById('custom-alert');
+                customAlert.style.display = 'none'; // Hide the alert after 3 seconds
+            }, 2000);
             return;
         }
 
