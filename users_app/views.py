@@ -130,7 +130,7 @@ def Security(request):
 
 
 ######################INTERVIEWER###########################
-
+@role_required('interviewer') 
 def interviewer_applicants(request):
     # Get the interviewer's account ID from the session (assuming session is properly set after login)
     account_id = request.session.get('account_id')
@@ -163,6 +163,7 @@ def interviewer_applicants(request):
 
     return render(request, 'Applicants.html', {'applicants': applicants_data})
 
+@role_required('interviewer') 
 def interviewer_appointments(request):
     # Get the account ID from the session
     account_id = request.session.get('account_id')
@@ -182,18 +183,12 @@ def interviewer_appointments(request):
     }
     return render(request, 'Appointments.html', context)
 
-def interviewer_editfeedback(request):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-    
+@role_required('interviewer') 
+def interviewer_editfeedback(request):    
     return render(request, 'EditFeedback.html')
 
-def interviewer_feedback(request):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-        
+@role_required('interviewer') 
+def interviewer_feedback(request):      
     if request.method == 'POST':
         # Assuming you have fields in your form named 'applicant_id', 'status', and 'feedback'
         applicant_id = request.POST.get('applicant_id')
@@ -215,6 +210,7 @@ def interviewer_feedback(request):
 
 
 # WEIN BAGO#
+@role_required('interviewer') 
 def interviewerhistory(request):
     user_id = request.session.get('user_id')  # Using 'user_id' for consistency
     if not user_id:
@@ -242,14 +238,11 @@ def interviewerhistory(request):
     return render(request, 'History.html', {'applicants': applicants_data})
 #WEIN BAGO#
 
-def interviewer_profile(request):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-        
+@role_required('interviewer') 
+def interviewer_profile(request):        
     return render(request, 'Profile.html')
 
-
+@role_required('interviewer') 
 def interviewer_viewinfo(request, applicant_status_id):
     # Fetch the applicant using the provided applicant_status_id
     applicant = get_object_or_404(ListOfApplicantsWithStatusAndCredentials, applicant_status_id=applicant_status_id)
@@ -309,23 +302,16 @@ def interviewer_viewinfo(request, applicant_status_id):
 
 
 ###################APPLICANT############################
+@role_required('applicant') 
 def applicant_homepage(request):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-        
     jobs = JobDetailsAndRequirements.objects.filter(job_status='ACTIVE')  # Fetch only active jobs
     context = {
         'jobs': jobs  # Pass the jobs to the template context
     }
     return render(request, 'Applicant_homepage.html', context)
 
-
+@role_required('applicant') 
 def applicant_jobreq(request, job_id):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-
     job_details = get_object_or_404(JobDetailsAndRequirements, job_id=job_id)
 
     # Check if the user has already applied for this job
@@ -345,12 +331,8 @@ def applicant_jobreq(request, job_id):
 
     return render(request, 'Applicant_JobReq.html', context)
 
-
-def applicant_fileupload(request, job_id):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-        
+@role_required('applicant') 
+def applicant_fileupload(request, job_id):        
     uploaded_files_display = []
 
     if request.method == 'GET':
@@ -436,7 +418,7 @@ def applicant_fileupload(request, job_id):
 
 
 
-
+@role_required('applicant') 
 def applicant_applicationstatus(request):
     # Ensure the user is logged in using session data
     account_id = request.session.get('account_id')
@@ -480,11 +462,8 @@ def applicant_applicationstatus(request):
 
     return render(request, 'Applicant_Applicationstatus.html', context)
 
+@role_required('applicant') 
 def applicant_viewfileupload(request, applicant_status_id):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-
     # Retrieve the application details using the applicant_status_id
     application = get_object_or_404(ListOfApplicantsWithStatusAndCredentials, applicant_status_id=applicant_status_id)
 
@@ -541,7 +520,7 @@ def applicant_viewfileupload(request, applicant_status_id):
 
     return render(request, 'Applicant_Viewfileupload.html', context)
 
-
+@role_required('applicant') 
 def applicant_interviewdetails(request, applicant_status_id):
     # Fetch interview details for the given applicant
     applicant = get_object_or_404(ListOfApplicantsWithStatusAndCredentials, applicant_status_id=applicant_status_id)
@@ -573,14 +552,8 @@ def applicant_interviewdetails(request, applicant_status_id):
             'show_not_qualified_message': True
         })
 
-
+@role_required('applicant') 
 def applicant_profile(request):
-
-    # Get the interviewer's account ID from the session
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-        
     account_id = request.session.get('account_id')
     user = get_object_or_404(AccountInformation, account_id=account_id)
 
@@ -613,6 +586,7 @@ def applicant_profile(request):
     return render(request, 'Applicant_profile.html', context)
 
 ###################APPLICANT############################
+@role_required('applicant') 
 def generate_pdf(request, applicant_status_id):
     # Ensure the user is logged in
     account_id = request.session.get('account_id')
@@ -692,11 +666,8 @@ def generate_pdf(request, applicant_status_id):
 ##########################Admin###############################################
 logger = logging.getLogger(__name__)
 
-def list_of_applicants(request):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-        
+@role_required('admin') 
+def list_of_applicants(request):        
     search_query = request.GET.get('search', '').strip()
     sort_type = request.GET.get('sort_type', '')
     sort_order = request.GET.get('sort_order', 'asc')
@@ -762,12 +733,8 @@ def list_of_applicants(request):
     }
     return render(request, 'AdminView_1_Homepage_ListofApplicants.html', context)
 
-
+@role_required('admin') 
 def open_applicants(request, applicant_status_id):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-
     # Fetch the applicant using the provided applicant_status_id
     applicant = get_object_or_404(ListOfApplicantsWithStatusAndCredentials, applicant_status_id=applicant_status_id)
 
@@ -843,11 +810,8 @@ def open_applicants(request, applicant_status_id):
 
     return render(request, 'AdminView_1_1_OpenApplicants.html', context)
 
-def viewing_files(request, file_name):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-        
+@role_required('admin') 
+def viewing_files(request, file_name):        
     # Construct the full file path
     file_path = os.path.join(settings.MEDIA_ROOT, file_name)
 
@@ -865,11 +829,8 @@ def viewing_files(request, file_name):
 
     return render(request, 'AdminView_1_2_ViewingFiles.html', context)
 
+@role_required('admin') 
 def list_of_jobs(request):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-
     search_query = request.GET.get('search', '').strip()
     sort_type = request.GET.get('sort', '')  # Default sort by job title ascending
     sort_order = 'desc' if 'desc' in sort_type else 'asc'  # Ensure proper sort order
@@ -912,11 +873,8 @@ def list_of_jobs(request):
 
     return render(request, 'AdminView_2_ListofJobs.html', context)
 
+@role_required('admin') 
 def edit_job_details(request, job_id):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-
     job = get_object_or_404(JobDetailsAndRequirements, pk=job_id)
 
     # Store the current page as the "previous_page" in session
@@ -966,11 +924,8 @@ def edit_job_details(request, job_id):
         'job_date': job_date,
     })
 
+@role_required('admin') 
 def create_job_details(request):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-
     # Store the current page as the "previous_page" in session
     if request.method == 'GET':
         referrer = request.META.get('HTTP_REFERER', '/list_of_jobs/')
@@ -1035,12 +990,8 @@ def create_job_details(request):
     today_date = date.today().strftime("%Y-%m-%d")  # Format today's date as YYYY-MM-DD
     return render(request, 'AdminView_2_2_CreateJobDetails.html', {'today_date': today_date})
 
-
-def qualification(request):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-        
+@role_required('admin') 
+def qualification(request):        
     interviewers = InterviewStorage.objects.select_related('account')
     grouped_interviewers = {}
 
@@ -1088,7 +1039,7 @@ def qualification(request):
         'applicants': applicant_data
     })
     
-
+@role_required('admin') 
 def send_schedule(request):
     # Fetch all applicants who are set for interview
     applicants = ListOfApplicantsWithStatusAndCredentials.objects.filter(
@@ -1164,7 +1115,7 @@ def send_schedule(request):
     })
 
 
-
+@role_required('admin') 
 def confirm_send_schedule(request):
     if request.method == "POST":
         # Retrieve data from POST request
@@ -1202,11 +1153,8 @@ def confirm_send_schedule(request):
 
     return redirect('send_schedule')  # Redirect if method is not POST
 
+@role_required('admin') 
 def open_schedule_list(request):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-
     # Extract parameters
     interviewer_name = request.GET.get('interviewer', None)
     search_query = request.GET.get('search', '').strip()
@@ -1264,11 +1212,8 @@ def open_schedule_list(request):
 
     return render(request, 'AdminView_3_2_OpenScheduleList.html', context)
 
+@role_required('admin') 
 def schedule(request):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-
     today = date.today()
     search_query_interviewer = request.GET.get('search_interviewer', '').strip()
     sort_type = request.GET.get('sort_type', '')
@@ -1349,12 +1294,8 @@ def schedule(request):
     }
     return render(request, 'AdminView_4_Schedule.html', context)
 
-
+@role_required('admin') 
 def view_schedule(request):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-
     search_query_schedule = request.GET.get('search_schedule', '').strip()
     sort_type = request.GET.get('sort_type', '')
     rows_schedule = request.GET.get('rows_schedule', 5)
@@ -1392,12 +1333,8 @@ def view_schedule(request):
     return render(request, 'AdminView_4_1_ViewSchedule.html', context)
 
 
-
+@role_required('admin') 
 def feedback(request):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-    
     search_query = request.GET.get('search', '').strip()
     sort_type = request.GET.get('sort_name', '')
     status_filter = request.GET.get('status_filter', '')
@@ -1450,14 +1387,10 @@ def feedback(request):
     }
     return render(request, 'AdminView_5_Feedback.html', context)
 
+@role_required('admin') 
 def view_feedback(request, applicant_status_id):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-        
     applicant = get_object_or_404(ListOfApplicantsWithStatusAndCredentials, pk=applicant_status_id)
-    
-    
+       
     if request.method == 'GET':
         if not applicant.applicant_status:
             applicant.applicant_status = "PASSED"
@@ -1494,12 +1427,8 @@ def view_feedback(request, applicant_status_id):
     return render(request, 'AdminView_5_1_ViewFeedback.html', context)
 
 
-
-def adminprofile(request):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-        
+@role_required('admin') 
+def adminprofile(request):        
     # Assuming the user's ID is stored in session
     account_id = request.session.get('account_id')
     user = get_object_or_404(AccountInformation, account_id=account_id)
@@ -1532,11 +1461,9 @@ def adminprofile(request):
     }
     return render(request, 'AdminView_6_Profile.html', context)
 
+@role_required('admin') 
 def add_accounts(request):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-        # Preserve the referring page URL
+    # Preserve the referring page URL
     if request.method == 'GET':
         referrer = request.META.get('HTTP_REFERER', '/list_of_applicants/')
         parsed_url = urlparse(referrer)
@@ -1614,12 +1541,8 @@ def add_accounts(request):
     # Render the form for GET request
     return render(request, 'AdminView_6_2_AddAccounts.html', {})  
 
-
+@role_required('admin') 
 def manage_accounts(request):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-
     # Fetch search, sort, and rows parameters from GET
     search_query = request.GET.get('search', '').strip()
     sort_order = request.GET.get('sort', '')
@@ -1669,6 +1592,7 @@ def manage_accounts(request):
 #WEIN BAGO DAGDAG 11-11-2024
 from django.contrib import messages
 
+@role_required('interviewer') 
 def interviewer_feedback(request):
     account_id = request.session.get('account_id')
     if not account_id:
@@ -1701,11 +1625,8 @@ def interviewer_feedback(request):
 
     return render(request, 'Feedback.html', {'applicants': applicants})
 
-def interviewer_editfeedback(request, applicant_status_id):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-        
+@role_required('interviewer') 
+def interviewer_editfeedback(request, applicant_status_id):        
     # Retrieve the applicant using the applicant_status_id
     applicant = ListOfApplicantsWithStatusAndCredentials.objects.get(applicant_status_id=applicant_status_id)
 
@@ -1743,6 +1664,7 @@ def interviewer_editfeedback(request, applicant_status_id):
     # Pass the applicant data to the template for pre-filling
     return render(request, 'EditFeedback.html', {'applicant': applicant})
 
+@role_required('interviewer') 
 def interviewer_applicants(request):
     # Get the interviewer's account ID from the session (assuming session is properly set after login)
     account_id = request.session.get('account_id')
@@ -1775,6 +1697,7 @@ def interviewer_applicants(request):
 
     return render(request, 'Applicants.html', {'applicants': applicants_data})
 
+@role_required('interviewer') 
 def interviewer_history(request):
     account_id = request.session.get('account_id')
     if not account_id:
@@ -1803,13 +1726,8 @@ def interviewer_history(request):
 
     return render(request, 'History.html', {'applicants': applicants_data})
 
-
-def interviewer_profile(request):
-    # Get the interviewer's account ID from the session
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-        
+@role_required('interviewer') 
+def interviewer_profile(request):  
     account_id = request.session.get('account_id')
     user = get_object_or_404(AccountInformation, account_id=account_id)
 
@@ -1844,12 +1762,6 @@ def interviewer_profile(request):
 # 11-11-2024
 
 ############################index##########################################
-def ensure_authenticated(request):
-    if 'account_id' not in request.session:
-        messages.error(request, "You must log in first.")
-        return redirect('login')
-    return None
-
 def login(request):
     if request.method == 'POST':
         username = request.POST.get('username').strip()
