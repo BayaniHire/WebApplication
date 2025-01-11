@@ -21,6 +21,8 @@
             <option value="interview_date_asc">Interview Date (Earliest to Latest)</option>
             <option value="interview_date_desc">Interview Date (Latest to Earliest)</option>
         </select>
+        <input type="number" id="rowsPerPage" name="rows" min="1" max="50" value="10" class="form-control" placeholder="Rows" style="width: 10%; display: inline-block; margin-left: 10px;">
+        <button class="sfbutton" onclick="setRows()">Set Rows</button>
     </div>
 
     <!-- Application Status Table -->
@@ -35,7 +37,7 @@
                 <th>Interview Date</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="applicationTableBody">
             {% if has_applications %}
                 {% for application in applications %}
                 <tr onclick="selectApplication({{ application.applicant_status_id }}, '{{ application.job__job_title }}', '{{ application.job__job_date_published }}', '{{ application.job__job_id }}')">
@@ -74,6 +76,9 @@
 <script>
     let selectedApplicantStatusId = null;
     let selectedJobId = null;
+    let currentPage = 1;
+    let rowsPerPage = 10; // Default number of rows per page
+
 
     function selectApplication(applicantStatusId, jobTitle, jobDatePublished, jobId) {
         selectedApplicantStatusId = applicantStatusId;
@@ -112,11 +117,47 @@
         window.location.href = url;
     }
 
-    function sortFunction() {
-        const sortOption = document.getElementById("sortOptions").value;
-        const table = document.querySelector("tbody");
+    function setRows() {
+        const rowsInput = document.getElementById("rowsPerPage").value;
+        const table = document.getElementById("applicationTableBody"); // Replace with your actual tbody ID
+        const rows = Array.from(table.querySelectorAll("tr")); // Get all rows
+
+        if (rowsInput === "" || parseInt(rowsInput) > rows.length || parseInt(rowsInput) <= 0) {
+            // If the input is empty, invalid, or exceeds the total number of rows, show all rows
+            rowsPerPage = rows.length; // Set rows per page to the total rows
+        } else {
+            rowsPerPage = parseInt(rowsInput); // Set rows per page to the input value
+        }
+
+        // Reset current page to 1 to avoid issues with pagination
+        currentPage = 1;
+
+        // Reapply pagination
+        displayPaginatedRows();
+    }
+
+
+    function displayPaginatedRows() {
+        const table = document.getElementById("applicationTableBody");
         const rows = Array.from(table.querySelectorAll("tr"));
 
+        rows.forEach((row, index) => {
+            // Show rows within the current range, hide others
+            if (index < rowsPerPage) {
+                row.style.display = ""; // Show row
+            } else {
+                row.style.display = "none"; // Hide row
+            }
+        });
+    }
+
+
+    function sortFunction() {
+        const sortOption = document.getElementById("sortOptions").value;
+        const table = document.getElementById("applicationTableBody");
+        const rows = Array.from(table.querySelectorAll("tr")); // Get all rows
+
+        // Perform sorting based on the selected option
         rows.sort((a, b) => {
             let valA, valB;
             switch (sortOption) {
@@ -130,42 +171,48 @@
                     return valB.localeCompare(valA);
                 case "date_created_asc":
                     valA = new Date(a.cells[1].innerText);
-                    valB = new Date(a.cells[1].innerText);
+                    valB = new Date(b.cells[1].innerText);
                     return valA - valB;
                 case "date_created_desc":
                     valA = new Date(a.cells[1].innerText);
-                    valB = new Date(a.cells[1].innerText);
+                    valB = new Date(b.cells[1].innerText);
                     return valB - valA;
                 case "application_status_asc":
-                    valA = a.cells[2].innerText.toLowerCase();
-                    valB = b.cells[2].innerText.toLowerCase();
+                    valA = a.cells[3].innerText.toLowerCase();
+                    valB = b.cells[3].innerText.toLowerCase();
                     return valA.localeCompare(valB);
                 case "application_status_desc":
-                    valA = a.cells[2].innerText.toLowerCase();
-                    valB = b.cells[2].innerText.toLowerCase();
+                    valA = a.cells[3].innerText.toLowerCase();
+                    valB = b.cells[3].innerText.toLowerCase();
                     return valB.localeCompare(valA);
                 case "date_applied_asc":
-                    valA = new Date(a.cells[3].innerText);
-                    valB = new Date(a.cells[3].innerText);
+                    valA = new Date(a.cells[4].innerText);
+                    valB = new Date(b.cells[4].innerText);
                     return valA - valB;
                 case "date_applied_desc":
-                    valA = new Date(a.cells[3].innerText);
-                    valB = new Date(a.cells[3].innerText);
+                    valA = new Date(a.cells[4].innerText);
+                    valB = new Date(b.cells[4].innerText);
                     return valB - valA;
                 case "interview_date_asc":
-                    valA = new Date(a.cells[4].innerText);
-                    valB = new Date(a.cells[4].innerText);
+                    valA = new Date(a.cells[5].innerText);
+                    valB = new Date(b.cells[5].innerText);
                     return valA - valB;
                 case "interview_date_desc":
-                    valA = new Date(a.cells[4].innerText);
-                    valB = new Date(a.cells[4].innerText);
+                    valA = new Date(a.cells[5].innerText);
+                    valB = new Date(b.cells[5].innerText);
                     return valB - valA;
                 default:
                     return 0;
             }
         });
+
+        // Append the sorted rows back to the table
         rows.forEach(row => table.appendChild(row));
+
+        // Reapply pagination after sorting
+        displayPaginatedRows();
     }
+
 
     function searchFunction() {
         const searchValue = document.querySelector(".applicant-search-input").value.toLowerCase().trim(); // Get search input value
