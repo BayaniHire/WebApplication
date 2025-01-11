@@ -43,6 +43,8 @@
 <div class="account-management-buttons">
     <button class="account-button" onclick="window.location.href='{% url 'manage_accounts' %}'">Manage Accounts</button>
     <button class="account-button" onclick="window.location.href='{% url 'add_accounts' %}'">Create Account</button>
+    <button class="account-button" onclick="window.location.href='{% url 'generate_system_pdf' %}'">Generate PDF</button>
+
 </div>
 
 <button class="sign-out-button" onclick="event.preventDefault(); window.location.href='{% url 'logout_view' %}';">Sign Out</button>
