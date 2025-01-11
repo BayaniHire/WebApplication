@@ -55,7 +55,6 @@ urlpatterns = [
     path('add_accounts/', views.add_accounts, name='add_accounts'),
     path('manage_accounts/', views.manage_accounts, name='manage_accounts'),
     
-    path('admin_interviewer_account_setup/', views.admin_interviewer_account_setup, name='admin_interviewer_account_setup'),
 
     
     #### wag galawing sa update to###
