@@ -1342,59 +1342,88 @@ def feedback(request):
     auth_response = ensure_authenticated(request)
     if auth_response:
         return auth_response
-        
+    
     search_query = request.GET.get('search', '').strip()
-    sort_order = request.GET.get('name_sort', 'asc')
+    sort_type = request.GET.get('sort_name', '')
+    status_filter = request.GET.get('status_filter', '')
     rows_param = request.GET.get('rows', '5')
     rows_per_page = max(min(int(rows_param), 10), 1) if rows_param.isdigit() else 5
 
-    # Base queryset of applicants excluding those with None or empty interviewer feedback status
     applicants = ListOfApplicantsWithStatusAndCredentials.objects.select_related('account', 'job') \
         .exclude(interviewer_feedback_status__isnull=True) \
-        .exclude(interviewer_feedback_status='')
+        .exclude(interviewer_feedback_status='') \
+        .annotate(full_name=Concat('account__first_name', Value(' '), 'account__middle_name', Value(' '), 'account__last_name'))
 
-    # Filter by search query if provided
+
     if search_query:
         applicants = applicants.filter(
-            account__first_name__icontains=search_query
+            Q(full_name__icontains=search_query) |
+            Q(job__job_title__icontains=search_query) |
+            Q(job__job_company__icontains=search_query)
         )
 
-    # Sort applicants by name
-    if sort_order == 'desc':
-        applicants = applicants.order_by('-account__first_name', '-account__last_name')
-    else:
-        applicants = applicants.order_by('account__first_name', 'account__last_name')
+    if status_filter:
+        if status_filter in ["Interview Status Passed", "Interview Status Failed"]:
+            applicants = applicants.filter(interviewer_feedback_status=status_filter.split()[-1])
+        else:
+            applicants = applicants.filter(applicant_status=status_filter.split()[-1])
 
-    # Pagination
+    if sort_type:
+        direction = '-' if 'desc' in sort_type else ''
+        if 'name' in sort_type:
+            sort_fields = [direction + 'account__first_name', direction + 'account__middle_name', direction + 'account__last_name']
+        elif 'company' in sort_type:
+            sort_fields = [direction + 'job__job_company']
+        elif 'position' in sort_type:
+            sort_fields = [direction + 'job__job_title']
+        else:
+            sort_fields = [direction + 'submission_date']
+            
+        applicants = applicants.order_by(*sort_fields)
+
     paginator = Paginator(applicants, rows_per_page)
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
 
-    return render(request, 'AdminView_5_Feedback.html', {
+    context = {
         'applicants': page_obj,
         'search_query': search_query,
-        'sort_order': sort_order,
+        'sort_type': sort_type,
+        'status_filter': status_filter,
         'rows_per_page': rows_per_page,
         'page_obj': page_obj,
-    })
+    }
+    return render(request, 'AdminView_5_Feedback.html', context)
 
-@require_http_methods(["GET", "POST"])
 def view_feedback(request, applicant_status_id):
     auth_response = ensure_authenticated(request)
     if auth_response:
         return auth_response
         
-    # Fetch the specific applicant using the provided ID
     applicant = get_object_or_404(ListOfApplicantsWithStatusAndCredentials, pk=applicant_status_id)
     
+    
+    if request.method == 'GET':
+        if not applicant.applicant_status:
+            applicant.applicant_status = "PASSED"
+            applicant.save()
+        referrer = request.META.get('HTTP_REFERER', '/admin_feedback/')
+        parsed_url = urlparse(referrer)
+        base_url = parsed_url.path
+        query_params = parse_qs(parsed_url.query)
+
+        # Reconstruct the URL with query parameters
+        reconstructed_url = f"{base_url}?{urlencode(query_params, doseq=True)}"
+        request.session['previous_page'] = reconstructed_url
+
     if request.method == "POST":
-        # Update the applicant's status with data from the form
         new_status = request.POST.get('applicant_status')
         if new_status:
             applicant.applicant_status = new_status
             applicant.save()
-            # Redirect to the same page to show updated status
-            return redirect('feedback')
+            previous_page = request.session.get('previous_page')
+            return redirect(f"{previous_page}&message=Applicant status successfully updated.&type=success")
+
 
     # For GET requests or initial form rendering
     interviewer_name = applicant.interview_applicant_id.interviewer_name if applicant.interview_applicant_id else "No interviewer assigned"
@@ -1403,6 +1432,7 @@ def view_feedback(request, applicant_status_id):
         'applicant_name': f"{applicant.account.first_name} {applicant.account.last_name}",
         'interview_status': applicant.interviewer_feedback_status,
         'interview_feedback': applicant.interviewer_feedback,
+        'applicant_status': applicant.applicant_status, 
         'applicant_status_id': applicant_status_id  # Needed to build the form action URL
     }
     
