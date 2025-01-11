@@ -51,10 +51,11 @@ urlpatterns = [
     path('view_schedule/', views.view_schedule, name='view_schedule'),
     path('admin_feedback/', views.feedback, name='feedback'),
     path('view_feedback/<int:applicant_status_id>/', views.view_feedback, name='view_feedback'),
-    path('profile_admin/', views.adminprofile, name='adminprofile'),
     path('add_accounts/', views.add_accounts, name='add_accounts'),
     path('manage_accounts/', views.manage_accounts, name='manage_accounts'),
-    
+
+    path('profile_admin/', views.adminprofile, name='adminprofile'),
+    path('generate_system_pdf/', views.generate_system_pdf, name='generate_system_pdf'),
 
     
     #### wag galawing sa update to###
