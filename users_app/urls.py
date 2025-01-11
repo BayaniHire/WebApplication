@@ -48,6 +48,7 @@ urlpatterns = [
     path('confirm_send_schedule/', views.confirm_send_schedule, name='confirm_send_schedule'),
     path('open_schedule_list/', views.open_schedule_list, name='open_schedule_list'),
     path('schedule/', views.schedule, name='schedule'),
+    path('view_schedule/', views.view_schedule, name='view_schedule'),
     path('admin_feedback/', views.feedback, name='feedback'),
     path('view_feedback/<int:applicant_status_id>/', views.view_feedback, name='view_feedback'),
     path('profile_admin/', views.adminprofile, name='adminprofile'),
