@@ -1976,8 +1976,21 @@ def verify_email(request, token):
         # Delete the token after successful verification
         verification_token.delete()
 
-        # Send success welcome email
-        send_success_email(account)
+        # Query AccountStorage by account ID
+        try:
+            account_storage = AccountStorage.objects.get(account_id=account.account_id)
+
+            # Debug: Print role information
+            print(f"Account role for account ID {account.account_id}: {account_storage.role}")
+
+            # Validate role and send appropriate success email
+            if account_storage.role and account_storage.role.lower() in ['admin', 'interviewer']:
+                send_success_email_2(account)  # Admin/interviewer email
+            else:
+                send_success_email(account)  # Applicant email
+        except AccountStorage.DoesNotExist:
+            print(f"No AccountStorage found for account ID: {account.account_id}")
+            return HttpResponse("Account role information is missing.", status=400)    
 
         # Redirect to a success page or login page
         return redirect('login')
@@ -2041,6 +2054,54 @@ def send_success_email(account):
     )
     email_message.attach_alternative(html_content, "text/html")
     email_message.send()
+
+def send_success_email_2(account):
+    try:
+        # Query AccountStorage to get the role
+        account_storage = AccountStorage.objects.get(account_id=account.account_id)
+
+        # Prepare email content
+        subject = "Welcome to BayaniHire - Account Successfully Created!"
+        html_content = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif; text-align: center; margin: 20px; padding: 20px; background-color: #FFFFFF; border: 1px solid #ddd; border-radius: 10px;">
+            <div>
+                <h1 style="color: #5c332e;">BayaniHire</h1>
+                <p style="color: #000000; margin-bottom: 15px;">Welcome, {account.first_name}!</p>
+                <p style="color: #000000; margin-bottom: 15px;">Your account as an <strong>{account_storage.role.capitalize()}</strong> has been successfully verified.</p>
+                <p style="color: #000000; margin-bottom: 15px;">You can now log in to the system using the following:</p>
+                <p style="font-size: 18px; font-weight: bold; color: #000000; margin-bottom: 15px;">
+                    username: <span style="color: #ff0000;">{account.username}</span>
+                </p>
+                <p style="font-size: 18px; font-weight: bold; color: #000000; margin-bottom: 15px;">
+                    password: <span style="color: #ff0000;">{account.password}</span>
+                </p>
+                <p style="color: #000000; margin-bottom: 15px;">
+                    <strong>Please ensure you change your password upon logging in for the first time.</strong>
+                    If you have any questions, feel free to contact our support team.
+                </p>
+                <p style="color: #000000; margin-top: 20px; margin-bottom: 15px; font-weight: bold;">We are glad to have you on board!</p>
+            </div>
+        </body>
+        </html>
+        """
+
+        # Send the email
+        email_message = EmailMultiAlternatives(
+            subject=subject,
+            body=f"Congratulations {account.first_name}, your account has been verified! You can now log in using your username: {account.username}.",  # Fallback plain text
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[account.email],
+        )
+        email_message.attach_alternative(html_content, "text/html")
+        email_message.send()
+
+    except AccountStorage.DoesNotExist:
+        print(f"No AccountStorage found for account ID: {account.account_id}")
+        raise Exception("Account role information is missing.")  # Raise an exception to debug further
+    except Exception as e:
+        print(f"Error sending email: {e}")
+        raise
 
     
 def change_password(request):
