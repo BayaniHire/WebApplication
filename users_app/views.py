@@ -286,10 +286,26 @@ def applicant_jobreq(request, job_id):
     auth_response = ensure_authenticated(request)
     if auth_response:
         return auth_response
-        
+
     job_details = get_object_or_404(JobDetailsAndRequirements, job_id=job_id)
 
-    return render(request, 'Applicant_JobReq.html', {'job_details': job_details})
+    # Check if the user has already applied for this job
+    account_id = request.session.get('account_id')
+    if not account_id:
+        return JsonResponse({"error": "User must be logged in."}, status=403)
+
+    already_applied = ListOfApplicantsWithStatusAndCredentials.objects.filter(
+        job_id=job_id, account_id=account_id
+    ).exists()
+
+    # Pass the already_applied flag to the template
+    context = {
+        'job_details': job_details,
+        'already_applied': already_applied,
+    }
+
+    return render(request, 'Applicant_JobReq.html', context)
+
 
 def applicant_fileupload(request, job_id):
     auth_response = ensure_authenticated(request)
