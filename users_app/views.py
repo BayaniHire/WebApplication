@@ -1463,7 +1463,10 @@ def adminprofile(request):
 
 @role_required('admin') 
 def add_accounts(request):
-    # Preserve the referring page URL
+    auth_response = ensure_authenticated(request)
+    if auth_response:
+        return auth_response
+
     if request.method == 'GET':
         referrer = request.META.get('HTTP_REFERER', '/list_of_applicants/')
         parsed_url = urlparse(referrer)
@@ -1483,27 +1486,63 @@ def add_accounts(request):
             last_name = request.POST.get('last_name', '').strip()
             email = request.POST.get('email', '').strip()
 
-            # Ensure all required fields are provided
-            if not (role and birthday and gender and first_name and last_name and email):
+            # Initialize error dictionary
+            errors = {}
+
+            # Validate age
+            if birthday:
+                birth_date = datetime.strptime(birthday, "%Y-%m-%d")
+                today = datetime.today()
+                age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
+                if age < 18:
+                    errors['birthday_error'] = "Users must be at least 18 years old."
+                if age > 65:
+                    errors['birthday_error'] = "Users must not be older than 65 years."
+            else:
+                errors['birthday_error'] = "Birthday is required."
+
+            # Validate names
+            if len(first_name) < 2 or not first_name.replace(" ", "").isalpha():
+                errors['first_name_error'] = "must be at 2+ characters long and contain only alphabetic characters."
+            if len(last_name) < 2 or not last_name.replace(" ", "").isalpha():
+                errors['last_name_error'] = "must be at least 2+ characters long and contain only alphabetic characters."
+            if len(middle_name) < 2 or not (middle_name.replace(" ", "").isalpha() or middle_name == 'N/A'):
+                errors['middle_name_error'] = "must be at least 2+ characters long and contain only alphabetic characters or 'N/A'."
+
+            # Validate email
+            if AccountInformation.objects.filter(email=email).exists():
+                errors['email_error'] = "An account with this email already exists."
+            if not email:
+                errors['email_error'] = "Email is required."
+
+            # Check if there are errors
+            if errors:
                 return render(request, 'AdminView_6_2_AddAccounts.html', {
-                    "message": "Missing required fields. Please fill out the form completely."
+                    "role": role,
+                    "gender": gender,
+                    "first_name": first_name,
+                    "middle_name": middle_name,
+                    "last_name": last_name,
+                    "email": email,
+                    "birthday": birthday,
+                    **errors  # Pass all error messages to the template
                 })
 
-            # Compute age based on birthday
-            birth_date = datetime.strptime(birthday, "%Y-%m-%d")
-            today = datetime.today()
-            age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
-
             # Generate default username and password
-            base_username = f"{first_name.lower().replace(' ', '')}@bynhr.com"
-            password = last_name.lower().replace(' ', '')  # Use the last name as the default password
+            # Function to generate a unique username
+            def generate_unique_username(base_name):
+                while True:
+                    random_number = random.randint(10, 99)  # Generate two random digits
+                    username = f"{base_name.lower().replace(' ', '')}{random_number}@bynhr.com"
+                    if not AccountInformation.objects.filter(username=username).exists():
+                        return username
 
-            # Ensure unique username
-            username = base_username
-            count = 1
-            while AccountInformation.objects.filter(username=username).exists():
-                username = f"{base_username}_{count}"
-                count += 1
+            # Generate unique username
+            base_name = first_name  # Use the first name as the base
+            username = generate_unique_username(base_name)
+
+            # Generate password
+            password = last_name.lower().replace(" ", "")  # Use the last name as the default password
 
             # Save to AccountInformation
             account_info = AccountInformation(
@@ -1526,6 +1565,13 @@ def add_accounts(request):
                 account_status='new'  # Default status
             )
             account_storage.save()
+            
+            # Generate a unique verification token
+            token = uuid.uuid4()
+            VerificationToken.objects.create(account=account_info, token=token)
+
+            # Send the verification email
+            send_verification_email(account_info, token)
 
             # Success message and redirect
             previous_page = request.session.get('previous_page', '/list_of_applicants/')
@@ -1535,11 +1581,11 @@ def add_accounts(request):
         except Exception as e:
             # Handle errors and log them if needed
             return render(request, 'AdminView_6_2_AddAccounts.html', {
-                "message": f"An error occurred: {e}"
+                "error": f"An error occurred: {e}"
             })
 
     # Render the form for GET request
-    return render(request, 'AdminView_6_2_AddAccounts.html', {})  
+    return render(request, 'AdminView_6_2_AddAccounts.html', {})
 
 @role_required('admin') 
 def manage_accounts(request):
