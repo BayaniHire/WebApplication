@@ -3,15 +3,142 @@
 {% block title %}Job Details{% endblock %}
 
 {% block content %}
-<div class="job-rek">
-    <h2 class="job-title">{{ job_details.job_title }}</h2>
-    <p class="job-description"><strong>Description:</strong> {{ job_details.job_description }}</p>
-    <p class="job-requirements"><strong>Requirements:</strong> {{ job_details.job_requirements }}</p>
-    <p class="job-company"><strong>Company:</strong> {{ job_details.job_company }}</p>
-    <p class="job-benefits"><strong>Benefits:</strong> {{ job_details.job_benefits }}</p>
-    <p class="job-status"><strong>Status:</strong> {{ job_details.job_status }}</p>
-    <p class="job-date"><strong>Date Published:</strong> {{ job_details.job_date_published }}</p>
 
-    <button class="apply-button" onclick="window.location.href='{% url 'fileupload' job_details.job_id %}'">Apply Now</button>
+<div class="main-content">
+    <h2 style="font-size: 36px; font-weight: bold; text-align: center;">Job Requirements</h2>
+    
+    <div class="job-rek" style="width: 80%; margin: 20px auto; text-align: left;">
+        <h2 class="job-title" style="font-size: 28px;">{{ job_details.job_title }}</h2>
+        <p class="job-description"><strong>Description:</strong> {{ job_details.job_description }}</p>
+        <p class="job-requirements"><strong>Requirements:</strong> {{ job_details.job_requirements }}</p>
+        <p class="job-company"><strong>Company:</strong> {{ job_details.job_company }}</p>
+        <p class="job-benefits"><strong>Benefits:</strong> {{ job_details.job_benefits }}</p>
+        <p class="job-status"><strong>Status:</strong> {{ job_details.job_status }}</p>
+        <p class="job-date"><strong>Date Published:</strong> {{ job_details.job_date_published }}</p>
+        
+        <!-- Add a note about applying once -->
+        <p style="font-size: 16px; color: #d9534f; font-weight: bold;">You can only apply for a job once.</p>
+
+        {% if already_applied %}
+        <div class="jr-alert-box" style="
+            background-color: #4CAF50 !important; /* Green background */
+            color: white !important; /* White text */
+            padding: 15px 20px; 
+            border-radius: 5px; 
+            font-size: 16px; 
+            font-weight: bold; 
+            margin-top: 10px; 
+            text-align: center; 
+            border: none; 
+            max-width: 90%; /* Responsive max width */
+            margin-left: auto; /* Center horizontally */
+            margin-right: auto;">
+            <p style="margin: 0; font-size: inherit;">You have already applied for this job.</p>
+        </div>
+        <style>
+            @media (max-width: 1024px) {
+                .jr-alert-box {
+                    font-size: 15px; /* Adjust font size for medium screens */
+                    padding: 12px 18px; /* Adjust padding */
+                }
+            }
+
+            @media (max-width: 768px) {
+                .jr-alert-box {
+                    font-size: 14px; /* Further adjust font size for smaller screens */
+                    padding: 10px 15px; /* Adjust padding */
+                }
+                .jr-alert-box p {
+                    font-size: 14px; /* Ensure text adapts to container */
+                }
+            }
+
+            @media (max-width: 480px) {
+                .jr-alert-box {
+                    font-size: 12px; /* Smallest font size for mobile */
+                    padding: 8px 10px; /* Smallest padding for mobile */
+                }
+                .jr-alert-box p {
+                    font-size: 12px; /* Ensure text remains readable */
+                }
+            }
+        </style>
+        {% else %}
+            <button class="apply-button" id="applyButton" onclick="handleApplyClick()">Apply Now</button>
+        {% endif %}
+    
+    </div>
 </div>
+
+<!-- Custom Alert -->
+<div id="custom-alert" class="alert-hidden">
+    <div class="jr-alert-box alert-success">
+        <p id="alertText"></p>
+    </div>
+</div>
+{% endblock %}
+
+{% block style %}
+<style>
+    .jr-alert-box {
+        background-color: #4CAF50 !important; /* Green background */
+        color: white !important; /* White text */
+        padding: 15px 20px;
+        border-radius: 5px;
+        font-size: 16px; /* Default font size */
+        font-weight: bold;
+        margin-top: 10px;
+        text-align: center;
+        border: none;
+        max-width: 90%; /* Responsive max width */
+        margin-left: auto; /* Center horizontally */
+        margin-right: auto;
+    }
+
+    /* Responsive font size and padding for smaller screens */
+    @media (max-width: 768px) {
+        .jr-alert-box {
+            font-size: 14px; /* Reduce font size */
+            padding: 10px 15px; /* Reduce padding */
+        }
+    }
+
+    @media (max-width: 480px) {
+        .jr-alert-box {
+            font-size: 12px; /* Further reduce font size */
+            padding: 8px 10px; /* Smaller padding for smaller screens */
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block script %}
+<script>
+    function handleApplyClick() {
+        const applyButton = document.getElementById('applyButton');
+        const alreadyApplied = "{{ already_applied }}";
+
+        if (alreadyApplied === "True") {
+            showCustomAlert("You have already applied for this job.", "error");
+        } else {
+            // Redirect to the file upload page
+            const jobId = "{{ job_details.job_id }}";
+            window.location.href = `{% url 'fileupload' job_details.job_id %}`.replace(jobId, jobId);
+        }
+    }
+
+    // Function to show alert messages
+    function showCustomAlert(message, type = 'success') {
+        const alertBox = document.getElementById('custom-alert');
+        const alertText = document.getElementById('alertText');
+
+        alertText.textContent = message; // Set the alert message
+        alertBox.classList.remove('alert-hidden'); // Show the alert
+
+        setTimeout(() => {
+            alertBox.classList.add('alert-hidden'); // Hide the alert after 3 seconds
+        }, 3000);
+    }
+</script>
 {% endblock %}
