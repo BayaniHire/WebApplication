@@ -1198,10 +1198,13 @@ def schedule(request):
     auth_response = ensure_authenticated(request)
     if auth_response:
         return auth_response
-        
+
     today = date.today()
     search_query_interviewer = request.GET.get('search_interviewer', '').strip()
-    search_query_schedule = request.GET.get('search_schedule', '').strip()  # Ensure this variable is defined
+    sort_type = request.GET.get('sort_type', '')
+    sort_order = request.GET.get('sort_order', 'asc')
+    rows_interviewer = request.GET.get('rows_interviewer', '5')
+    page_number_interviewer = request.GET.get('page_interviewer', '1')
 
     interviewers = AccountStorage.objects.filter(role='interviewer').select_related('account')
     if search_query_interviewer:
@@ -1211,20 +1214,44 @@ def schedule(request):
             Q(account__last_name__icontains=search_query_interviewer)
         )
 
+    # Corrected sorting logic: Sorting by both first and last names
+    if sort_type:
+        if 'name_asc' == sort_type:
+            interviewers = interviewers.order_by('account__first_name', 'account__last_name')
+        elif 'name_desc' == sort_type:
+            interviewers = interviewers.order_by('-account__first_name', '-account__last_name')
+
     if request.method == "POST":
         selected_interviewer_name = request.POST.get('selected_interviewer')
         interview_date = request.POST.get('interview_date')
-
         if interview_date:
             interview_date_obj = date.fromisoformat(interview_date)
-            if interview_date_obj < today:
-                messages.error(request, 'The selected date must be today or in the future.')
-                return redirect('schedule')
-
+            if interview_date_obj <= today:
+                query_params = {
+                    'search_interviewer': search_query_interviewer,
+                    'sort_type': sort_type,
+                    'sort_order': sort_order,
+                    'rows_interviewer': rows_interviewer,
+                    'page_interviewer': page_number_interviewer,
+                    'message': 'The selected date must be in the future.',
+                    'type': 'error'
+                }
+                url_params = urlencode(query_params)
+                url = f"{reverse('schedule')}?{url_params}"
+                return HttpResponseRedirect(url)
+        
         selected_interviewer = interviewers.filter(
             account__first_name__icontains=selected_interviewer_name.split()[0],
             account__last_name__icontains=selected_interviewer_name.split()[-1]
         ).first()
+
+        if selected_interviewer:
+            is_booked = InterviewStorage.objects.filter(
+                account=selected_interviewer.account,
+                interview_schedule_date=interview_date_obj
+            ).exists()
+            if is_booked:
+                return redirect(f"{reverse('schedule')}?message=The date is already set for that interviewer.&type=error")
 
         if selected_interviewer:
             InterviewStorage.objects.create(
@@ -1233,57 +1260,46 @@ def schedule(request):
                 interview_schedule_date=interview_date_obj,
                 interviewer_name=selected_interviewer_name
             )
-            messages.success(request, 'Interview scheduled successfully.')
-            return redirect('schedule')
+            return redirect(f"{reverse('view_schedule')}?message=Interview scheduled successfully.&type=success")
         else:
-            messages.error(request, 'Selected interviewer not found.')
-            return redirect('schedule')
+            return redirect(f"{reverse('view_schedule')}?message=Selected interviewer not found.&type=error")
 
-    # Pagination for interviewers
     rows_interviewer = int(request.GET.get('rows_interviewer', 5))
     page_number_interviewer = request.GET.get('page_interviewer', 1)
     interviewer_paginator = Paginator(interviewers, rows_interviewer)
     page_obj_interviewer = interviewer_paginator.get_page(page_number_interviewer)
 
-    # Handling interview schedules display setup
-    interview_data = InterviewStorage.objects.select_related('account').order_by('-interview_schedule_date')
-    formatted_interview_data = [
-        {
-            "name": f"{entry.account.first_name} {entry.account.middle_name} {entry.account.last_name}".strip(),
-            "date": entry.interview_schedule_date
-        } for entry in interview_data
-    ]
-
-    # Pagination for interview schedules
-    rows_schedule = int(request.GET.get('rows_schedule', 5))
-    page_number_schedule = request.GET.get('page_schedule', 1)
-    schedule_paginator = Paginator(formatted_interview_data, rows_schedule)
-    page_obj_schedule = schedule_paginator.get_page(page_number_schedule)
-
     context = {
         'interviewer_names': page_obj_interviewer,
-        'formatted_interview_data': page_obj_schedule,
         'search_query_interviewer': search_query_interviewer,
-        'search_query_schedule': search_query_schedule,
         'rows_interviewer': rows_interviewer,
-        'rows_schedule': rows_schedule,
         'page_obj_interviewer': page_obj_interviewer,
-        'page_obj_schedule': page_obj_schedule,
+        'sort_type': sort_type,
+        'sort_order': sort_order,
     }
     return render(request, 'AdminView_4_Schedule.html', context)
 
 
-def schedule_view(request):
+def view_schedule(request):
     auth_response = ensure_authenticated(request)
     if auth_response:
         return auth_response
-        
-    # Retrieve interview records with interviewer names and scheduled dates
-    interview_data = InterviewStorage.objects.select_related('account').values(
-        'account__first_name', 'account__middle_name', 'account__last_name', 'interview_schedule_date'
-    )
 
-    # Format interviewer names and dates for display
+    search_query_schedule = request.GET.get('search_schedule', '').strip()
+    sort_type = request.GET.get('sort_type', '')
+    rows_schedule = request.GET.get('rows_schedule', 5)
+    rows_schedule = max(min(int(rows_schedule), 10), 1)  # Ensure valid integer between 1 and 10
+
+    query = Q(account__first_name__icontains=search_query_schedule) | \
+            Q(account__last_name__icontains=search_query_schedule)
+
+    interview_data = InterviewStorage.objects.filter(query).select_related('account').order_by(
+        '-account__last_name' if sort_type == 'name_desc' else
+        'account__last_name' if sort_type == 'name_asc' else
+        '-interview_schedule_date' if sort_type == 'date_desc' else
+        'interview_schedule_date'
+    ).values('account__first_name', 'account__middle_name', 'account__last_name', 'interview_schedule_date')
+
     formatted_interview_data = [
         {
             "name": f"{entry['account__first_name'] or ''} {entry['account__middle_name'] or ''} {entry['account__last_name'] or ''}".strip(),
@@ -1292,11 +1308,20 @@ def schedule_view(request):
         for entry in interview_data
     ]
 
-    # Pass formatted interview data to the template
+    paginator = Paginator(formatted_interview_data, rows_schedule)
+    page_number = request.GET.get('page_schedule', 1)
+    page_obj_schedule = paginator.get_page(page_number)
+
     context = {
-        'formatted_interview_data': formatted_interview_data,
+        'formatted_interview_data': page_obj_schedule,
+        'page_obj_schedule': page_obj_schedule,
+        'search_query_schedule': search_query_schedule,
+        'rows_schedule': rows_schedule,
+        'sort_type': sort_type,
     }
-    return render(request, 'AdminView_4_Schedule.html', context)
+    return render(request, 'AdminView_4_1_ViewSchedule.html', context)
+
+
 
 def feedback(request):
     auth_response = ensure_authenticated(request)
