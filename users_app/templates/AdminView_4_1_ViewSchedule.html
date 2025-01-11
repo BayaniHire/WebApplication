@@ -15,8 +15,8 @@
             <option value="" {% if sort_type == '' %}selected{% endif %}>Sort</option>
             <option value="name_asc" {% if sort_type == 'name_asc' %}selected{% endif %}>Interviewer Name (A-Z)</option>
             <option value="name_desc" {% if sort_type == 'name_desc' %}selected{% endif %}>Interviewer Name (Z-A)</option>
-            <option value="date_asc" {% if sort_type == 'date_asc' %}selected{% endif %}>Date (Oldest to Newest)</option>
-            <option value="date_desc" {% if sort_type == 'date_desc' %}selected{% endif %}>Date (Newest to Oldest)</option>
+            <option value="date_asc" {% if sort_type == 'date_asc' %}selected{% endif %}>Date Ascending</option>
+            <option value="date_desc" {% if sort_type == 'date_desc' %}selected{% endif %}>Date Descending</option>
         </select>
         <input type="text" name="search_schedule" id="searchSchedule" value="{{ search_query_schedule }}" placeholder="Search Interview Schedule" class="applicant-search-input" style="width: 150%;">
         <button style="margin-right: 5px;" type="submit" class="applicant-search-button">Search</button>
