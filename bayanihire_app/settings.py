@@ -73,11 +73,11 @@ WSGI_APPLICATION = 'bayanihire_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'bayanihire_webapp_database',  # Replace with your database name
-        'USER': 'root',  # Replace with your database user
-        'PASSWORD': 'admin',  # Replace with your database password
-        'HOST': 'localhost',
-        'PORT': '3307',  # Replace with your database port if needed
+        'NAME': 'bayanihiretest$bayanihire_webapp_database',  # Replace with your database name
+        'USER': 'bayanihiretest',  # Replace with your database user
+        'PASSWORD': 'bayanihire123456789',  # Replace with your database password
+        'HOST': 'bayanihiretest.mysql.pythonanywhere-services.com',
+        'PORT': '3306',  # Replace with your database port if needed
     }
 }
 
