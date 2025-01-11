@@ -62,11 +62,50 @@ from urllib.parse import urlparse, parse_qs, urlencode
 import uuid
 from django.db.models import F, Value
 from django.db.models.functions import Coalesce
+from functools import wraps
+from django.views.decorators.cache import never_cache
 
+def role_required(*allowed_roles):
+    def decorator(view_func):
+        @wraps(view_func)
+        @never_cache 
+        def _wrapped_view(request, *args, **kwargs):
+            # Check if the user is logged in first
+            if 'account_id' not in request.session:
+                messages.error(request, "You must log in first.")
+                return redirect('login')
+
+            # Retrieve the account ID from the session
+            account_id = request.session['account_id']
+
+            try:
+                # Retrieve the account from the database
+                account_storage = AccountStorage.objects.get(account__account_id=account_id)
+
+                # Check if the user's role is one of the allowed roles
+                if account_storage.role not in allowed_roles:
+                    # Clear the session and display a permission error
+                    request.session.flush()
+                    messages.error(request, "You do not have permission to access this page. You have been automatically logged out.")
+                    return HttpResponseRedirect(reverse('login'))
+            except AccountStorage.DoesNotExist:
+                # Clear the session and inform the user their account is not found
+                request.session.flush()
+                messages.error(request, "Your account was not found or is no longer active.")
+                return HttpResponseRedirect(reverse('login'))
+            
+            # If all checks pass, proceed to the view
+            return view_func(request, *args, **kwargs)
+        
+        return _wrapped_view
+    return decorator
 
 def logout_view(request):
-    logout(request)
-    return redirect('Index')
+    logout(request)  # This clears all sessions and cookies related to this session
+    response = redirect('login')
+    response.delete_cookie('sessionid', path='/')  # Optional: Explicitly remove session cookie
+    response['Cache-Control'] = 'no-store'  # Ensures pages are not cached by the browser
+    return response
 
 def Index(request):
     return render(request, "index.html")
