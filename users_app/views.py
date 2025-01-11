@@ -1596,6 +1596,9 @@ def manage_accounts(request):
     status_filter = request.GET.get('status', '')
     rows_param = request.GET.get('rows', '5')
 
+    base_url = request.build_absolute_uri('/manage_accounts/')
+    query_params = request.GET.dict() 
+        
     # Set rows per page with a default of 5
     rows_per_page = max(min(int(rows_param), 15), 1) if rows_param.isdigit() else 5
 
@@ -1616,6 +1619,27 @@ def manage_accounts(request):
     elif sort_order == 'asc':
         accounts = accounts.order_by('account__username')
 
+    if request.method == "POST":
+        action = request.POST.get('action')
+        role_id = int(request.POST.get('role_id'))
+        account_storage = AccountStorage.objects.get(role_id=role_id)
+
+        # Update the account status based on the action
+        if action == 'deactivate' and account_storage.account_status == 'active':
+            account_storage.account_status = 'deactivated'
+            account_storage.save()
+            query_params.update({'message': 'This account has been deactivated.', 'type': 'error'})
+            return redirect(f"{base_url}?{urlencode(query_params)}")
+
+        elif action == 'reactivate' and account_storage.account_status == 'deactivated':
+            account_storage.account_status = 'active'
+            account_storage.save()
+            query_params.update({'message': 'This account has been deactivated.', 'type': 'success'})
+            return redirect(f"{base_url}?{urlencode(query_params)}")
+        elif account_storage.account_status == 'active':
+            query_params.update({'message': 'This account is already active.', 'type': 'error'})
+            return redirect(f"{base_url}?{urlencode(query_params)}")
+
     # Pagination
     paginator = Paginator(accounts, rows_per_page)
     page_number = request.GET.get('page', 1)
@@ -1630,6 +1654,7 @@ def manage_accounts(request):
         'status_filter': status_filter,
     }
     return render(request, 'AdminView_6_1_manage_accounts.html', context)
+
 
 
 
