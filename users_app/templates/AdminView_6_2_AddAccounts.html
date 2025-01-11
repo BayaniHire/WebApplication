@@ -23,7 +23,10 @@
         <br><br>
     
         <label style="font-size: 20px;">Birthday:</label>
-        <input type="date"  class="AD-calendar-input" name="birthday" min="1900-01-01" max="2024-09-21" required>
+        <input type="date" class="AD-calendar-input" name="birthday" min="1900-01-01" max="2024-09-21" value="{{ birthday }}" required>
+        {% if birthday_error %}
+            <p id="error-message" style="color: red;">{{ birthday_error }}</p>
+        {% endif %}
         <br><br>
     
         <label style="font-size: 20px;">Gender:</label>
@@ -34,43 +37,40 @@
         </select>
         <br><br>
     
+        <!-- First Name -->
         <label style="font-size: 20px;">First Name:</label>
-        <input type="text" class="search-input" name="first_name" placeholder="First Name" required>
+        <input type="text" class="search-input" name="first_name" placeholder="First Name" value="{{ first_name }}" required>
+        {% if first_name_error %}
+            <p id="error-message" style="color: red;">{{ first_name_error }}</p>
+        {% endif %}
         <br><br>
     
+        <!-- Middle Name -->
         <label style="font-size: 20px;">Middle Name:</label>
-        <input type="text" class="search-input" name="middle_name" placeholder="Middle Name" required>
+        <input type="text" class="search-input" name="middle_name" placeholder="Middle Name" value="{{ middle_name }}" required>
+        {% if middle_name_error %}
+            <p id="error-message" style="color: red;">{{ middle_name_error }}</p>
+        {% endif %}
         <br><br>
     
+        <!-- Last Name -->
         <label style="font-size: 20px;">Last Name:</label>
-        <input type="text" class="search-input" name="last_name" placeholder="Last Name" required>
+        <input type="text" class="search-input" name="last_name" placeholder="Last Name" value="{{ last_name }}" required>
+        {% if last_name_error %}
+            <p id="error-message" style="color: red;">{{ last_name_error }}</p>
+        {% endif %}
         <br><br>
     
+        <!-- Email -->
         <label style="font-size: 20px;">Email:</label>
-        <input type="email" class="search-input" name="email" placeholder="Enter Email" required>
+        <input type="email" class="search-input" name="email" placeholder="Enter Email" value="{{ email }}" required>
+        {% if email_error %}
+            <p id="error-message" style="color: red;">{{ email_error }}</p>
+        {% endif %}
         <br><br>
 
         <button type="submit" class="sfbutton">Create</button>
     </form>
 
 </div>
-
-<script>
-    document.querySelector('form').addEventListener('submit', function(event) {
-        const birthdayInput = document.querySelector('input[name="birthday"]');
-        const birthDate = new Date(birthdayInput.value);
-        const today = new Date();
-        const age = today.getFullYear() - birthDate.getFullYear();
-        const m = today.getMonth() - birthDate.getMonth();
-
-        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
-        }
-
-        if (age < 18) {
-            event.preventDefault(); // Prevent form submission
-            alert("Users must be at least 18 years old.");
-        }
-    });
-</script>
 {% endblock %}
