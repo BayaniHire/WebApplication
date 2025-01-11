@@ -130,3 +130,6 @@ SESSION_COOKIE_AGE = 1800  # Session valid for 30 minutes (in seconds)
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Keep session alive even after closing the browser
 SESSION_SAVE_EVERY_REQUEST = True  # Reset session expiry on each request
 BASE_URL = "http://127.0.0.1:8000"  # Replace with your actual domain in production
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 64 * 1024 * 1024  # 64MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 64 * 1024 * 1024  # 64MB
