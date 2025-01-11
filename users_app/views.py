@@ -1481,20 +1481,84 @@ def add_accounts(request):
     auth_response = ensure_authenticated(request)
     if auth_response:
         return auth_response
-        
+        # Preserve the referring page URL
+    if request.method == 'GET':
+        referrer = request.META.get('HTTP_REFERER', '/list_of_applicants/')
+        parsed_url = urlparse(referrer)
+        base_url = parsed_url.path
+        query_params = parse_qs(parsed_url.query)
+        reconstructed_url = f"{base_url}?{urlencode(query_params, doseq=True)}"
+        request.session['previous_page'] = reconstructed_url
+
     if request.method == 'POST':
-        # Birthday validation
-        birthday = request.POST.get('birthday')
-        if birthday:
-            birth_date = date.fromisoformat(birthday)
-            today = date.today()
+        try:
+            # Get the form data
+            role = request.POST.get('role', '').strip().lower()
+            birthday = request.POST.get('birthday', '').strip()
+            gender = request.POST.get('gender', '').strip()
+            first_name = request.POST.get('first_name', '').strip()
+            middle_name = request.POST.get('middle_name', '').strip()
+            last_name = request.POST.get('last_name', '').strip()
+            email = request.POST.get('email', '').strip()
+
+            # Ensure all required fields are provided
+            if not (role and birthday and gender and first_name and last_name and email):
+                return render(request, 'AdminView_6_2_AddAccounts.html', {
+                    "message": "Missing required fields. Please fill out the form completely."
+                })
+
+            # Compute age based on birthday
+            birth_date = datetime.strptime(birthday, "%Y-%m-%d")
+            today = datetime.today()
             age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
-            if age < 18:
-                messages.error(request, "Users must be at least 18 years old.")
-                return redirect('add_accounts')
-        
-        # Continue processing the form if email and age are valid
-    return render(request, 'AdminView_6_2_AddAccounts.html')
+
+            # Generate default username and password
+            base_username = f"{first_name.lower().replace(' ', '')}@bynhr.com"
+            password = last_name.lower().replace(' ', '')  # Use the last name as the default password
+
+            # Ensure unique username
+            username = base_username
+            count = 1
+            while AccountInformation.objects.filter(username=username).exists():
+                username = f"{base_username}_{count}"
+                count += 1
+
+            # Save to AccountInformation
+            account_info = AccountInformation(
+                first_name=first_name,
+                middle_name=middle_name,
+                last_name=last_name,
+                birth_date=birth_date,
+                gender=gender,
+                username=username,
+                password=password,
+                email=email,
+                age=age
+            )
+            account_info.save()
+
+            # Save to AccountStorage
+            account_storage = AccountStorage(
+                account=account_info,
+                role=role,
+                account_status='new'  # Default status
+            )
+            account_storage.save()
+
+            # Success message and redirect
+            previous_page = request.session.get('previous_page', '/list_of_applicants/')
+            messages.success(request, f"Account created successfully with username: {username}")
+            return redirect(f"{previous_page}&message=Account created successfully&type=success")
+
+        except Exception as e:
+            # Handle errors and log them if needed
+            return render(request, 'AdminView_6_2_AddAccounts.html', {
+                "message": f"An error occurred: {e}"
+            })
+
+    # Render the form for GET request
+    return render(request, 'AdminView_6_2_AddAccounts.html', {})  
+
 
 def manage_accounts(request):
     auth_response = ensure_authenticated(request)
@@ -1561,74 +1625,6 @@ def manage_accounts(request):
     }
     return render(request, 'AdminView_6_1_manage_accounts.html', context)
 
-def admin_interviewer_account_setup(request):
-    auth_response = ensure_authenticated(request)
-    if auth_response:
-        return auth_response
-        
-    if request.method == 'POST':
-        try:
-            # Get the form data
-            role = request.POST.get('role').lower()
-            birthday = request.POST.get('birthday')
-            gender = request.POST.get('gender')
-            first_name = request.POST.get('first_name')
-            middle_name = request.POST.get('middle_name')
-            last_name = request.POST.get('last_name')
-            email = request.POST.get('email')
-
-            # Ensure all required fields are provided
-            if not (role and birthday and gender and first_name and last_name and email):
-                return render(request, 'users_app/AdminView_6_2_AddAccounts.html', {"message": "Missing required fields. Please fill out the form completely."})
-
-            # Check if the birthday is not empty and compute age
-            birth_date = datetime.strptime(birthday, "%Y-%m-%d")
-            today = datetime.today()
-            age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
-
-            # Generate default username and password
-            base_username = f"{first_name.lower().replace(' ', '')}@bynhr.com"
-            password = last_name.lower().replace(' ', '')  # Use the last name as the default password and remove spaces
-
-            # Check if the username already exists and make it unique if needed
-            username = base_username
-            count = 1
-            while AccountInformation.objects.filter(username=username).exists():
-                username = f"{base_username}_{count}"
-                count += 1
-
-            # Step 1: Save data to AccountInformation, including the email field
-            account_info = AccountInformation(
-                first_name=first_name,
-                middle_name=middle_name,
-                last_name=last_name,
-                birth_date=birth_date,
-                gender=gender,
-                username=username,
-                password=password,
-                email=email,
-                age=age
-            )
-            account_info.save()  # Save to the database
-
-            # Step 2: Save data to AccountStorage with the role
-            account_storage = AccountStorage(
-                account=account_info,  # Link to the saved AccountInformation instance
-                role=role,
-                account_status='new'  # Default status or customize as needed
-            )
-            account_storage.save()  # Save to the database
-
-            # Redirect to the profile admin page
-            messages.success(request, f"Account created successfully with username: {username}")
-            return redirect('adminprofile')
-
-        except Exception as e:
-            # Handle any errors
-            return render(request, 'users_app/AdminView_6_2_AddAccounts.html', {"message": f"An error occurred: {str(e)}"})
-
-    # Render the form if it's not a POST request
-    return render(request, 'users_app/AdminView_6_2_AddAccounts.html')
 
 
 ###########################ADMIN RETRIEVAL####################################
