@@ -45,6 +45,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'users_app.middleware.NoCacheMiddleware',
 ]
 
 TEMPLATES = [
@@ -133,3 +134,6 @@ BASE_URL = "http://127.0.0.1:8000"  # Replace with your actual domain in product
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 64 * 1024 * 1024  # 64MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 64 * 1024 * 1024  # 64MB
+
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SECURE = True 
