@@ -5,22 +5,42 @@
 {% block content %}
 <div class="main-content" style="padding: 0; margin: 0; text-align: center; display: flex; flex-direction: column; align-items: center;"></div>
     <h2 style="font-size: 36px; font-weight: bold; text-align: center;">Applicant Interview Status and Feedback</h2>
-
+    <p style="font-size: 14px; font-weight: bold; text-align: center;">
+        Welcome to Feedback! Here, the system administrator can review the interviewer's feedback for each applicant. Based on the feedback, you can determine the final status of the applicants, deciding whether to hire them or not using 'Passed' or 'Failed' criteria.
+    </p>
     <!-- Search, Sorting, and Rows per Page Form -->
-    <form method="GET" action="" class="form-inline" id="filterForm">
-        <input type="text" name="search" id="search-input" value="{{ search_query }}" placeholder="Search by Applicant's Name" class="form-control mr-2">
+    <form method="GET" action="" class="form-inline d-flex justify-content-center align-items-center" id="filterForm">
+        <input type="hidden" name="sort_name" value="{{ sort_type }}">
+        <input type="hidden" name="rows" value="{{ rows_per_page }}">
+
+        <input type="text" name="search" class="applicant-search-input" id="search-input" value="{{ search_query }}" placeholder="Search by Applicant's Name">
         <button type="submit" class="sfbutton">Search</button>
 
         <!-- Sort by Name -->
-        <select name="name_sort" class="form-control mr-2" onchange="document.getElementById('filterForm').submit()">
-            <option value="asc" {% if sort_order == 'asc' %}selected{% endif %}>Name Ascending</option>
-            <option value="desc" {% if sort_order == 'desc' %}selected{% endif %}>Name Descending</option>
+        <select name="sort_name" class="AD-admin-sort-dropdown" onchange="this.form.submit()">
+            <option value="" {% if not sort_type %}selected{% endif %}>Sort</option>
+            <option value="name_asc" {% if sort_type == 'name_asc' %}selected{% endif %}>Applicant Name (A-Z)</option>
+            <option value="name_desc" {% if sort_type == 'name_desc' %}selected{% endif %}>Applicant Name (Z-A)</option>
+            <option value="company_asc" {% if sort_type == 'company_asc' %}selected{% endif %}>Company (A-Z)</option>
+            <option value="company_desc" {% if sort_type == 'company_desc' %}selected{% endif %}>Company (Z-A)</option>
+            <option value="position_asc" {% if sort_type == 'position_asc' %}selected{% endif %}>Position Applied (A-Z)</option>
+            <option value="position_desc" {% if sort_type == 'position_desc' %}selected{% endif %}>Position Applied (Z-A)</option>
+        </select>
+
+        <!-- Filter by Status -->
+        <select name="status_filter" class="AD-admin-sort-dropdown" onchange="this.form.submit()">
+            <option value="" {% if not status_filter %}selected{% endif %}>All Status</option>
+            <option value="Interview Status Passed" {% if status_filter == 'Interview Status Passed' %}selected{% endif %}>Interview Status Passed</option>
+            <option value="Interview Status Failed" {% if status_filter == 'Interview Status Failed' %}selected{% endif %}>Interview Status Failed</option>
+            <option value="Applicant Final Status Passed" {% if status_filter == 'Applicant Final Status Passed' %}selected{% endif %}>Applicant Final Status Passed</option>
+            <option value="Applicant Final Status Failed" {% if status_filter == 'Applicant Final Status Failed' %}selected{% endif %}>Applicant Final Status Failed</option>
         </select>
 
         <!-- Rows per Page -->
-        <input type="number" name="rows" min="1" max="10" value="{{ rows_per_page }}" class="form-control mr-2" placeholder="Rows per page">
+        <input type="number" name="rows" min="1" max="10" value="{{ rows_per_page }}" class="form-control mr-2">
         <button type="submit" class="sfbutton">Set Rows</button>
     </form>
+
 
     <table class="interviewer-table">
         <thead>
@@ -51,53 +71,62 @@
                 {% endfor %}
             {% else %}
                 <tr>
-                    <td colspan="6" style="text-align: center;">No applicants found.</td>
+                    <td colspan="7" style="text-align: center;">No applicants/position/company found.</td>
                 </tr>
             {% endif %}
         </tbody>
     </table>
+    <p id="no-match" style="display:none;">No applicants/position/company found.</p>
 
     <!-- Pagination Controls -->
     <div class="pagination">
         {% if page_obj.has_previous %}
-            <a href="?page=1&name_sort={{ sort_order }}&rows={{ rows_per_page }}&search={{ search_query }}">First</a>
-            <a href="?page={{ page_obj.previous_page_number }}&name_sort={{ sort_order }}&rows={{ rows_per_page }}&search={{ search_query }}">Previous</a>
+            <a href="?page=1&sort_name={{ sort_type }}&status_filter={{ status_filter }}&rows={{ rows_per_page }}&search={{ search_query }}">First</a>
+            <a href="?page={{ page_obj.previous_page_number }}&sort_name={{ sort_type }}&status_filter={{ status_filter }}&rows={{ rows_per_page }}&search={{ search_query }}">Previous</a>
         {% endif %}
         <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
         {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}&name_sort={{ sort_order }}&rows={{ rows_per_page }}&search={{ search_query }}">Next</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}&name_sort={{ sort_order }}&rows={{ rows_per_page }}&search={{ search_query }}">Last</a>
+            <a href="?page={{ page_obj.next_page_number }}&sort_name={{ sort_type }}&status_filter={{ status_filter }}&rows={{ rows_per_page }}&search={{ search_query }}">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}&sort_name={{ sort_type }}&status_filter={{ status_filter }}&rows={{ rows_per_page }}&search={{ search_query }}">Last</a>
         {% endif %}
     </div>
 </div>
 
 <script>
-// Function to perform live search on the entire dataset
-document.getElementById('search-input').addEventListener('input', function() {
-    const searchValue = this.value.toLowerCase();
-    const rows = document.querySelectorAll('#applicantsTable tbody tr');
-    let matchFound = false;
+    
+function searchTable() {
+    var input = document.querySelector('input[name="search"]').value.toLowerCase();
+    var rows = document.querySelectorAll('tbody tr:not(#no-match)');
+    var noMatch = document.getElementById('no-match');
+    var matchFound = false;
 
-    rows.forEach(row => {
-        const applicantName = row.cells[1].textContent.toLowerCase();
-        if (applicantName.includes(searchValue)) {
-            row.style.display = '';  // Show matching rows
-            matchFound = true;
-        } else {
-            row.style.display = 'none';  // Hide non-matching rows
-        }
-    });
-
-    // If no match is found, display a "No results found" row
-    if (!matchFound) {
-        const noResultsRow = document.createElement('tr');
-        noResultsRow.innerHTML = '<td colspan="6" style="text-align: center;">No results found.</td>';
-        document.querySelector('#applicantsTable tbody').appendChild(noResultsRow);
+    if (input.trim() === '') {
+        // If the search input is empty, display all rows
+        rows.forEach(function(row) {
+            row.style.display = '';
+        });
+        noMatch.style.display = 'none';
     } else {
-        // Remove "No results found" message if there are matches
-        const noResultsRow = document.querySelector('#applicantsTable tbody tr.no-results');
-        if (noResultsRow) noResultsRow.remove();
+        // Iterate over each row to check for matches when there is input
+        rows.forEach(function(row) {
+            var text = row.textContent.toLowerCase();
+            if (text.includes(input)) {
+                row.style.display = '';
+                matchFound = true;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        // Display the 'no match' message if no rows are found
+        noMatch.style.display = matchFound ? 'none' : 'block';
     }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    var searchInput = document.querySelector('input[name="search"]');
+    searchInput.addEventListener('keyup', searchTable);
 });
+
+
 </script>
 {% endblock %}
