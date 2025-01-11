@@ -3,6 +3,13 @@
 {% block title %}File Upload Page{% endblock %}
 
 {% block content %}
+<div id="custom-alert" class="alert-hidden">
+    <div class="alert-box alert-success">
+        <p id="alertText"></p>
+    </div>
+</div>
+
+
 <div class="main-content">
     <form id="upload-form" action="{% url 'fileupload' job_id=job_id %}" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
@@ -26,9 +33,8 @@
         <div class="verbutton-group">
             <button type="button" class="button" onclick="document.getElementById('file-input').click();">UPLOAD</button>
             <button type="button" class="button" id="delete-button" onclick="deleteSelectedFiles();">DELETE</button>
-            <button type="button" class="button" id="view-button" onclick="viewSelectedFiles();">VIEW</button>
-            <button type="button" class="button" id="download-button" onclick="downloadSelectedFiles();">DOWNLOAD</button>
-            <button type="submit" class="apply-button">APPLY</button>
+            <button type="button" class="button" id="view-button" onclick="viewFile();" disabled>VIEW</button>
+            <button type="button" class="apply-button" id="apply-button">APPLY</button>
         </div>
     </form>
 </div>
@@ -41,14 +47,42 @@
     const largeContainer = document.getElementById('large-container');
     const deleteButton = document.getElementById('delete-button');
     const viewButton = document.getElementById('view-button');
-    const downloadButton = document.getElementById('download-button');
     const applyButton = document.getElementById('apply-button');
+    const customAlert = document.getElementById('custom-alert');
+    const alertText = document.getElementById('alertText');
     let selectedFile = null;
 
-    fileInput.addEventListener('change', function(event) {
+    // Function to show alert messages
+    function showCustomAlert(message, type = 'success') {
+        const customAlert = document.getElementById('custom-alert');
+        const alertText = document.getElementById('alertText');
+
+        alertText.textContent = message; // Set the alert message
+        customAlert.className = `alert-box alert-${type}`; // Add the appropriate type class (success, error, warning)
+        customAlert.style.display = 'block'; // Ensure the alert is visible
+
+        setTimeout(() => {
+            closeCustomAlert();
+        }, 3000); // Automatically close after 3 seconds
+    }
+
+    // Handle file input change
+    fileInput.addEventListener('change', function (event) {
         const files = event.target.files;
+        const maxFileSize = 64 * 1024 * 1024; // Maximum file size 64MB
+        const allowedFileTypes = ['application/pdf', 'image/jpeg', 'image/png'];
 
         for (const file of files) {
+            if (file.size > maxFileSize) {
+                showCustomAlert(`File "${file.name}" exceeds the 64MB size limit.`, 'error');
+                continue; // Skip adding this file
+            }
+
+            if (!allowedFileTypes.includes(file.type)) {
+                showCustomAlert(`File "${file.name}" is not a valid format. Only PDF, PNG, and JPEG are allowed.`, 'error');
+                continue; // Skip adding this file
+            }
+
             const fileNameElement = document.createElement('div');
             fileNameElement.textContent = file.name;
             fileNameElement.className = 'file-name';
@@ -64,11 +98,13 @@
                     }
                     fileNameElement.classList.add('selected');
                 }
+                viewButton.disabled = !selectedFile; // Enable/disable view button
             };
             fileList.appendChild(fileNameElement);
         }
     });
 
+    // Handle delete button click
     deleteButton.addEventListener('click', () => {
         if (selectedFile) {
             const fileNames = Array.from(fileList.getElementsByClassName('file-name'));
@@ -78,9 +114,11 @@
             }
             selectedFile = null;
             largeContainer.innerHTML = '';
+            viewButton.disabled = true; // Disable view button after deleting
         }
     });
 
+    // Handle view button click
     viewButton.addEventListener('click', () => {
         if (selectedFile) {
             const reader = new FileReader();
@@ -96,58 +134,49 @@
             };
             reader.readAsDataURL(selectedFile);
         } else {
-            alert("Please select a file to view.");
+            showCustomAlert("Please select a file to view.", "error");
         }
     });
 
-    downloadButton.addEventListener('click', () => {
-        if (selectedFile) {
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(selectedFile);
-            link.download = selectedFile.name;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-    });
-
+    // Handle apply button click
     applyButton.addEventListener('click', async (event) => {
-        event.preventDefault();  // Prevent default form submission
-        const formData = new FormData();
+        event.preventDefault(); // Prevent default form submission
+
         const fileNames = Array.from(fileList.getElementsByClassName('file-name'));
+        if (fileNames.length === 0) {
+            showCustomAlert("Please select a file to upload.", "error");
+            return;
+        }
 
-        if (fileNames.length > 0) {
-            const concatenatedFileNames = fileNames.map(el => el.textContent).join(',');
-            formData.append('file_metadata', concatenatedFileNames);
+        const formData = new FormData();
+        const concatenatedFileNames = fileNames.map(el => el.textContent).join(',');
+        formData.append('file_metadata', concatenatedFileNames);
 
-            const filesToUpload = Array.from(fileInput.files);
-            filesToUpload.forEach(file => {
-                formData.append('files', file);
+        const filesToUpload = Array.from(fileInput.files);
+        filesToUpload.forEach(file => {
+            formData.append('files', file);
+        });
+
+        try {
+            const response = await fetch("{% url 'fileupload' job_id=job_id %}", {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
             });
 
-            try {
-                const response = await fetch("{% url 'fileupload' job_id=job_id %}", {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}'
-                    }
-                });
-
-                if (response.ok) {
-                    alert("Files uploaded successfully!");
-                    fileInput.value = '';
-                    fileList.innerHTML = '';
-                    largeContainer.innerHTML = '';
-                } else {
-                    alert("Error uploading files. Please try again.");
-                }
-            } catch (error) {
-                console.error("Error:", error);
-                alert("An error occurred while uploading the files.");
+            if (response.ok) {
+                showCustomAlert("Files uploaded successfully!", "success");
+                setTimeout(() => {
+                    window.location.href = "{% url 'homepage' %}"; // Redirect to homepage
+                }, 2000); // Delay for showing success message before redirect
+            } else {
+                showCustomAlert("Error uploading files. Please try again.", "error");
             }
-        } else {
-            alert("Please select a file to upload.");
+        } catch (error) {
+            console.error("Error:", error);
+            showCustomAlert("An error occurred while uploading the files.", "error");
         }
     });
 </script>
