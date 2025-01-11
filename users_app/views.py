@@ -656,7 +656,47 @@ def generate_pdf(request, applicant_status_id):
 
 
 
-###################APPLICANT############################
+###################GENERATE PDF SYSTEM ############################
+@role_required('admin') 
+def generate_system_pdf(request):
+    # Ensure the user is logged in
+    account_id = request.session.get('account_id')
+    if not account_id:
+        return HttpResponse("You must be logged in to generate a PDF.", status=403)
+
+    # Fetch the user's account information
+    admin = get_object_or_404(AccountInformation, account_id=account_id)
+
+    # Fetch relevant data for the system report
+    applicants = ListOfApplicantsWithStatusAndCredentials.objects.select_related('job', 'account').all()
+    jobs = JobDetailsAndRequirements.objects.all()
+    accounts = AccountInformation.objects.all()
+
+    # Prepare data for the template
+    context = {
+        'admin_name': f"{admin.first_name} {admin.last_name}".strip(),
+        'applicants': applicants,
+        'jobs': jobs,
+        'accounts': accounts,
+        'total_applicants': applicants.count(),
+        'total_jobs': jobs.count(),
+        'total_accounts': accounts.count(),
+    }
+
+    # Render the template to HTML
+    html = render_to_string('ADMIN_GENERATEPDF.html', context)
+
+    # Create a PDF
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="System_Report.pdf"'
+    pisa_status = pisa.CreatePDF(html, dest=response)
+
+    # Check for PDF generation errors
+    if pisa_status.err:
+        return HttpResponse("There was an error generating the PDF.", status=500)
+
+    return response
+
 
     
 
@@ -1432,6 +1472,15 @@ def adminprofile(request):
     # Assuming the user's ID is stored in session
     account_id = request.session.get('account_id')
     user = get_object_or_404(AccountInformation, account_id=account_id)
+
+    # For example, get the latest or a specific logic-based status ID
+    applicant_status = ListOfApplicantsWithStatusAndCredentials.objects.filter(
+        account_id=account_id
+    ).order_by('-submission_date').first()
+
+    # Use a fallback if no applicant_status is found
+    applicant_status_id = applicant_status.applicant_status_id if applicant_status else None
+
     
     if request.method == "POST":
         # Change Password Logic
@@ -1457,9 +1506,11 @@ def adminprofile(request):
     context = {
         'username': user.username,
         'full_name': f"{user.first_name} {user.middle_name or ''} {user.last_name}",
-        'email': user.email
+        'email': user.email,
+        'applicant_status_id': applicant_status_id  # Dynamically set the ID
     }
     return render(request, 'AdminView_6_Profile.html', context)
+
 
 @role_required('admin') 
 def add_accounts(request):
