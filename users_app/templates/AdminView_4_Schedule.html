@@ -8,114 +8,83 @@
     <p style="font-size: 14px; font-weight: bold; text-align: center;">
         Welcome!, This is where the System Admin schedule interviewer dates to the interviewer.
     </p>
+ 
 
-    <div class="table-container">
+    <!-- Search and Rows per Page for Interviewer Table -->
+    <form method="GET" action="" id="interviewerForm" class="form-inline d-flex justify-content-center align-items-center">
+
+        <input type="hidden" name="sort_type" value="{{ sort_type }}">
+        <input type="hidden" name="sort_order" value="{{ sort_order }}">
+        <input type="hidden" name="rows_interviewer" value="{{ request.GET.rows_interviewer }}">
+        <input type="hidden" name="page_interviewer" value="{{ request.GET.page_interviewer }}">
     
-        <!-- Left Table: Interviewer Selection -->
-        <div class="left-table">
-            <h3>Interviewer Selection</h3>
-    
-            <!-- Search and Rows per Page for Interviewer Table -->
-            <form method="GET" action="" id="interviewerForm">
-                <input type="text" name="search_interviewer" id="searchInterviewer" value="{{ search_query_interviewer }}" placeholder="Search Interviewer" class="form-control mb-2">
-                <input type="number" name="rows_interviewer" min="1" max="10" value="{{ rows_interviewer }}" class="form-control mb-2" placeholder="Rows per page">
-                <button type="submit" class="sfbutton">Set Rows</button>
-            </form>
-    
-            <!-- Interviewer Selection Table -->
-            <form action="{% url 'schedule' %}" method="post">
-                {% csrf_token %}
-                <table class="table table-bordered" id="interviewerTable">
-                    <thead>
-                        <tr>
-                            <th>No.</th>
-                            <th>Interviewer Name</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for interviewer in interviewer_names %}
-                        <tr>
-                            <td>{{ page_obj_interviewer.start_index|add:forloop.counter0 }}</td>
-                            <td>
-                                <input type="radio" name="selected_interviewer" value="{{ interviewer.account.first_name }} {{ interviewer.account.last_name }}" required>
-                                {{ interviewer.account.first_name }} {{ interviewer.account.last_name }}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                <label for="interview_date">Interview Date:</label>
-                <input type="date" name="interview_date" class="form-control w-auto d-inline" required>
-                <button type="submit" class="sfbutton">Schedule Interview</button>
-            </form>
-    
-            <!-- Pagination Controls for Interviewer Table -->
-            <div class="pagination mt-3">
-                {% if page_obj_interviewer.has_previous %}
-                    <a href="?page_interviewer=1&search_interviewer={{ search_query_interviewer }}&rows_interviewer={{ rows_interviewer }}">First</a>
-                    <a href="?page_interviewer={{ page_obj_interviewer.previous_page_number }}&search_interviewer={{ search_query_interviewer }}&rows_interviewer={{ rows_interviewer }}">Previous</a>
-                {% endif %}
-                <span>Page {{ page_obj_interviewer.number }} of {{ page_obj_interviewer.paginator.num_pages }}</span>
-                {% if page_obj_interviewer.has_next %}
-                    <a href="?page_interviewer={{ page_obj_interviewer.next_page_number }}&search_interviewer={{ search_query_interviewer }}&rows_interviewer={{ rows_interviewer }}">Next</a>
-                    <a href="?page_interviewer={{ page_obj_interviewer.paginator.num_pages }}&search_interviewer={{ search_query_interviewer }}&rows_interviewer={{ rows_interviewer }}">Last</a>
-                {% endif %}
-            </div>
+
+        <select name="sort_type" class="AD-admin-sort-dropdown" onchange="this.form.submit()" style="width: 100px;">
+            <option value="" {% if not sort_type %}selected{% endif %}>Sort</option>
+            <option value="name_asc" {% if sort_type == 'name_asc' %}selected{% endif %}>Interviewer Name (A-Z)</option>
+            <option value="name_desc" {% if sort_type == 'name_desc' %}selected{% endif %}>Interviewer Name (Z-A)</option>
+        </select>
+
+
+        <input type="text" name="search_interviewer" id="searchInterviewer" value="{{ search_query_interviewer }}" placeholder="Search Interviewer" class="applicant-search-input" style="width: 150%;">
+        <button style="margin-right: 5px;" type="submit" class="applicant-search-button">Search</button>
+        <input type="number" name="rows_interviewer" min="1" max="10" value="{{ rows_interviewer }}" class="form-control mr-2" placeholder="Rows per page" style="width: 10%;">
+        <button type="submit" class="sfbutton">
+            Set Rows
+        </button>
+        <a href="{% url 'view_schedule' %}" class= "sfbutton" >View Schedule</a>
+    </form>
+    <!-- Interviewer Selection Table -->
+    <form action="{% url 'schedule' %}" method="post">
+        {% csrf_token %}
+        <div class="form-inline d-flex justify-content-center align-items-center">
+            <input type="date" name="interview_date" id="interview_date" class = "date_style" required>
+            <button type="submit" class="sfbutton">Schedule Interview</button>
+
         </div>
+        
+        <table class="interviewer-table" id="interviewerTable" style="width: 80%; table-layout: fixed; margin-left: auto; margin-right: auto;">
+            <thead>
+                <tr>
+                    <th style="width: 20%;">No.</th>
+                    <th style="width: 80%;">Interviewer Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for interviewer in interviewer_names %}
+                <tr>
+                    <td>{{ page_obj_interviewer.start_index|add:forloop.counter0 }}</td>
+                    <td>
+                        <input type="radio" name="selected_interviewer" value="{{ interviewer.account.first_name }} {{ interviewer.account.last_name }}" required>
+                        {{ interviewer.account.first_name }} {{ interviewer.account.last_name }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+
+    </form>
     
-        <!-- Right Table: Interview Schedule -->
-        <div class="right-table">
-            <h3>Interview Schedule</h3>
-    
-            <!-- Search and Rows per Page for Schedule Table -->
-            <form method="GET" action="" id="scheduleForm">
-                <input type="text" name="search_schedule" id="searchSchedule" value="{{ search_query_schedule }}" placeholder="Search Interview Schedule" class="form-control mb-2">
-                <input type="number" name="rows_schedule" min="1" max="10" value="{{ rows_schedule }}" class="form-control mb-2" placeholder="Rows per page">
-                <button type="submit" class="sfbutton">Set Rows</button>
-            </form>
-    
-            <!-- Interview Schedule Table -->
-            <table class="table table-bordered" id="scheduleTable">
-                <thead>
-                    <tr>
-                        <th>No.</th>
-                        <th>Interviewer Name</th>
-                        <th>Date Given</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for interview in formatted_interview_data %}
-                    <tr>
-                        <td>{{ page_obj_schedule.start_index|add:forloop.counter0 }}</td>
-                        <td>{{ interview.name }}</td>
-                        <td>{{ interview.date }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="3" class="text-center">No interviews scheduled</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-    
-            <!-- Pagination Controls for Schedule Table -->
-            <div class="pagination mt-3">
-                {% if page_obj_schedule.has_previous %}
-                    <a href="?page_schedule=1&search_schedule={{ search_query_schedule }}&rows_schedule={{ rows_schedule }}">First</a>
-                    <a href="?page_schedule={{ page_obj_schedule.previous_page_number }}&search_schedule={{ search_query_schedule }}&rows_schedule={{ rows_schedule }}">Previous</a>
-                {% endif %}
-                <span>Page {{ page_obj_schedule.number }} of {{ page_obj_schedule.paginator.num_pages }}</span>
-                {% if page_obj_schedule.has_next %}
-                    <a href="?page_schedule={{ page_obj_schedule.next_page_number }}&search_schedule={{ search_query_schedule }}&rows_schedule={{ rows_schedule }}">Next</a>
-                    <a href="?page_schedule={{ page_obj_schedule.paginator.num_pages }}&search_schedule={{ search_query_schedule }}&rows_schedule={{ rows_schedule }}">Last</a>
-                {% endif %}
-            </div>
-        </div>
-    </div>    
+
+    <!-- Pagination Controls for Interviewer Table -->
+    <div class="pagination mt-3">
+        {% if page_obj_interviewer.has_previous %}
+            <a href="?page_interviewer=1&sort_type={{ sort_type }}&sort_order={{ sort_order }}&search_interviewer={{ search_query_interviewer }}&rows_interviewer={{ rows_interviewer }}">First</a>
+            <a href="?page_interviewer={{ page_obj_interviewer.previous_page_number }}&sort_type={{ sort_type }}&sort_order={{ sort_order }}&search_interviewer={{ search_query_interviewer }}&rows_interviewer={{ rows_interviewer }}">Previous</a>
+        {% endif %}
+        <span>Page {{ page_obj_interviewer.number }} of {{ page_obj_interviewer.paginator.num_pages }}</span>
+        {% if page_obj_interviewer.has_next %}
+            <a href="?page_interviewer={{ page_obj_interviewer.next_page_number }}&sort_type={{ sort_type }}&sort_order={{ sort_order }}&search_interviewer={{ search_query_interviewer }}&rows_interviewer={{ rows_interviewer }}">Next</a>
+            <a href="?page_interviewer={{ page_obj_interviewer.paginator.num_pages }}&sort_type={{ sort_type }}&sort_order={{ sort_order }}&search_interviewer={{ search_query_interviewer }}&rows_interviewer={{ rows_interviewer }}">Last</a>
+        {% endif %}
+    </div>
 </div>
 
 <script>
 // Live search function for Interviewer Table
+
+
 document.getElementById('searchInterviewer').addEventListener('input', function() {
     const searchValue = this.value.toLowerCase();
     const rows = document.querySelectorAll('#interviewerTable tbody tr');

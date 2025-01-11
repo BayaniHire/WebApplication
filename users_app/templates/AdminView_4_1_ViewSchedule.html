@@ -1,0 +1,120 @@
+{% extends "Admin_Inheritance.html" %}
+
+{% block title %}BayaniHire Admin Center{% endblock %}
+
+{% block content %}
+<div class="main-content" style="padding: 0; margin: 0; text-align: center; display: flex; flex-direction: column; align-items: center;"></div>
+    <h2 style="font-size: 36px; font-weight: bold; text-align: center;"> View Interviewer Schedule</h2>
+    <p style="font-size: 14px; font-weight: bold; text-align: center;">
+        View the interview dates assigned to the interviewers.
+    </p>
+
+    <!-- Search and Rows per Page for Schedule Table -->
+    <form method="GET" action="{% url 'view_schedule' %}" id="scheduleForm" class="form-inline d-flex justify-content-center align-items-center">
+        <select name="sort_type" class="AD-admin-sort-dropdown" onchange="this.form.submit()" style="width: 100px;">
+            <option value="" {% if sort_type == '' %}selected{% endif %}>Sort</option>
+            <option value="name_asc" {% if sort_type == 'name_asc' %}selected{% endif %}>Interviewer Name (A-Z)</option>
+            <option value="name_desc" {% if sort_type == 'name_desc' %}selected{% endif %}>Interviewer Name (Z-A)</option>
+            <option value="date_asc" {% if sort_type == 'date_asc' %}selected{% endif %}>Date (Oldest to Newest)</option>
+            <option value="date_desc" {% if sort_type == 'date_desc' %}selected{% endif %}>Date (Newest to Oldest)</option>
+        </select>
+        <input type="text" name="search_schedule" id="searchSchedule" value="{{ search_query_schedule }}" placeholder="Search Interview Schedule" class="applicant-search-input" style="width: 150%;">
+        <button style="margin-right: 5px;" type="submit" class="applicant-search-button">Search</button>
+        <input type="number" name="rows_schedule" min="1" max="10" value="{{ rows_schedule }}" class="form-control mb-2" placeholder="Rows per page" style="width: 10%;" >
+        <button type="submit" class="applicant-search-button" style="height: 50px; font-size: 14px; white-space: nowrap;">Set Rows</button>
+    </form>
+
+    <br>
+    <!-- Interview Schedule Table -->
+    <table class="interviewer-table" id="scheduleTable" >
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Interviewer Name</th>
+                <th>Date Given</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for interview in formatted_interview_data %}
+            <tr>
+                <td>{{ page_obj_schedule.start_index|add:forloop.counter0 }}</td>
+                <td>{{ interview.name }}</td>
+                <td>{{ interview.date }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" class="text-center">No interviews scheduled</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Pagination Controls for Schedule Table -->
+    <div class="pagination mt-3">
+        {% if page_obj_schedule.has_previous %}
+            <a href="?page_schedule=1&search_schedule={{ search_query_schedule }}&sort_type={{ sort_type }}&rows_schedule={{ rows_schedule }}">First</a>
+            <a href="?page_schedule={{ page_obj_schedule.previous_page_number }}&search_schedule={{ search_query_schedule }}&sort_type={{ sort_type }}&rows_schedule={{ rows_schedule }}">Previous</a>
+        {% endif %}
+        <span>Page {{ page_obj_schedule.number }} of {{ page_obj_schedule.paginator.num_pages }}</span>
+        {% if page_obj_schedule.has_next %}
+            <a href="?page_schedule={{ page_obj_schedule.next_page_number }}&search_schedule={{ search_query_schedule }}&sort_type={{ sort_type }}&rows_schedule={{ rows_schedule }}">Next</a>
+            <a href="?page_schedule={{ page_obj_schedule.paginator.num_pages }}&search_schedule={{ search_query_schedule }}&sort_type={{ sort_type }}&rows_schedule={{ rows_schedule }}">Last</a>
+        {% endif %}
+    </div>
+
+  
+</div>
+
+<script>
+// Live search function for Interviewer Table
+
+document.getElementById('searchInterviewer').addEventListener('input', function() {
+    const searchValue = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#interviewerTable tbody tr');
+    let matchFound = false;
+
+    rows.forEach((row, index) => {
+        const interviewerName = row.cells[1].textContent.toLowerCase();
+        if (interviewerName.includes(searchValue)) {
+            row.style.display = '';
+            row.cells[0].textContent = index + 1;  // Update No. column dynamically
+            matchFound = true;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    // Show "No results found" if no matches
+    if (!matchFound) {
+        const noResultsRow = document.createElement('tr');
+        noResultsRow.innerHTML = '<td colspan="2" class="text-center">No results found</td>';
+        document.querySelector('#interviewerTable tbody').appendChild(noResultsRow);
+    }
+});
+
+// Live search function for Schedule Table
+document.getElementById('searchSchedule').addEventListener('input', function() {
+    const searchValue = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#scheduleTable tbody tr');
+    let matchFound = false;
+
+    rows.forEach((row, index) => {
+        const interviewerName = row.cells[1].textContent.toLowerCase();
+        if (interviewerName.includes(searchValue)) {
+            row.style.display = '';
+            row.cells[0].textContent = index + 1;  // Update No. column dynamically
+            matchFound = true;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    // Show "No results found" if no matches
+    if (!matchFound) {
+        const noResultsRow = document.createElement('tr');
+        noResultsRow.innerHTML = '<td colspan="3" class="text-center">No results found</td>';
+        document.querySelector('#scheduleTable tbody').appendChild(noResultsRow);
+    }
+});
+</script>
+{% endblock %}
