@@ -53,7 +53,7 @@
                 
                 <form method="POST" action="{% url 'open_applicants' applicant_status_id=applicant_status_id %}">
                     {% csrf_token %}
-                    <select name="new_status" class="form-control mb-3" {% if applicant_status == "FAILED" or applicant_status == "PASSED" %}disabled{% endif %}>
+                    <select name="new_status" class="form-control mb-3" {% if applicant_status == "FAILED" or applicant_status == "PASSED" or applicant_status == "QUALIFIED" or applicant_status == "PENDING FINAL APPROVAL" %}disabled{% endif %}>
                         <option value="FOR INTERVIEW" {% if applicant_status == "FOR INTERVIEW" %}selected{% endif %}>FOR INTERVIEW</option>
                         <option value="FAILED TO MEET REQUIREMENTS" {% if applicant_status == "FAILED TO MEET REQUIREMENTS" %}selected{% endif %}>FAILED TO MEET REQUIREMENTS</option>
                         <option value="INCOMPLETE" {% if applicant_status == "INCOMPLETE" %}selected{% endif %}>INCOMPLETE</option>
