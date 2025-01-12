@@ -19,12 +19,12 @@
 
     <!-- Header with Background and Logo Images -->
     <header class="header">
-		<!-- Background image -->
-		<img src="{% static 'headerpic.png' %}" alt="Header Background Image" 
+        <!-- Background image -->
+        <img src="{% static 'headerpic.png' %}" alt="Header Background Image">
 
-		<!-- Logo image -->
-		<img src="{% static 'Logo.png' %}" alt="Logo Image" width="150" height="128" class="logo">
-	</header>
+        <!-- Logo image -->
+        <img src="{% static 'Logo.png' %}" alt="Logo Image" width="150" height="128" class="logo">
+    </header>
 
     <!-- Content Area -->
     <div class="container content-area my-5 p-4">
@@ -38,7 +38,7 @@
                 <label for="full-name" class="form-label">Please enter your full name correctly in each field:</label>
                 <div class="row g-3 justify-content-center">
                     <div class="col">
-                        <label for="full-name" class="instruction-text">First Name</label>
+                        <label for="first-name" class="instruction-text">First Name</label>
                         {{ form.first_name }}
                         <!-- Error message for first_name field -->
                         {% if form.first_name.errors %}
@@ -50,7 +50,7 @@
                         {% endif %}
                     </div>
                     <div class="col">
-                        <label for="full-name" class="instruction-text">Middle Name</label>
+                        <label for="middle-name" class="instruction-text">Middle Name</label>
                         {{ form.middle_name }}
                         <!-- Error message for middle_name field -->
                         {% if form.middle_name.errors %}
@@ -62,7 +62,7 @@
                         {% endif %}
                     </div>
                     <div class="col">
-                        <label for="full-name" class="instruction-text">Last Name</label>
+                        <label for="last-name" class="instruction-text">Last Name</label>
                         {{ form.last_name }}
                         <!-- Error message for last_name field -->
                         {% if form.last_name.errors %}
@@ -81,9 +81,8 @@
                 <label for="address" class="form-label">Please provide your complete <strong>current address</strong> in the fields below:</label>
                 <div class="row g-3 mb-2">
                     <div class="col">
-                        <label for="address" class="instruction-text">House Number</label>
+                        <label for="house-no" class="instruction-text">House Number</label>
                         {{ form.house_no }}
-                        <!-- Error message for house_no -->
                         {% if form.house_no.errors %}
                             <div class="text-danger">
                                 {% for error in form.house_no.errors %}
@@ -93,9 +92,8 @@
                         {% endif %}
                     </div>
                     <div class="col">
-                        <label for="address" class="instruction-text">Street or Village</label>
+                        <label for="street-village" class="instruction-text">Street or Village</label>
                         {{ form.street_village }}
-                        <!-- Error message for street_village -->
                         {% if form.street_village.errors %}
                             <div class="text-danger">
                                 {% for error in form.street_village.errors %}
@@ -105,9 +103,8 @@
                         {% endif %}
                     </div>
                     <div class="col">
-                        <label for="address" class="instruction-text">Barangay</label>
+                        <label for="barangay" class="instruction-text">Barangay</label>
                         {{ form.barangay }}
-                        <!-- Error message for barangay -->
                         {% if form.barangay.errors %}
                             <div class="text-danger">
                                 {% for error in form.barangay.errors %}
@@ -119,9 +116,8 @@
                 </div>
                 <div class="row g-3 mb-2">
                     <div class="col">
-                        <label for="address" class="instruction-text">City or Municipality</label>
+                        <label for="city-municipality" class="instruction-text">City or Municipality</label>
                         {{ form.city_municipality }}
-                        <!-- Error message for city_municipality -->
                         {% if form.city_municipality.errors %}
                             <div class="text-danger">
                                 {% for error in form.city_municipality.errors %}
@@ -131,7 +127,7 @@
                         {% endif %}
                     </div>
                     <div class="col">
-                        <label for="address" class="instruction-text">Province</label>
+                        <label for="province" class="instruction-text">Province</label>
                         {{ form.province }}
                         {% if form.province.errors %}
                             <div class="text-danger">
@@ -142,9 +138,8 @@
                         {% endif %}
                     </div>
                     <div class="col">
-                        <label for="address" class="instruction-text">Country</label>
+                        <label for="state" class="instruction-text">Country</label>
                         {{ form.state }}
-                        <!-- Error message for state field -->
                         {% if form.state.errors %}
                             <div class="text-danger">
                                 {% for error in form.state.errors %}
@@ -156,7 +151,7 @@
                 </div>
                 <div class="row g-3">
                     <div class="col">
-                        <label for="address" class="instruction-text">Zipcode</label>
+                        <label for="zipcode" class="instruction-text">Zipcode</label>
                         {{ form.zipcode }}
                         {% if form.zipcode.errors %}
                             <div class="text-danger">
@@ -172,25 +167,22 @@
             <!-- Contact Info -->
             <div class="mb-4">
                 <label class="form-label">Contact Information:</label>
-		<label class="form-label">Please make sure that the email is valid and existing as this will be very important in the login process.</label>
+                <label class="form-label">Please make sure that the email is valid and existing as this will be very important in the login process.</label>
                 <div class="row g-3">
-                    <!-- Email Field -->
                     <div class="col">
-                        <label class="instruction-text">Email</label>
+                        <label for="email" class="instruction-text">Email</label>
                         {{ form.email }}
-                        <!-- Error message for email field -->
                         {% if form.email.errors %}
                             <div class="text-danger">
                                 {% for error in form.email.errors %}
                                     <p>{{ error }}</p>
                                 {% endfor %}
                             </div>
-                        {% endif %}     
+                        {% endif %}
                     </div>
                     <div class="col">
-                        <label class="instruction-text">Mobile Number</label>
+                        <label for="mobile-number" class="instruction-text">Mobile Number</label>
                         {{ form.mobile_number }}
-                        <!-- Error message for mobile_number field -->
                         {% if form.mobile_number.errors %}
                             <div class="text-danger">
                                 {% for error in form.mobile_number.errors %}
@@ -200,43 +192,39 @@
                         {% endif %}
                     </div>
                     <div class="col">
-                            <label for="birthdate" class="form-label me-2">Birthday:</label> <!-- Add margin-end for spacing -->
-                            {{ form.birth_date }}
-                        <!-- Error message for birth_date field -->
+                        <label for="birthdate" class="form-label">Birthday</label>
+                        {{ form.birth_date }}
                         {% if form.birth_date.errors %}
                             <div class="text-danger">
                                 {% for error in form.birth_date.errors %}
                                     <p>{{ error }}</p>
                                 {% endfor %}
                             </div>
-                        {% endif %}     
+                        {% endif %}
                     </div>
                 </div>
             </div>
-            <!-- Gender Field -->
+
+            <!-- Gender -->
             <div class="mb-4">
                 <label for="gender" class="form-label">Gender</label>
-                <div class="row g-3">
-                    <div class="col">
-                        {{ form.gender }} <!-- Make sure your Django form includes a gender field -->
+                {{ form.gender }}
+                {% if form.gender.errors %}
+                    <div class="text-danger">
+                        {% for error in form.gender.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
                     </div>
-                </div>
+                {% endif %}
             </div>
 
-            
-
-            <!-- Username with Domain Suffix -->
+            <!-- Username -->
             <div class="mb-4">
                 <label for="username" class="form-label">Username</label>
-                <label class="instruction-text">
-                    Please enter your username only. <strong>Do not include "@bynhr.com."</strong>
-                </label>
                 <div class="input-group">
                     {{ form.username }}
-                    <span class="input-group-text" style="margin-left: 5px;">@bynhr.com</span>
+                    <span class="input-group-text">@bynhr.com</span>
                 </div>
-            
-                <!-- Error message for username field -->
                 {% if form.username.errors %}
                     <div class="text-danger">
                         {% for error in form.username.errors %}
@@ -245,7 +233,7 @@
                     </div>
                 {% endif %}
             </div>
-            
+
             <!-- Password -->
             <div class="mb-4">
                 <label for="password" class="form-label">Password</label>
@@ -258,7 +246,6 @@
                     </div>
                 {% endif %}
             </div>
-
             <div class="mb-4">
                 <label for="confirm_password" class="form-label">Confirm Password</label>
                 {{ form.confirm_password }}
@@ -271,99 +258,23 @@
                 {% endif %}
             </div>
 
-            <!-- Submit Button -->
+            <!-- Submit -->
             <div class="button-container text-center mt-4">
                 <button type="submit" class="btn btn-dark w-50">Register</button>
             </div>
         </form>
 
-        <!-- Terms Checkbox -->
+        <!-- Terms -->
         <div class="terms-container text-center mt-3">
             <input type="checkbox" id="terms" name="terms" required>
-            <label for="terms">I agree to the <a href="#" id="terms-link">Terms and Conditions</a></label>
+            <label for="terms">I agree to the <a href="#">Terms and Conditions</a></label>
         </div>
     </div>
-
-    <!-- Terms and Conditions Modal -->
-    <div id="terms-modal" class="modal">
-        <div class="modal-content">
-            <img src="{% static 'terms.png' %}" alt="Terms and Conditions Icon" />
-            <div class="modal-text">
-                <h2>Terms and Conditions</h2>
-                <p>
-                    By accessing BayaniHire, you agree to be bound by the following terms and conditions. Please read these terms carefully before using the System. If you do not agree to these terms, you may not use the System.
-                </p>
-                <p class="bold-text">1. Personal Information:</p>
-                <p>
-                    a. In the process of using this System, you may be required to provide personal information such as your name, contact details, educational background, work experience, and other relevant details.
-                </p>
-                <p>
-                    b. You agree that all Personal Information provided by you is accurate, complete, and up-to-date. c. You acknowledge and agree that all Personal Information provided by you will be used solely for the purpose of the hiring process facilitated by this System.
-                </p>
-                <p class="bold-text">2. Confidentiality:</p>
-                <p>
-                    a. We are committed to maintaining the confidentiality of your Personal Information.
-                </p>
-                <p>
-                    b. Your Personal Information will not be shared with any third parties without your consent, except as required by law or as necessary for the hiring process.
-                </p>
-                <p class="bold-text">3. Security:</p>
-                <p>
-                    a. We employ reasonable security measures to protect your Personal Information from unauthorized access, disclosure, alteration, or destruction.
-                </p>
-                <p>
-                    b. However, you acknowledge that no method of transmission over the internet or electronic storage is 100% secure and we cannot guarantee absolute security of your Personal Information.
-                </p>
-                <p class="bold-text">4. Retention of Personal Information:</p>
-                <p>
-                    a. We will retain your Personal Information only for as long as necessary for the purposes outlined in these Terms and in compliance with applicable laws and regulations.
-                </p>
-                <p>
-                    b. You may request the deletion or modification of your Personal Information by contacting us through the provided channels.
-                </p>
-                <p class="bold-text">5. Consent</p>
-                <p>
-                    a. By using this System and providing your Personal Information, you consent to the collection, use, and disclosure of your Personal Information as described in these Terms.
-                </p>
-                <p>
-                    b. You also consent to receiving communications from us regarding the hiring process, including but not limited to emails, notifications, and updates.
-                </p>
-                <p class="bold-text">6. Changes to Terms:</p>
-                <p>
-                    a. We reserve the right to modify these Terms at any time without prior notice.
-                </p>
-                <p>
-                    b. Your continued use of the System after any such changes indicates your acceptance of the modified Terms.
-                </p>
-                <p class="bold-text">7. Governing Law:</p>
-                <p>
-                    a. These Terms shall be governed by and construed in accordance with the laws of the Republic of the Philippines, without regard to its conflict of law provisions.
-                </p>
-                <p>
-                    b. Any dispute arising out of or relating to these Terms or the use of the System shall be exclusively resolved by the courts of the Republic of the Philippines.
-                </p>
-                <p class="bold-text">8. Contact Information:</p>
-                <p>If you have any questions or concerns about these Terms or the System, please contact us at +63-9471-798-884 or email us at bayanihire_cavite@gmail.com.</p>
-                <p>By using this System, you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions.</p>
-    
-                <!-- Checkbox inside Modal -->
-                <div class="modal-checkbox-container">
-                    <input type="checkbox" id="modal-terms" name="modal-terms" required>
-                    <label for="modal-terms">I have read and agree to the Terms and Conditions</label>
-                </div>
-            </div>
-        </div>
-        <!-- Close Button -->
-        <button class="close-btn" id="close-modal">&times;</button>
-    </div>
-    
 
     <footer class="text-center py-3">
         &copy; 2024 BayaniHire. All Rights Reserved.
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="{% static 'javascript/registration.js' %}"></script>
 </body>
 </html>
