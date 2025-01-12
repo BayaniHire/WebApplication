@@ -18,26 +18,31 @@
     <div class="user-profile-value">{{ email }}</div>
 </div>
 
-<h3 class="features-title password-title">Change Password</h3>
-<form method="post" action="{% url 'adminprofile' %}">
-    {% csrf_token %}
+<div class="password-section">
     <div class="text-placeholder">
-        <label>Current Password:</label>
-        <input type="password" class="input-profile" name="current_password" placeholder="Current Password">
+        <label>Password:</label>
+        <div><i>*HIDDEN*</i></div>
+    </div>
+    <button class="edit-password-button">Edit Password</button>
+</div>
+<div class="change-password-section" style="display: none;"> <!-- Initially hidden -->
+    <div class="features-title change-password-title" style="font-family: Georgia; font-size: 28px; color: rgb(53, 36, 13); font-weight: bold;">Change Password</div>
+    <div class="text-placeholder">
+        <label>Password:</label>
+        <input type="password" class="input-profile" placeholder="Current Password">
     </div>
     <div class="text-placeholder">
         <label>New Password:</label>
-        <input type="password" class="input-profile" name="new_password" placeholder="New Password">
+        <input type="password" class="input-profile" placeholder="New Password">
     </div>
     <div class="text-placeholder">
-        <label>Confirm New Password:</label>
-        <input type="password" class="input-profile" name="confirm_password" placeholder="Confirm Password">
+        <label>Confirm Password:</label>
+        <input type="password" class="input-profile" placeholder="Confirm Password">
     </div>
     <div class="change-password-buttons">
-        <button type="button" class="save-button">Save</button>
+        <button class="save-button">Save</button>
     </div>
-    <div id="errorMessage" class="error-message"></div>
-</form>
+</div>
 
 <h3 class="features-title manage-title">Manage Admin and Interviewer Accounts</h3>
 <div class="account-management-buttons">
@@ -53,31 +58,54 @@
 {% block script %}
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        // Toggle display of the change password section
+        const editPasswordButton = document.querySelector('.edit-password-button');
+        const passwordSection = document.querySelector('.password-section');
+        const changePasswordSection = document.querySelector('.change-password-section');
+
+        editPasswordButton.addEventListener('click', function () {
+            if (changePasswordSection.style.display === 'none' || changePasswordSection.style.display === '') {
+                passwordSection.style.display = 'none'; // Hide the password section
+                changePasswordSection.style.display = 'block'; // Show the change-password section
+            } else {
+                passwordSection.style.display = 'block'; // Show the password section
+                changePasswordSection.style.display = 'none'; // Hide the change-password section
+            }
+        });
+
+        // JavaScript code for updating the password
         const saveButton = document.querySelector('.save-button');
-        const currentPasswordInput = document.querySelector('input[placeholder="Enter Current Password"]');
-        const newPasswordInput = document.querySelector('input[placeholder="Enter New Password"]');
-        const confirmPasswordInput = document.querySelector('input[placeholder="Confirm New Password"]');
-        const errorMessage = document.getElementById("errorMessage");
+        const currentPasswordInput = document.querySelector('input[placeholder="Current Password"]');
+        const newPasswordInput = document.querySelector('input[placeholder="New Password"]');
+        const confirmPasswordInput = document.querySelector('input[placeholder="Confirm Password"]');
+        const errorMessage = document.createElement("div"); // Error message container
 
-        saveButton.addEventListener("click", function (event) {
-            event.preventDefault();
+        errorMessage.style.color = "red";
+        errorMessage.style.marginTop = "5px";
+        changePasswordSection.appendChild(errorMessage);
 
+        saveButton.addEventListener("click", function () {
             const currentPassword = currentPasswordInput.value;
             const newPassword = newPasswordInput.value;
             const confirmPassword = confirmPasswordInput.value;
 
+            // Check if password is at least 6 characters long
             if (newPassword.length < 6) {
                 errorMessage.textContent = "Your password is too short! You need 6+ characters.";
                 return;
             }
 
+            // Check if passwords match
             if (newPassword !== confirmPassword) {
                 errorMessage.textContent = "Passwords don’t match.";
                 return;
             }
 
+            // Clear error message if validation passes
             errorMessage.textContent = "";
 
+            // AJAX request to Django backend to update the password
+            const accountId = "{{ request.session.account_id }}";
             fetch("{% url 'update_password' %}", {
                 method: "POST",
                 headers: {
@@ -85,27 +113,37 @@
                     "X-CSRFToken": "{{ csrf_token }}",
                 },
                 body: JSON.stringify({
-                    account_id: "{{ request.session.account_id }}",
+                    account_id: accountId,
                     current_password: currentPassword,
                     new_password: newPassword,
                 }),
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert("Password updated successfully!");
-                    currentPasswordInput.value = "";
-                    newPasswordInput.value = "";
-                    confirmPasswordInput.value = "";
-                } else {
-                    errorMessage.textContent = data.error || "Failed to update password.";
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                errorMessage.textContent = "An error occurred. Please try again.";
-            });
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Server response:", data);
+                    if (data.success) {
+                        alert("Password updated successfully!");
+                        currentPasswordInput.value = "";
+                        newPasswordInput.value = "";
+                        confirmPasswordInput.value = "";
+                        passwordSection.style.display = 'block'; // Show password section
+                        changePasswordSection.style.display = 'none'; // Hide change-password section
+                    } else {
+                        errorMessage.textContent = data.error || "Failed to update password.";
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    errorMessage.textContent = "An error occurred. Please try again.";
+                });
         });
     });
+
+    // Function to sign out
+    function signOut() {
+        sessionStorage.clear();
+        localStorage.clear();
+        window.location.href = "{% url 'login' %}";
+    }
 </script>
 {% endblock %}
