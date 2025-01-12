@@ -3,6 +3,12 @@
 {% block title %}Application Status Page{% endblock %}
 
 {% block content %}
+<div id="custom-alert" class="alert-hidden">
+    <div class="alert-box alert-success">
+        <p id="alertText"></p>
+    </div>
+</div>
+
 <div class="main-content">
     <!-- Search and Sort Controls -->
     <div class="applicant-search-bar">
@@ -90,32 +96,58 @@
 
     function redirectToPage(page) {
         if (!selectedApplicantStatusId) {
-            alert('Please select an application first.');
+            showCustomAlert("Please select an application first.", "error");
             return;
         }
 
-        let url;
-        if (page === 'jobreq') {
-            if (!selectedJobId) {
-                alert('Invalid job selection.');
+        // Fetch the applicant's status dynamically (example simulation)
+        const applicantStatus = document.querySelector(".selected td:nth-child(4)").innerText.trim(); // Get the status from the table
+
+        if (page === "interviewdetails") {
+            if (["UNDER REVIEW", "FAILED TO MEET REQUIREMENTS", "REJECTED", "INCOMPLETE"].includes(applicantStatus)) {
+                // Show alert message if not qualified
+                showCustomAlert("No interview schedule yet. Please wait for further updates.", "error");
                 return;
             }
-            url = "{% url 'jobreq' 0 %}".replace('0', selectedJobId);
+        }
+
+        let url;
+        if (page === "jobreq") {
+            if (!selectedJobId) {
+                showCustomAlert("Invalid job selection.", "error");
+                return;
+            }
+            url = "{% url 'jobreq' 0 %}".replace("0", selectedJobId);
         } else {
             switch (page) {
-                case 'viewfileupload':
-                    url = "{% url 'viewfileupload' 0 %}".replace('0', selectedApplicantStatusId);
+                case "viewfileupload":
+                    url = "{% url 'viewfileupload' 0 %}".replace("0", selectedApplicantStatusId);
                     break;
-                case 'interviewdetails':
-                    url = "{% url 'interviewdetails' 0 %}".replace('0', selectedApplicantStatusId);
+                case "interviewdetails":
+                    url = "{% url 'interviewdetails' 0 %}".replace("0", selectedApplicantStatusId);
                     break;
                 default:
-                    alert('Invalid page selection');
+                    showCustomAlert("Invalid page selection.", "error");
                     return;
             }
         }
         window.location.href = url;
     }
+
+    function showCustomAlert(message, type = "success") {
+        const customAlert = document.getElementById("custom-alert");
+        const alertText = document.getElementById("alertText");
+
+        alertText.textContent = message; // Set the alert message
+        customAlert.className = `alert-box alert-${type}`; // Add appropriate type class (success, error, warning)
+        customAlert.style.display = "block"; // Show the alert
+
+        setTimeout(() => {
+            customAlert.style.display = "none"; // Hide the alert after 3 seconds
+        }, 3000); // Adjust the timing as needed
+    }
+
+
 
     function setRows() {
         const rowsInput = document.getElementById("rowsPerPage").value;
@@ -214,35 +246,62 @@
     }
 
 
+    document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.querySelector(".applicant-search-input");
+
+    // Add a keyup event listener to the search input for instant results
+    searchInput.addEventListener("keyup", searchFunction);
+});
+
     function searchFunction() {
         const searchValue = document.querySelector(".applicant-search-input").value.toLowerCase().trim(); // Get search input value
         const table = document.querySelector("tbody");
         const rows = table.querySelectorAll("tr");
+        let matchFound = false; // Track if any match is found
 
+        if (!searchValue) {
+            // If the search input is empty, display all rows and remove 'No results found' row
+            rows.forEach(row => {
+                row.style.display = ""; // Show all rows
+            });
+
+            // Remove "No results found" message if present
+            const noResultsRow = table.querySelector('tr td[colspan="6"]');
+            if (noResultsRow) {
+                noResultsRow.parentElement.remove();
+            }
+            return;
+        }
+
+        // Iterate over rows to check for matches in the "Job Applied" column (column index 0)
         rows.forEach(row => {
             // Skip rows without cells (e.g., "No applications found" row)
             if (!row.cells.length) return;
 
-            const jobTitle = row.cells[0]?.innerText.toLowerCase();
-            const jobCompany = row.cells[2]?.innerText.toLowerCase();
-            const applicationStatus = row.cells[3]?.innerText.toLowerCase();
+            const jobTitle = row.cells[0]?.innerText.toLowerCase(); // "Job Applied" column (index 0)
 
-            // Check if the search value matches any of the relevant columns
-            if (
-                jobTitle.includes(searchValue) ||
-                jobCompany.includes(searchValue) ||
-                applicationStatus.includes(searchValue)
-            ) {
-                row.style.display = ""; // Show matching row
+            // Check if the "Job Applied" column matches the search value
+            if (jobTitle.includes(searchValue)) {
+                row.style.display = ""; // Show matching rows
+                matchFound = true;
             } else {
-                row.style.display = "none"; // Hide non-matching row
+                row.style.display = "none"; // Hide non-matching rows
             }
         });
 
-        // Check if no rows match and display a "No results found" message
-        const visibleRows = Array.from(rows).filter(row => row.style.display !== "none");
-        if (visibleRows.length === 0) {
-            table.innerHTML = `<tr><td colspan="6" style="text-align: center;">No results found.</td></tr>`;
+        // Display "No results found" message if no matches are found
+        if (!matchFound) {
+            if (!table.querySelector('tr td[colspan="6"]')) {
+                const noResultsRow = document.createElement("tr");
+                noResultsRow.innerHTML = `<td colspan="6" style="text-align: center;">No results found.</td>`;
+                table.appendChild(noResultsRow);
+            }
+        } else {
+            // Remove "No results found" message if present
+            const noResultsRow = table.querySelector('tr td[colspan="6"]');
+            if (noResultsRow) {
+                noResultsRow.parentElement.remove();
+            }
         }
     }
 
