@@ -695,9 +695,11 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-bottom: 10px;
 }
 
 .verbutton-group .button:hover {
+    margin-bottom: 10px;
     background-color: rgba(59, 47, 32, 0.3);
     color: #FFD8AD;
 }
