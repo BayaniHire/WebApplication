@@ -3,30 +3,37 @@
 {% block title %}Feedback{% endblock %}
 
 {% block content %}
-<div class="main-content">
+<div class="main-content" style="padding: 0; margin: 0; text-align: center; display: flex; flex-direction: column; align-items: center;"></div>
+    <h2 style="font-size: 36px; font-weight: bold; text-align: center;">Feedback</h2>
+    <p style="font-size: 14px; font-weight: bold; text-align: center;">
+        The interviewer will provide the admin with his decision on whether the applicant passed or failed the interview.
+    </p>
     <form method="POST">
         {% csrf_token %}
-        <label style="font-family: Georgia; font-size: 36px; font-weight: bold; color: rgb(71, 48, 17);">Applicant Name:  </label><br><br>
-        <select name="applicant_id" class="AD-admin-sort-dropdown" required>
-            <option value="" selected disabled>Select Applicant</option>
-            {% for applicant in applicants %}
-            <option value="{{ applicant.applicant_status_id }}">{{ applicant.account.first_name }} {{ applicant.account.middle_name }} {{ applicant.account.last_name }}</option>
-            {% endfor %}
-        </select>
-        <br><br><br>
+        <div style="flex: 1; margin-right: 20px;"> <!-- Adjust flex-basis as needed -->
+            <div style="margin-bottom: 20px;">
+                <label style="font-family: Georgia; font-size: 24px; font-weight: bold; color: rgb(71, 48, 17);">Applicant Name:</label>
+                <div class="text-placeholder user-profile-item">
+                    <span class="user-profile-value">{{ applicant.first_name }} {{ applicant.middle_name }} {{ applicant.last_name }}</span>
+                </div>
+            </div>
 
-        <label style="font-family: Georgia; font-size: 36px; font-weight: bold; color: rgb(71, 48, 17);">Applicant Status:  </label><br><br>
-        <select name="status" class="AD-admin-sort-dropdown" required>
-            <option value="" disabled selected>Select Status</option>
-            <option>PASSED</option>
-            <option>FAILED</option>
-        </select>
-        <br><br><br><br>
+            <div style="margin-bottom: 20px;">
+                <label style="font-family: Georgia; font-size: 24px; font-weight: bold; color: rgb(71, 48, 17);">Applicant Status:</label>
+                <select name="status" class="AD-admin-sort-dropdown" required>
+                    <option value="" disabled selected>Select Status</option>
+                    <option>PASSED</option>
+                    <option>FAILED</option>
+                </select>
+            </div>
+        </div>
 
-        <label style="font-family: Georgia; font-size: 36px; font-weight: bold; color: rgb(71, 48, 17);">Interviewer Remarks:</label>
-        <textarea name="feedback" class="remarks-textarea" style="font-family: Georgia; font-size: 18px;"></textarea><br><br>
-        <button type="submit" class="sfbutton" style="font-family: Georgia; font-size: 18px;">Submit Feedback</button>
-        <br>
+        <!-- Right side: Feedback Form -->
+        <div style="flex: 1;"> <!-- Adjust flex-basis as needed -->
+            <label style="font-family: Georgia; font-size: 24px; font-weight: bold; color: rgb(71, 48, 17);">Interviewer Remarks:</label>
+            <textarea name="feedback" class="remarks-textarea" style="width: 100%; height: 200px; font-family: Georgia; font-size: 18px;"required></textarea>
+            <button type="submit" class="sfbutton" style="font-family: Georgia; font-size: 18px; margin-top: 20px;">Submit Feedback</button>
+        </div>
     </form>
 </div>
 {% endblock %}

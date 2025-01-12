@@ -3,41 +3,47 @@
 {% block title %}Applicant{% endblock %}
 
 {% block content %}
-    <div class="interviewer-main-content">
-        <div class="qualified-applicants">
-            <h2 style="color: rgb(71, 48, 17);">Qualified Applicants</h2>
-        </div>
-        <div class="interviewer-table-container">
-            <table class="interviewer-table">
-                <thead>
-                    <tr>
-                        <th>Applicant's Name</th>
-                        <th>Job Applied</th>
-                        <th>Date Applied</th>
-                        <th>Interview Date</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for applicant in applicants %}
-                    <tr>
-                        <td>{{ applicant.full_name }}</td>
-                        <td>{{ applicant.job_title }}</td>
-                        <td>{{ applicant.date_applied }}</td>
-                        <td>{{ applicant.interview_date }}</td>
-                        <td>{{ applicant.status }}</td>
-                        <td>
-                            {% if applicant.applicant_status_id %}
-                                <button class="bodybutton" onclick="location.href='{% url 'INTviewinfo' applicant.applicant_status_id %}'">View Details</button>
-                            {% else %}
-                                <span>No Action Available</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+<div class="main-content" style="padding: 0; margin: 0; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 0;"></div>
+    <h2 style="font-size: 36px; font-weight: bold; text-align: center;">Qualified Applicants</h2>
+    <p style="font-size: 14px; font-weight: bold; text-align: center;">
+        Welcome to Qualified Applicants, where interviewers will see the details of the applicant and their resume and provide feedback that can be sent to the system admin for final approval.
+    </p>     
+    <div class="interviewer-table-container">
+        <table class="interviewer-table">
+            <thead>
+                <tr>
+                    <th>Applicant's Name</th>
+                    <th>Job Applied</th>
+                    <th>Date Applied</th>
+                    <th>Interview Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for applicant in applicants %}
+                <tr>
+                    <td>{{ applicant.full_name }}</td>
+                    <td>{{ applicant.job_title }}</td>
+                    <td>{{ applicant.date_applied }}</td>
+                    <td>{{ applicant.interview_date }}</td>
+                    <td>{{ applicant.status }}</td>
+                    <td>
+                        {% if applicant.applicant_status_id %}
+                            <button class="bodybutton" onclick="location.href='{% url 'INTviewinfo' applicant.applicant_status_id %}'">View Details</button>
+                        {% else %}
+                            <span>No Action Available</span>
+                        {% endif %}
+                    </td>
+                    
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" style="font-family: Georgia; font-size: 18px; text-align: center;">No interview dates scheduled</td>
+                </tr>
+
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 {% endblock %}

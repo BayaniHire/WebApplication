@@ -3,28 +3,30 @@
 {% block title %}View Information{% endblock %}
 
 {% block content %}
-<div class="main-content interviewer-main-content">
-    <table class="interviewer-main-table">
-        <tr>
-            <td class="interviewer-valign-top"> <!-- Group 1 -->
-                <table class="interviewer-inner-table">
-                    <tr><td><strong>Name:</strong></td><td>{{ applicant.first_name }} {{ applicant.middle_name }} {{ applicant.last_name }}</td></tr>
-                    <tr><td><strong>Applied For:</strong></td><td>{{ job_details.job_title }}</td></tr>
-                    <tr><td><strong>Date Applied:</strong></td><td>{{ submission_date }}</td></tr>
-                    <tr><td><strong>Age:</strong></td><td>{{ applicant.age }}</td></tr>
-                    <tr><td><strong>Gender:</strong></td><td>{{ applicant.gender }}</td></tr>
-                    <tr>
-                        <td><strong>Current Address:</strong></td>
-                        <td>{{ applicant.house_no }}, {{ applicant.street_village }}, {{ applicant.barangay }}, {{ applicant.city_municipality }}, {{ applicant.province }}, {{ applicant.state }} ({{ applicant.zipcode }})</td>
-                    </tr>
-                    <tr><td><strong>Mobile Number:</strong></td><td>{{ applicant.mobile_number }}</td></tr>
-                    <tr><td><strong>Email:</strong></td><td>{{ applicant.email }}</td></tr>
-                    <tr><td><strong>Username:</strong></td><td>{{ applicant.username }}</td></tr>
-                </table>
+
+<div class="container-fluid">
+    <div class="main-content" style="padding: 0; margin: 0; text-align: center; display: flex; flex-direction: column; align-items: center;"></div>
+    
+        <h2 style="font-size: 36px; font-weight: bold; text-align: center;">Evaluation Applicant's File Upload</h2>
+        
+        
+        <div class="row">
+            <div class="col-md-6">
+                <table style="width: 100%; border-collapse: collapse;" class="table-no-border">
+                    <tr><td><span class="bold-label">Name:</span></td><td>{{ applicant.first_name }} {{ applicant.middle_name }} {{ applicant.last_name }}</td></tr>
+                    <tr><td><span class="bold-label">Applied For:</span></td><td>{{ job_details.job_title }}</td></tr>
+                    <tr><td><span class="bold-label">Date Applied:</span></td><td>{{ submission_date }}</td></tr>
+                    <tr><td><span class="bold-label">Age:</span></td><td>{{ applicant.age }}</td></tr>
+                    <tr><td><span class="bold-label">Gender:</span></td><td>{{ applicant.gender }}</td></tr>
+                    <tr><td><span class="bold-label">Current Address:</span></td><td>{{ applicant.house_no }}, {{ applicant.street_village }}, {{ applicant.barangay }}, {{ applicant.city_municipality }}, {{ applicant.province }}, {{ applicant.state }} ({{ applicant.zipcode }})</td></tr>
+                    <tr><td><span class="bold-label">Mobile Number:</span></td><td>{{ applicant.mobile_number }}</td></tr>
+                    <tr><td><span class="bold-label">Email:</span></td><td>{{ applicant.email }}</td></tr>
+                    <tr><td><span class="bold-label">Username:</span></td><td>{{ applicant.username }}</td></tr>
+                </table><br>
                 
-                <!-- File Upload Section -->
+                <!-- File Upload List with Displayed Metadata -->
                 <label><strong>File Upload</strong></label>
-                <ul id="file-list">
+                <ul id="admin_filelist">
                     {% if uploaded_files %}
                         {% for file in uploaded_files %}
                             <li onclick="selectFile('{{ file.data }}', '{{ file.metadata }}')">{{ file.metadata }}</li>
@@ -33,92 +35,115 @@
                         <li>No files uploaded.</li>
                     {% endif %}
                 </ul>
-                
-                <!-- Buttons for Viewing, Downloading, and Printing -->
-                <div class="interviewer-file-buttons">
-                    <button id="view-button" class="interviewer-button" onclick="viewFile()" disabled>View File</button>
-                    <button id="download-button" class="interviewer-button" onclick="downloadFile()">Download</button>
-                    <button id="print-button" class="interviewer-button" onclick="printFile()">Print</button>
-                </div>
-            </td>
-            <td class="interviewer-valign-top"> <!-- Group 2 -->
-                <table class="interviewer-inner-table">
-                    <tr><td><strong>Job Title:</strong></td><td>{{ job_details.job_title }}</td></tr>
-                    <tr><td><strong>Company:</strong></td><td>{{ job_details.job_company }}</td></tr>
+                <br>
+                <!-- View File Button (displays selected file) -->
+                <button id="view-button" class="sfbutton" onclick="viewFile()" disabled>View File</button>
+            </div>
+
+            <div class="col-md-6">
+
+                <table style="width: 100%; border-collapse: collapse;" class="table-no-border">
+                    <tr>
+                        <td style="width: 20%;"><span class="bold-label">Job Title:</span></td>
+                        <td>{{ job_details.job_title }}</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 20%;"><span class="bold-label">Company:</span></td>
+                        <td>{{ job_details.job_company }}</td>
+                    </tr>
+                    <!-- Add additional rows as needed -->
                 </table>
-                <textarea readonly class="interviewer-textarea" placeholder="Job Requirements">{{ job_details.job_requirements }}</textarea>
-                <label><strong>Status:</strong> {{ applicant_status }}</label>
-            </td>
-        </tr>
-    </table>
+                
+                <strong><span class="bold-label" style="font-size: 14px; padding: 10px; margin-right: 10px;">Job Description:</span></strong>
+                <textarea readonly class="form-control" style="height: 260px;">{{ job_details.job_requirements }}</textarea>
+                <br>
 
-    <!-- File Name Container -->
-    <div id="file-container" class="file-container">
-        <h3>Selected File</h3>
-        <p>No file selected yet.</p>
-    </div>
+                <label><strong>Status:</strong> {{ interviewer_feedback_status|default:"No Feedback Yet" }}</label><br>
+                <button class = "sfbutton" onclick="window.location.href='{% url 'INTfeedback' applicant_status_id %}'">Provide Feedback</button>
 
-    <!-- File Preview Section -->
-    <div id="file-preview" class="file-preview">
-        <h3>File Preview</h3>
-        <p>Select a file from the list and click "View File" to preview it here.</p>
+
+            </div>
+        </div>
+
+        <!-- File Name Container for Selected File -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="container bg-light border p-3">
+                    <h3>Selected File</h3>
+                    <div class="file-container" id="file-container">
+                        <p>No file selected yet.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- File Preview Container -->
+        <div class="row mt-4" id="file-preview-container" style="display: none;">
+            <div class="col-12">
+                <div class="container bg-light border p-3">
+                    <h3>File Preview</h3>
+                    <div class="file-preview" id="file-preview">
+                        <p>Select a file from the list and click "View File" to see the preview here.</p>
+                    </div>
+                    <!-- Download and Print Buttons -->
+                    <div class="mt-3">
+                        <button id="download-button" class="sfbutton" onclick="downloadFile()">Download</button>
+                        <button id="print-button" class="sfbutton" onclick="printFile()">Print</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
 
 {% block script %}
 <script>
-    let selectedFileData = '';  // Store base64-encoded file data
-    let selectedFileName = ''; // Store file name
+    let selectedFileData = '';  // Store the file preview data (base64 encoded)
+    let selectedFileName = ''; // Store the selected file name
 
     // Function to handle file selection
     function selectFile(data, fileName) {
-        if (!data || !fileName) {
-            alert("Invalid file selection.");
-            return;
-        }
-        selectedFileData = data;  // Store the selected file's base64 data
-        selectedFileName = fileName;  // Store the file's name
-
-        // Update the selected file container
-        const fileContainer = document.getElementById('file-container');
-        fileContainer.innerHTML = `<h3>Selected File</h3><p><strong>${fileName}</strong></p>`;
-
-        // Enable the View File button
-        document.getElementById('view-button').disabled = false;
+        selectedFileData = data;  // Store the selected file data (base64)
+        selectedFileName = fileName;  // Store the selected file name
+        document.getElementById('file-container').innerHTML = `<strong>Selected File:</strong> ${fileName}`;
+        
+        // Enable the "View File" button
+        const viewButton = document.getElementById('view-button');
+        viewButton.disabled = false;
     }
 
-    // Function to display the selected file inline
+    // Function to display the selected file's preview
     function viewFile() {
-        if (!selectedFileData || !selectedFileName) {
-            alert("Please select a file to view.");
+        const previewElement = document.getElementById('file-preview');
+        if (!selectedFileData) {
+            alert("Please select a file first.");
             return;
         }
-
-        const filePreview = document.getElementById('file-preview');
-        filePreview.innerHTML = '<h3>File Preview</h3>';  // Clear previous content
-
-        if (selectedFileName.toLowerCase().endsWith('.pdf')) {
-            filePreview.innerHTML += `
-                <embed src="data:application/pdf;base64,${selectedFileData}" type="application/pdf" width="100%" height="600px">
-            `;
-        } else if (
-            selectedFileName.toLowerCase().endsWith('.jpg') ||
-            selectedFileName.toLowerCase().endsWith('.jpeg') ||
-            selectedFileName.toLowerCase().endsWith('.png')
-        ) {
-            filePreview.innerHTML += `
-                <img src="data:image/jpeg;base64,${selectedFileData}" style="width:100%; height:auto;" alt="File Preview">
-            `;
+        previewElement.innerHTML = '';  // Clear previous content
+        // Add the logic to handle different file types and show preview accordingly
+        if (selectedFileName.toLowerCase().endsWith('.jpg') || selectedFileName.toLowerCase().endsWith('.jpeg') || selectedFileName.toLowerCase().endsWith('.png')) {
+            const img = document.createElement('img');
+            img.src = `data:image/jpeg;base64,${selectedFileData}`;
+            img.alt = 'File Preview';
+            img.style.maxWidth = '100%';
+            img.style.height = 'auto';
+            previewElement.appendChild(img);
+        } else if (selectedFileName.toLowerCase().endsWith('.pdf')) {
+            const embed = document.createElement('embed');
+            embed.src = `data:application/pdf;base64,${selectedFileData}`;
+            embed.type = 'application/pdf';
+            embed.style.width = '100%';
+            embed.style.height = '600px';
+            previewElement.appendChild(embed);
         } else {
-            filePreview.innerHTML += '<p>Unsupported file type for preview.</p>';
+            previewElement.innerHTML = '<p>Unsupported file type for preview.</p>';
         }
     }
-
     // Function to download the selected file
     function downloadFile() {
         if (!selectedFileData || !selectedFileName) {
-            alert("Please select a file to download.");
+            alert('Please select a file first.');
             return;
         }
 
@@ -128,34 +153,79 @@
         link.click();
     }
 
-    // Function to print the selected file
+    // Function to print the file preview
     function printFile() {
-        if (!selectedFileData || !selectedFileName) {
-            alert("Please select a file to print.");
+        if (!selectedFileData) {
+            alert('Please select a file to preview first.');
             return;
         }
 
         const printWindow = window.open('', '', 'height=600,width=800');
-        printWindow.document.write('<html><body><h1>File Preview</h1>');
+        printWindow.document.write('<html><body>');
+        printWindow.document.write('<h1>File Preview</h1>');
 
-        if (
-            selectedFileName.toLowerCase().endsWith('.jpg') ||
-            selectedFileName.toLowerCase().endsWith('.jpeg') ||
-            selectedFileName.toLowerCase().endsWith('.png')
-        ) {
-            printWindow.document.write(
-                `<img src="data:image/jpeg;base64,${selectedFileData}" style="width:100%; height:auto;">`
-            );
+        if (selectedFileName.toLowerCase().endsWith('.jpg') || selectedFileName.toLowerCase().endsWith('.jpeg') || selectedFileName.toLowerCase().endsWith('.png')) {
+            const img = document.createElement('img');
+            img.src = `data:image/jpeg;base64,${selectedFileData}`;
+            img.style.maxWidth = '100%';
+            img.style.height = 'auto';
+            printWindow.document.body.appendChild(img);
         } else if (selectedFileName.toLowerCase().endsWith('.pdf')) {
-            printWindow.document.write(
-                `<embed src="data:application/pdf;base64,${selectedFileData}" type="application/pdf" width="100%" height="600px">`
-            );
+            const embed = document.createElement('embed');
+            embed.src = `data:application/pdf;base64,${selectedFileData}`;
+            embed.type = 'application/pdf';
+            embed.style.width = '100%';
+            embed.style.height = '600px';
+            printWindow.document.body.appendChild(embed);
         } else {
             printWindow.document.write('<p>Unsupported file type for printing.</p>');
         }
+
         printWindow.document.write('</body></html>');
         printWindow.document.close();
         printWindow.print();
     }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const listItems = document.querySelectorAll('#admin_filelist li');
+        const filePreviewContainer = document.getElementById('file-preview-container'); // Entire File Preview Container
+        const fileDisplayContainer = document.getElementById('file-container'); // Container for showing selected file info
+        const viewButton = document.getElementById('view-button'); // View button that triggers file preview
+
+        // Initially hide the entire file preview container
+        filePreviewContainer.style.display = 'none';
+
+        listItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // Toggle 'active' class on the clicked item
+                if (this.classList.contains('active')) {
+                    // If already active, remove the class and hide file preview
+                    this.classList.remove('active');
+                    fileDisplayContainer.innerHTML = "<strong>Selected File:</strong> No file selected yet.";
+                    filePreviewContainer.style.display = 'none'; // Hide the entire file preview container
+                    viewButton.disabled = true; // Disable the view button
+                } else {
+                    // Remove 'active' class from all items first
+                    listItems.forEach(innerItem => {
+                        innerItem.classList.remove('active');
+                    });
+                    // Add 'active' class to the clicked item
+                    this.classList.add('active');
+                    fileDisplayContainer.innerHTML = `<strong>Selected File:</strong> ${this.textContent}`;
+                    viewButton.disabled = false; // Enable the view button
+                }
+            });
+        });
+
+        // Handle the view button click to show or hide the preview dynamically
+        viewButton.addEventListener('click', function() {
+            if (selectedFileData) {
+                filePreviewContainer.style.display = 'block'; // Show the entire file preview container
+                viewFile(); // Function to populate the preview based on selected file
+            } else {
+                filePreviewContainer.style.display = 'none'; // Ensure container is hidden if no file data
+            }
+        });
+    });
 </script>
 {% endblock %}

@@ -3,7 +3,12 @@
 {% block title %}Edit Feedback{% endblock %}
 
 {% block content %}
-<div class="main-content">
+<div class="main-content" style="padding: 0; margin: 0; text-align: center; display: flex; flex-direction: column; align-items: center;"></div>
+    <h2 style="font-size: 36px; font-weight: bold; text-align: center;">Edit Feedback</h2>
+    <p style="font-size: 14px; font-weight: bold; text-align: center;">
+        The interviewer may now edit their feedback for the applicant.
+    </p>
+
     <form method="POST">
         {% csrf_token %}
         

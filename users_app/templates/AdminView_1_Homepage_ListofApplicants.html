@@ -35,8 +35,10 @@
             <option value="INCOMPLETE" {% if request.GET.status == 'INCOMPLETE' %}selected{% endif %}>Incomplete</option>
             <option value="REJECTED" {% if request.GET.status == 'REJECTED' %}selected{% endif %}>Rejected</option>
             <option value="QUALIFIED" {% if request.GET.status == 'QUALIFIED' %}selected{% endif %}>Qualified</option>
+            <option value="PENDING FINAL APPROVAL" {% if request.GET.status == 'PENDING FINAL APPROVAL' %}selected{% endif %}>Pending Final Approval</option>
             <option value="PASSED" {% if request.GET.status == 'PASSED' %}selected{% endif %}>Passed</option>
             <option value="FAILED" {% if request.GET.status == 'FAILED' %}selected{% endif %}>Failed</option>
+            
         </select>
         
         <input style="margin-right: 5px;" type="text" name="search" value="{{ search_query }}" class="applicant-search-input" placeholder="Search by name..." style="width: 55%;">

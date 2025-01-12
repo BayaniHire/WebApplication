@@ -11,6 +11,9 @@
 
     <!-- Your custom CSS -->
     <link rel="stylesheet" href="{% static 'applicant_styles.css' %}">
+    <link rel="stylesheet" href="{% static 'admin_styles.css' %}">
+
+    <!-- Custom Alert CSS -->
 </head>
 <body>
 <div class="background">
@@ -18,22 +21,28 @@
         <h1 class="center-text">BayaniHire: Interviewer Center</h1>
         <div class="profile-button" onclick="window.location.href='{% url 'INTprofile' %}';">Profile</div>
     </div>
-
-    <div class="content-area">
+    <div class="content-area d-flex">
         <div class="sidebar">
             <div class="image-placeholder">
                 <img src="{% static 'Logo.png' %}" alt="BayaniHire Logo">
             </div>
             <button class="sidebutton" onclick="window.location.href='{% url 'INTappointments' %}'">Appointments</button>
             <button class="sidebutton" onclick="window.location.href='{% url 'INTapplicants' %}'">Applicants</button>
-            <button class="sidebutton" onclick="window.location.href='{% url 'INTfeedback' %}'">Feedback</button>
             <button class="sidebutton" onclick="window.location.href='{% url 'INThistory' %}'">Feedback History</button>
         </div>
 
         <div class="main-content flex-grow-1">  <!-- Added Bootstrap flex-grow utility -->
-            {% block content %}
-            <!-- Content will be defined in inheriting templates -->
-            {% endblock %}
+        {% block content %}
+        <!-- Content will be defined in inheriting templates -->
+        
+        
+        {% endblock %}
+        </div>
+
+        <div id="admincustomalert" class="alert-hidden">
+            <div class="alert-box" id="alertContent">
+                <p></p>
+            </div>
         </div>
     </div>
 
@@ -45,6 +54,88 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+
+    console.log('Notification script loaded');
+
+    // THIS IS FOR THE DAMN MESSAGE ALERT
+    function removeQueryParameters() {
+        history.replaceState({}, document.title, location.pathname);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const adminCustomAlert = document.getElementById('admincustomalert');
+        const alertContent = adminCustomAlert.querySelector('#alertContent p');
+
+        // Check if there are any messages passed from Django
+        {% if messages %}
+        {% for message in messages %}
+        adminCustomAlert.classList.remove('alert-hidden'); // Show the alert
+        alertContent.textContent = "{{ message }}"; // Set the message text
+
+        // Automatically hide the alert after 5 seconds
+        setTimeout(() => {
+            adminCustomAlert.classList.add('alert-hidden');
+        }, 5000);
+        {% endfor %}
+        {% endif %}
+    });
+    
+
+</script>
+
+<!-- css -->
+<style>
+    #no-match {
+        text-align: center; /* Centers the text horizontally */
+        width: 100%; /* Ensures the paragraph takes full width of its container */
+        margin-top: 20px; /* Adds space above the message, adjust as needed */
+        font-size: 16px; /* Sets the font size, adjust as needed */
+        color: #666; /* Sets the text color, adjust as needed */
+        display: none; /* Initially hidden */
+    }
+
+    .table-no-border td, .table-no-border th {
+        border: none; /* Removes table borders */
+    }
+
+    .bold-label {
+        font-weight: bold; /* Makes text bold */
+    }
+
+    #admin_filelist {
+        list-style-type: none; /* Removes bullet points from the list */
+        padding: 0;
+        margin: 0;
+        border: 0; /* Light grey border */
+        width: 100%; /* Full width */
+        max-width: 600px; /* Optional: Set a max width for the list */
+    }
+
+    #admin_filelist li {
+        padding: 10px;
+        border-bottom: 1px solid #ddd; /* Light grey line between items */
+        cursor: pointer; /* Changes cursor to pointer to indicate clickable */
+        transition: background-color 0.3s; /* Smooth transition for hover effect */
+        background-color: transparent; /* No background by default */
+    }
+
+    #admin_filelist li:hover {
+        background-color: #361f02; /* Golden background color */
+        color: #D3B18B; /* Dark brown text color */
+    }
+
+    #admin_filelist li.active {
+        background-color: #361f02; /* Green background for selected items */
+        color: #D3B18B; /* Dark brown text color */
+    }
+
+    #admin_filelist li:last-child {
+        border-bottom: none; /* Removes bottom border from the last item */
+    }
+    
+</style>
 
 {% block script %}{% endblock %}
 
