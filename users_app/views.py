@@ -856,6 +856,11 @@ def open_applicants(request, applicant_status_id):
             # Redirect back to the stored previous page with an error message
             previous_page = request.session.get('previous_page')
             return redirect(f"{previous_page}&message=This applicant has already been interviewed and cannot be updated further.&type=error")
+        if applicant.applicant_status in ["QUALIFIED", "PENDING FINAL APPROVAL"]:
+            # Redirect back to the stored previous page with an error message
+            previous_page = request.session.get('previous_page')
+            return redirect(f"{previous_page}&message=This applicant is currently undergoing the interview process and cannot be updated at this time.&type=error")
+
 
         new_status = request.POST.get('new_status')
         applicant.applicant_status = new_status
