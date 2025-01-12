@@ -49,8 +49,13 @@
                 
                 <!-- Map Section -->
                 <p>Interview Location</p>
+
                 <div id="map-container">
                     <input type="text" id="search-location" placeholder="Search for a location" class="AD-input-full-width">
+                    <strong>Note:</strong> Enter the location name or address and press "Enter" to search. 
+                        Please ensure the location details are accurate before confirming. Some specific or less commonly known locations may not be searchable due to limitations in the map database. 
+                        In such cases, try using broader or nearby landmarks to find the desired location.
+                    </p>
                     <div id="admin-map" class="AD-map-container"></div>
                 </div>
                 
@@ -152,11 +157,24 @@
         });
 
         // Confirm location button functionality
+        // Confirm location button functionality
         confirmButton.addEventListener('click', function () {
             isLocationConfirmed = true;
             confirmedLocation.readOnly = true;
+            marker.dragging.disable();
+            map.dragging.disable();
+            map.scrollWheelZoom.disable();
+            map.doubleClickZoom.disable();
+            map.touchZoom.disable();
+            map.boxZoom.disable();
+            map.keyboard.disable();
+
+            // Add a CSS class to disable pointer events on the map container
+            document.getElementById('admin-map').classList.add('map-locked');
+
             alert("Location confirmed! The map is now locked.");
         });
+
 
         // Edit location button functionality
         editButton.addEventListener('click', function () {
