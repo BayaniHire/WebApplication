@@ -684,42 +684,82 @@ def generate_system_pdf(request):
     if not account_id:
         return HttpResponse("You must be logged in to generate a PDF.", status=403)
 
-    # Fetch the user's account information
+    # Fetch the admin's account information
     admin = get_object_or_404(AccountInformation, account_id=account_id)
 
-    # Fetch relevant data for the system report
-    applicants = ListOfApplicantsWithStatusAndCredentials.objects.select_related('job', 'account').all()
+    # Collect data about users, jobs, and applicants
+    users = AccountInformation.objects.all()
     jobs = JobDetailsAndRequirements.objects.all()
-    accounts = AccountInformation.objects.all()
+    applicants = ListOfApplicantsWithStatusAndCredentials.objects.select_related('job', 'account').all()
+    account_storages = AccountStorage.objects.select_related('account').all()
+ 
+    # Calculate user types and job statuses
+    total_applicants = account_storages.filter(role='applicant').count()
+    total_admins = account_storages.filter(role='admin').count()
+    total_interviewers = account_storages.filter(role='interviewer').count()
+    verified_users = users.filter(verified=True).count()
+    unverified_users = users.filter(verified=False).count()
+    active_accounts = account_storages.filter(account_status='active').count()
+    deactivated_accounts = account_storages.filter(account_status='deactivated').count()
+    new_accounts = account_storages.filter(account_status='new').count()
 
+    # Job status counts
+    jobs_active = jobs.filter(job_status='ACTIVE').count()
+    jobs_closed = jobs.filter(job_status='CLOSED').count()
+
+    # Applicant statuses
+    applicants_under_review = ListOfApplicantsWithStatusAndCredentials.objects.filter(applicant_status='UNDER REVIEW').count()
+    applicants_for_interview = ListOfApplicantsWithStatusAndCredentials.objects.filter(applicant_status='FOR INTERVIEW').count()
+    applicants_failed_to_meet_requirements = ListOfApplicantsWithStatusAndCredentials.objects.filter(applicant_status='FAILED TO MEET REQUIREMENTS').count()
+    applicants_incomplete = ListOfApplicantsWithStatusAndCredentials.objects.filter(applicant_status='INCOMPLETE').count()
+    applicants_rejected = ListOfApplicantsWithStatusAndCredentials.objects.filter(applicant_status='REJECTED').count()
+    applicants_qualified = ListOfApplicantsWithStatusAndCredentials.objects.filter(applicant_status='QUALIFIED').count()
+    applicants_passed = ListOfApplicantsWithStatusAndCredentials.objects.filter(applicant_status='PASSED').count()
+    applicants_failed = ListOfApplicantsWithStatusAndCredentials.objects.filter(applicant_status='FAILED').count()
+    applicants_pending_final_approval = ListOfApplicantsWithStatusAndCredentials.objects.filter(applicant_status='PENDING FINAL APPROVAL').count()
+    
     # Prepare data for the template
     context = {
-        'admin_name': f"{admin.first_name} {admin.last_name}".strip(),
-        'applicants': applicants,
+        'date_generated': timezone.now().date(),
+        'requested_by': f"{admin.first_name} {admin.middle_name} {admin.last_name} - {admin.username}",
+        'total_users': users.count(),
+        'total_applicants': total_applicants,
+        'total_admins': total_admins,
+        'total_interviewers': total_interviewers,
+        'verified_users': verified_users,
+        'unverified_users': unverified_users,
+        'active_accounts': active_accounts,
+        'deactivated_accounts': deactivated_accounts,
+        'new_accounts': new_accounts,
         'jobs': jobs,
-        'accounts': accounts,
-        'total_applicants': applicants.count(),
         'total_jobs': jobs.count(),
-        'total_accounts': accounts.count(),
+        'jobs_active': jobs_active,
+        'jobs_closed': jobs_closed,
+        'applicants': applicants,
+        'applicants_under_review': applicants_under_review,
+        'applicants_for_interview': applicants_for_interview,
+        'applicants_failed_to_meet_requirements': applicants_failed_to_meet_requirements,
+        'applicants_incomplete': applicants_incomplete,
+        'applicants_rejected': applicants_rejected,
+        'applicants_qualified': applicants_qualified,
+        'applicants_passed': applicants_passed,
+        'applicants_failed': applicants_failed,
+        'applicants_pending_final_approval': applicants_pending_final_approval,
     }
 
-    # Render the template to HTML
+    # Render the HTML template to a string
     html = render_to_string('ADMIN_GENERATEPDF.html', context)
 
-    # Create a PDF
+    # Create a PDF response
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="System_Report.pdf"'
-    pisa_status = pisa.CreatePDF(html, dest=response)
 
-    # Check for PDF generation errors
+    # Generate PDF
+    pisa_status = pisa.CreatePDF(html, dest=response)
     if pisa_status.err:
         return HttpResponse("There was an error generating the PDF.", status=500)
 
     return response
-
-
-    
-
 
 
 
