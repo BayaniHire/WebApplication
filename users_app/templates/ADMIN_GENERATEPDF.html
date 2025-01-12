@@ -62,37 +62,48 @@
 <body>
     <h1>BayaniHire Overall Report of the System</h1>
     <div class="info">
-        <p>Date Generated: {{ date_generated }}</p>
-        <p>Requested By: {{ requested_by }}</p>
-        <p>Email: automatedbayanihire@gmail.com</p>
+        <p><strong>Date Generated:</strong> {{ date_generated }}</p>
+        <p><strong>Requested By:</strong> {{ requested_by }}</p>
+        <p><strong>System Email: </strong>automatedbayanihire@gmail.com</p>
     </div>
-    <p>Introduction: Welcome to BayaniHire – where talent meets opportunity. Whether you're a job seeker or an employer, our system is here to streamline the process for you.</p>
 
-    <h2>Table of Contents</h2>
+    <br>
+    <p>This document serves as the official report on the overall assessment of our system, which is accessible solely by the system administrator. As the system administrator, it is imperative that you do not disseminate this information to unauthorized individuals.
+        Our platform is designed to optimize the job-seeking and recruitment processes. It provides a seamless, user-friendly interface for job seekers and robust management tools for employers, facilitating an efficient search and application experience for candidates, and effective posting and candidate evaluation capabilities for recruiters. The system supports various functionalities within the hiring process, ensuring smooth administration, applicant engagement, and thorough candidate assessments.
+    </p>
+
+    <br>
+    <h2 style="font-size: 24px; font-weight: bold;">Table of Contents</h2>
     <ol>
         <li>Users</li>
         <li>Jobs</li>
-        <li>Applicant Status</li>
+        <li>Applicant Summary Report</li>
     </ol>
 
-    <h2>USERS</h2>
+    <br>
+    <h2 style="font-size: 24px; font-weight: bold;">USERS</h2>
+    <p>The summary of all the users that registered in the bayanihire web appication</p>
+    <br>
     <div class="summary">
-        <p>Total Count of All Users: {{ total_users }}</p>
-        <p>Total Count of Applicants: {{ applicants|length }}</p>
-        <p>Total Count of Admins: {{ total_admins }}</p>
-        <p>Total Count of Interviewers: {{ total_interviewers }}</p>
-        <p>Total Count of Unverified Users: {{ unverified_users }}</p>
-        <p>Total Count of Verified Users: {{ verified_users }}</p>
-        <p>Total Count of Active Accounts: {{ active_accounts }}</p>
-        <p>Total Count of Deactivated Accounts: {{ deactivated_accounts }}</p>
-        <p>Total Count of New Accounts: {{ new_accounts }}</p>
+        <p><strong>Total Count of All Users: </strong>{{ total_users }}</p>
+        <p><strong>Total Count of Applicants: </strong>{{ applicants|length }}</p>
+        <p><strong>Total Count of Admins: </strong>{{ total_admins }}</p>
+        <p><strong>Total Count of Interviewers: </strong>{{ total_interviewers }}</p>
+        <p><strong>Total Count of Unverified Users: </strong>{{ unverified_users }}</p>
+        <p><strong>Total Count of Verified Users: </strong>{{ verified_users }}</p>
+        <p><strong>Total Count of Active Accounts: </strong>{{ active_accounts }}</p>
+        <p><strong>Total Count of Deactivated Accounts: </strong>{{ deactivated_accounts }}</p>
+        <p><strong>Total Count of New Accounts: </strong>{{ new_accounts }}</p>
     </div>
+    <br>
 
-    <h2>JOBS</h2>
+    <h2 style="font-size: 24px; font-weight: bold;">JOBS</h2>
+    <p>The summary of all jobs posted within this system is documented herein.</p>
+    <br>
     <div class="summary">
-        <p>Total Count of Jobs: {{ total_jobs }}</p>
-        <p>Total Count of Active Jobs: {{ jobs_active }}</p>
-        <p>Total Count of Closed Jobs: {{ jobs_closed }}</p>
+        <p><strong>Total Count of Jobs: </strong>{{ total_jobs }}</p>
+        <p><strong>Total Count of Active Jobs: </strong>{{ jobs_active }}</p>
+        <p><strong>Total Count of Closed Jobs: </strong>{{ jobs_closed }}</p>
     </div>
     <table class="table">
         <thead>
@@ -116,18 +127,21 @@
             {% endfor %}
         </tbody>
     </table>
+    <br>
 
-    <h2>Applicant Status along the system</h2>
+    <h2 style="font-size: 24px; font-weight: bold;">Applicant Summary Report</h2>
+    <p>The summary of all applicants who applied through the BayaniHire system is documented herein.</p>
+    <br>
     <div class="summary">
-        <p>Total Count of Applicants Status: Under Review: {{ applicants_under_review }}</p>
-        <p>Total Count of Applicants Status: For Interview: {{ applicants_for_interview }}</p>
-        <p>Total Count of Applicants Status: Failed to Meet Requirements: {{ applicants_failed_to_meet_requirements }}</p>
-        <p>Total Count of Applicants Status: Incomplete: {{ applicants_incomplete }}</p>
-        <p>Total Count of Applicants Status: Rejected: {{ applicants_rejected }}</p>
-        <p>Total Count of Applicants Status: Qualified: {{ applicants_qualified }}</p>
-        <p>Total Count of Applicants Status: Passed: {{ applicants_passed }}</p>
-        <p>Total Count of Applicants Status: Failed: {{ applicants_failed }}</p>
-        <p>Total Count of Applicants Status: Pending Final Approval: {{ applicants_pending_final_approval }}</p>
+        <p><strong>Total Count of Applicants Status: Under Review: </strong>{{ applicants_under_review }}</p>
+        <p><strong>Total Count of Applicants Status: For Interview: </strong>{{ applicants_for_interview }}</p>
+        <p><strong>Total Count of Applicants Status: Failed to Meet Requirements: </strong>{{ applicants_failed_to_meet_requirements }}</p>
+        <p><strong>Total Count of Applicants Status: Incomplete: </strong>{{ applicants_incomplete }}</p>
+        <p><strong>Total Count of Applicants Status: Rejected: </strong>{{ applicants_rejected }}</p>
+        <p><strong>Total Count of Applicants Status: Qualified: </strong>{{ applicants_qualified }}</p>
+        <p><strong>Total Count of Applicants Status: Passed: </strong>{{ applicants_passed }}</p>
+        <p><strong>Total Count of Applicants Status: Failed: </strong>{{ applicants_failed }}</p>
+        <p><strong>Total Count of Applicants Status: Pending Final Approval: </strong>{{ applicants_pending_final_approval }}</p>
     </div>
     <table class="table">
         <thead>
@@ -153,12 +167,17 @@
             {% endfor %}
         </tbody>
     </table>
+    <br>
+
+    <div class="signature-section">
+        <p><strong>BayaniHire Inc.</strong></p>
+        <p><strong>Technical Support Team:</strong> Trysha Rhoy Benitez, Wein Jazfer C Marito, John Michael A. Quiambao, Irish Mae R Rodriguez</p>
+        <p><strong>Course Subject:</strong> Web App Programming (Laboratory) - (CPET12L)</p>
+        <p><strong>Date Published:</strong> January 12, 2025</p>
+    </div>
 
     <div class="footer">
-        <p>Instructor Name: Sir Heyyy</p>
-        <p>Group Members: 1. SIYA, 2. AKO, 3. IKAW YIE</p>
-        <p>Course Subject: coding dying</p>
-        <p>Short_Message: "We would like for your merciful on us oh dear please and add some quotes in British, make this in British accent"</p>
+        BayaniHire © 2024. All rights reserved.
     </div>
 </body>
 </html>
