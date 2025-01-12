@@ -11,12 +11,17 @@
 
 
 <div class="main-content">
+    <h2 style="font-size: 36px; font-weight: bold; text-align: center;">File Upload</h2>
     <form id="upload-form" action="{% url 'fileupload' job_id=job_id %}" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         
         <div class="upload-info">
-            Please select files to upload. Supported file types include PDF documents and images (JPEG, PNG).
+            Please select file to upload. Supported file types include PDF documents and images (JPEG, PNG).
         </div>
+        <p style="font-size: 14px; color: #666;">
+            <strong>Important:</strong> You can only upload <strong>one file</strong> at a time. 
+            Ensure that the file follows the supported formats (PDF, JPEG, PNG) and does not exceed 64MB in size.
+        </p>
         
         <div class="upload-container">
             <div class="small-container" id="file-list">
@@ -181,6 +186,8 @@
     // Handle apply button click
     applyButton.addEventListener('click', async (event) => {
         event.preventDefault(); // Prevent default form submission
+
+        applyButton.disabled = true;
 
         const fileNames = Array.from(fileList.getElementsByClassName('file-name'));
         if (fileNames.length === 0) {
