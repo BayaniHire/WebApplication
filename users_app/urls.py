@@ -21,7 +21,7 @@ urlpatterns = [
     path('applicants/', views.interviewer_applicants, name='INTapplicants'),
     path('viewinfo/<int:applicant_status_id>/', views.interviewer_viewinfo, name='INTviewinfo'),
     path('editfeedback/<int:applicant_status_id>/', views.interviewer_editfeedback, name='INTeditfeedback'),
-    path('feedback/', views.interviewer_feedback, name='INTfeedback'),
+    path('feedback/<int:applicant_status_id>/', views.interviewer_feedback, name='INTfeedback'),
     path('history/', views.interviewer_history, name='INThistory'),
     ##########INTERVIEWER###########################
 ##########################APPLICANT###############################################
