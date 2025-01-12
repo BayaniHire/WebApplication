@@ -1688,7 +1688,7 @@ def add_accounts(request):
             # Success message and redirect
             previous_page = request.session.get('previous_page', '/list_of_applicants/')
             messages.success(request, f"Account created successfully with username: {username}")
-            return redirect(f"{previous_page}&message=Account created successfully&type=success")
+            return redirect(f"{previous_page}&message=Please Check your Email Address for verification&type=success")
 
         except Exception as e:
             # Handle errors and log them if needed
